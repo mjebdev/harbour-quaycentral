@@ -25,6 +25,7 @@ Licensed under GNU GPLv3.
 - Timeout only applies to the app's interaction with the CLI, i.e. swiping back a page, going to Settings, or scrolling down a list, etc. will not reset the lockout timer.
 - Leaving the app open on an item details page that includes a TOTP (one-time password) will mean the lockout timer never times out, as it will keep resetting every 30 seconds a new code is generated.
 - No support for multiple accounts or for groups. No plans for this, as app is designed for individual use.
+- Items are not listed alphabetically, so search method is, for now, necessary as opposed to scrolling through list.
 - Option to select a default vault and possibly more vault management, similar to the official app, is on hold until I have a Sailfish Secrets implementation to provide the secure storage that may be required for data such as a default vault UUID.
 - Clipboard icon on item details page may be somewhat misaligned if the system font size is enlarged in system's Display Settings. Will edit code to work around this somehow, prefer the medium clipboard icon to the small one, there is no small-plus icon size for the clipboard icon available as of now.
 - Lock icon on cover may appear somewhat smaller than other standard cover icons. No lock icon available under the Cover category so went with the small icon for now.
