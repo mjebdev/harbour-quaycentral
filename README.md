@@ -44,7 +44,7 @@ User is responsible once a password is copied to the clipboard. May add optional
 
 Overall the app is able to avoid any privacy or security issues due to the CLI obviously handling all of that kind of processing and encryption.
 
-With regards to removing the login access for CentralQuay, user will need to get back into Terminal and may possibly need to remove the CLI from authorized devices on their 1Password profile page also. Looking to add a button in Settings that does this (signs out and forgets the "centquaysfos" shorthand, thereby removing any access without a need for user to open Terminal) but there are still issues with the CLI preventing it from functioning properly as of version 1.8.0. Info on how to sign out, as well as using the 'forget' flag and command, are here:<br>
+With regards to removing the login access for CentralQuay, user will need to get back into Terminal and may also need to remove the CLI from authorized devices on their 1Password profile page. Looking to add a button in Settings that does this (signs out and forgets the "centquaysfos" shorthand, thereby removing any access without a need for user to open Terminal) but there are still issues with the CLI preventing it from functioning properly as of version 1.8.0. Info on how to sign out, as well as using the 'forget' flag and command, are here:<br>
     https://support.1password.com/command-line-reference/#signout <br>
     https://support.1password.com/command-line-reference/#forget
 
