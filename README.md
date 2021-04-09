@@ -14,7 +14,6 @@ Licensed under GNU GPLv3.
 <h3>Requirements</h3>
 
 - Installation of the 1Password command-line tool in /usr/local/bin or another directory in your $PATH. (The app has not been tested with the tool in a location other than /usr/local/bin).
-
 - Adding the shorthand <centquaysfos> as a method of signing in to the CLI. Further rationale for this under Privacy & Security. The shorthand is device-specific. Even if user has already signed in for the first time, a new shorthand may be added by signing in again with domain, email and secret key. More info on adding the shorthand is available at:<br>
     https://support.1password.com/command-line-reference/#options-for-signin &<br>
     https://1password.community/discussion/comment/561753/#Comment_561753
@@ -35,21 +34,23 @@ Licensed under GNU GPLv3.
     https://1password.community/discussion/119973/can-not-signout-account
 - No icon yet.
 
-<h3>User Privacy & Security</h3>
+<h3>Privacy & Security</h3>
 
 By assigning the shorthand <centquaysfos>, app is able to avoid requiring any secrets to be stored. User also has control over what accounts that shorthand is associated with, incase they'd like to use the CLI for separate accounts and not use a GUI for all, or to continue using the CLI after revoking CentralQuay login access, etc. While the default domain value <my> is now the only option available to new users, it was the case previously that personalized domains could be chosen, hence the classification of this information as secret.
 
 Master password entered by user is cleared immediately following its passing to the CLI and is never stored.
 
-User is responsible once a password is copied to the clipboard. Intend to add optional timer (similar to official apps) so that user can designate a time after which clipboard is cleared following a password or username being copied. It will require a variable string in RAM to cross reference clipboard contents (and avoid deleting unrelated data that user may have put on clipboad in the meantime), after which both clipboard and variable string will be cleared.
+User is responsible once a password is copied to the clipboard. Intend to add optional timer (similar to official apps) so that user can designate a time after which clipboard is cleared following a password or username being copied. It will require a variable string in RAM to cross reference clipboard contents (and avoid deleting unrelated data that user may have put on clipboad in the meantime), after which both clipboard and variable string will be erased.
 
-<h3>Miscellaneous</h3>
+With regards to removing the login access for CentralQuay, user will need to get back into Terminal and may possibly need to remove the CLI from authorized devices on their 1Password profile page also. Looking to add a button in Settings that does this (signs out and forgets the CentralQuay shorthand, thereby removing any access without a need for user to open Terminal) but there are still issues with the CLI preventing it from functioning properly as of version 1.8.0. Info on signing out and using the 'forget' flag, as well as the 'forget' command, are here:
+    https://support.1password.com/command-line-reference/#signout
+    https://support.1password.com/command-line-reference/#forget
+
+<h3>Contact</h3>
 
 If you would like to send feedback regarding the app, please email mjbarrett@eml.cc
 
-Source code is available at: https://github.com/michaeljohnbarrett/harbour-centralquay
-
-If you would like to support my work in developing native Sailfish OS apps (this would inch my status closer to full-time developer), you may do that here -- https://www.buymeacoffee.com/michaeljb <br>
+If you would like to support my work in developing native Sailfish OS apps (this would bring my status closer to full-time developer), you may do that here -- https://www.buymeacoffee.com/michaeljb <br>
 <br>
 	Thanks,<br>
-		Michael Barrett
+		Michael B.
