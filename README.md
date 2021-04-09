@@ -30,7 +30,7 @@ Licensed under GNU GPLv3.
 - Lock icon on cover may appear somewhat smaller than other standard cover icons. No lock icon available under the Cover category so went with the small icon for now.
 - No app icon yet.
 - No setup screen to allow user to enter necessary credentials to signin with the app for the first time and avoid having to add the shorthand manually in Terminal. May add this later, clearing all fields as soon as data is passed to the CLI as is done with the master password. With the pre-determined centquaysfos shorthand, there's currently no need for the storage of any secrets, i.e. user's own domain/shorthand.
-- - Need to look at consolidating some of the processes to reduce the overall number, a change that may improve performance by reducing resources used by the app, and it is possible that there don't need to be as many.
+- Need to look at consolidating some of the processes to reduce the overall number, a change that may improve performance by reducing resources used by the app, and it is possible that there don't need to be as many.
 - Button on Settings page meant to signout and forget the CentralQuay shorthand does not function and may require that the user first removes the CLI on that device from their list of authorized devices on their profile page at my.1password.com, followed by a device restart and then would have to get back into Terminal to complete with the 'forget' command. This removes the justification for the button being in Settings in the app, since user would have to re-verify the app to get to it. Will re-check functionality in future CLI versions as this would be a cleaner and more preferrable way to allow the user to remove login access to their Vaults from CentralQuay for any given reason, easily and quickly. This issue has been discussed on the 1Password Community support pages and can be read about here:<br>
     https://1password.community/discussion/119973/can-not-signout-account
 
@@ -44,8 +44,8 @@ User is responsible once a password is copied to the clipboard. May add optional
 
 Overall the app is able to avoid any privacy or security issues due to the CLI obviously handling all of that kind of processing and encryption.
 
-With regards to removing the login access for CentralQuay, user will need to get back into Terminal and may possibly need to remove the CLI from authorized devices on their 1Password profile page also. Looking to add a button in Settings that does this (signs out and forgets the "centquaysfos" shorthand, thereby removing any access without a need for user to open Terminal) but there are still issues with the CLI preventing it from functioning properly as of version 1.8.0. Info on how to sign out, as well as using the 'forget' flag and command, are here:
-    https://support.1password.com/command-line-reference/#signout
+With regards to removing the login access for CentralQuay, user will need to get back into Terminal and may possibly need to remove the CLI from authorized devices on their 1Password profile page also. Looking to add a button in Settings that does this (signs out and forgets the "centquaysfos" shorthand, thereby removing any access without a need for user to open Terminal) but there are still issues with the CLI preventing it from functioning properly as of version 1.8.0. Info on how to sign out, as well as using the 'forget' flag and command, are here:<br>
+    https://support.1password.com/command-line-reference/#signout <br>
     https://support.1password.com/command-line-reference/#forget
 
 <h3>Contact</h3>
