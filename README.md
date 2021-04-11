@@ -40,14 +40,14 @@ Licensed under GNU GPLv3.
 - By assigning the shorthand "quaycentsfos", app is able to avoid requiring any secrets to be stored. User also has control over what accounts that that shorthand is associated with, incase they'd like to use the CLI for separate accounts and not use a GUI for all, or to continue using the CLI after revoking QuayCentral signin access, etc. While the default domain value "my" is now the only option available to new users (AFAIK), it was the case previously that personalized domains could be chosen, hence the classification of this information as secret.
 - Master password entered by user is cleared immediately following its passing to the CLI and is never stored. Item usernames and passwords are only ever in RAM, are cleared when the vault(s) are locked, and are only copied to the clipboard if user so chooses.
 - May add optional timer (similar to official apps) so that user can designate a time after which clipboard is cleared following a password or username being copied. It will require a string variable in RAM to cross reference clipboard contents (and avoid deleting unrelated data that user may have put on clipboad in the meantime), after which both clipboard and string variable will be erased.
-- Overall the app is able to avoid any privacy or security issues due to the CLI naturally handling all of that processing and encryption.
-- When removing the login access for QuayCentral, user will need to get back into Terminal and may also need to remove the CLI from authorized devices on their 1Password profile page. Looking to add a button in Settings that does this (signs out and forgets the "quaycentsfos" shorthand, thereby removing any access without a need for user to open Terminal) but there appear to be issues with the CLI preventing it from functioning properly as of version 1.8.0. Info on how to sign out directly in Terminal, as well as using the 'forget' flag and command, are here:<br>
+- Overall the app is able to avoid privacy or security issues due to the CLI naturally handling all of that processing and encryption.
+- When removing the login access for QuayCentral, user will need to get back into Terminal but may also need to remove the CLI from authorized devices on their 1Password profile page. Looking to add a button in Settings that does this (signs out and forgets the "quaycentsfos" shorthand, thereby removing any access without a need for user to open Terminal) but there appear to be issues with the CLI preventing it from functioning properly as of version 1.8.0. Info on how to sign out directly in Terminal, as well as using the 'forget' flag and command, are here:<br>
     https://support.1password.com/command-line-reference/#signout <br>
     https://support.1password.com/command-line-reference/#forget
 
 <h3>Contact</h3>
 
-If you would like to send feedback regarding the app, please email mjbarrett@eml.cc
+If you would like to send feedback regarding the app, please email mjbarrett@eml.cc with the subject "QuayCentral Feedback".
 
 If you would like to support my work in developing native Sailfish OS apps (this would bring my status closer to full-time developer), you're welcome to here! -- https://www.buymeacoffee.com/michaeljb <br>
 <br>
