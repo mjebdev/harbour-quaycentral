@@ -8,7 +8,7 @@ Licensed under GNU GPLv3.
 <h3>Requirements</h3>
 
 - Installation of the 1Password command-line tool in /usr/local/bin or another directory in your $PATH. (The app has not been tested with the tool in a location other than /usr/local/bin).
-- Addition of the shorthand "quaycentsfos" to your device's CLI. The shorthand is device-specific. Even if user has already signed in for the first time, a new shorthand may be added by signing in again with domain, email and secret key, along with "--shorthand quaycentsfos". More info on adding the shorthand is available at:<br>
+- Addition of the shorthand "quaycentsfos" to your device's CLI. The shorthand is device-specific. More info on adding the shorthand is available at:<br>
     https://support.1password.com/command-line-reference/#options-for-signin &<br>
     https://1password.community/discussion/comment/561753/#Comment_561753
 
