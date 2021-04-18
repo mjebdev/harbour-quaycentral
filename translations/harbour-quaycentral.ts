@@ -4,6 +4,26 @@
 <context>
     <name>ItemDetails</name>
     <message>
+        <source>Copy Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy One-Time Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>One-Time Password Copied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Error loading one-time password. Please check network connection and try accessing page again.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -20,31 +40,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Copied</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>one-time password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>One-Time Password Copied</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>website</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copy Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copy One-Time Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lock</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -55,7 +55,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source> copied.</source>
+        <source>Search items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 copied.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -66,10 +70,6 @@
         <source>Error - Password not copied.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Search items</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>Settings</name>
@@ -78,15 +78,71 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>About</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>QuayCentral</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Item Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>loads top item details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>copies top item password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tapping item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>loads details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>copies password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press and hold for item details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press and hold to copy password.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login Session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock when CLI is inactive for</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>30 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2 minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>5 minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>15 minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>30 minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -101,11 +157,32 @@
         <source>Support my work</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Notify when session expires</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A GUI app for the 1Password command-line tool on Sailfish OS.
+
+By Michael J. Barrett
+
+Version 0.1
+Licensed under GNU GPLv3
+
+QuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.
+
+Version %1 of the 1Password command-line tool is installed on your device.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SignIn</name>
     <message>
         <source>Enter Master Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unlocking...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -117,24 +194,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown error:
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Vault listing complete.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Listing vault items...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error occurred when gathering Vault data.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unlocking...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -144,9 +208,17 @@ Please confirm that 1Password CLI has been installed in /usr/local/bin and relau
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>1Password command-line tool has not been configured.
+        <source>QuayCentral shorthand has not been added to 1Password command-line tool.
 
 Please setup tool to accept QuayCentral requests and relaunch app.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error occurred when gathering Vault data.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -164,6 +236,17 @@ Please confirm that 1Password CLI has been installed in /usr/local/bin and relau
     </message>
     <message>
         <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>harbour-quaycentral</name>
+    <message>
+        <source>Locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
