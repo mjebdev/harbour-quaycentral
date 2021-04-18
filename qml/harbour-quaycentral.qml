@@ -19,12 +19,12 @@ ApplicationWindow {
 
         // Below option in Settings to be enabled when there is a Sailfish-Secrets implementation
         // in the app, with which the default vault UUID can be stored securely.
+        // property string defaultVaultUUID: ""
         property bool skipVaultScreen: false
         property bool tapToCopy
         property bool enterKeyLoadsDetails
         property bool sessionExpiryNotify
-        property string defaultVaultUUID: ""
-        property int sessionTimeLength: 1790000
+        property int sessionTimeLength: 900000
         property int sessionTimeIndex: 4
 
     }
@@ -122,14 +122,14 @@ ApplicationWindow {
 
             if (expiredSession && settings.sessionExpiryNotify) notifySessionExpired.publish();
 
-            return "Locked";
+            return qsTr("Locked");
 
         }
 
         else {
 
             Clipboard.text = errorReadout;
-            return "Error";
+            return qsTr("Error");
 
         }
 
@@ -140,14 +140,14 @@ ApplicationWindow {
         id: notifySessionExpired
         isTransient: true
         urgency: Notification.Low
-        previewSummary: "QuayCentral session has expired."
+        expireTimeout: 800
+        previewSummary: qsTr("QuayCentral Locked")
 
     }
 
     Process {
 
         id: signOutProcess
-
         onReadyReadStandardError: errorReadout = readAllStandardError();
 
     }
