@@ -249,5 +249,9 @@ Please confirm that 1Password CLI has been installed in /usr/local/bin and relau
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>QuayCentral Locked</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
