@@ -6,13 +6,15 @@ Page {
 
     id: page
     allowedOrientations: Orientation.PortraitMask
-    property bool skippingVaultScreen: false
+    property bool skippingVaultScreen
+    property bool initialSetup
+    property string deviceID
 
     onStatusChanged: {
 
         if (status === PageStatus.Active) {
 
-            if (appPastLaunch) {
+            if (appPastLaunch) { // this is a swipe back, vault(s) will be locked.
 
                 signOutProcess.start("op", ["signout"]);
                 itemDetailsModel.setProperty(0, "username", "000000000000000000000000000000000000000000000000000000000000000000000000");
@@ -32,9 +34,9 @@ Page {
 
             else { // this is the first view of signin screen following app launch
 
-                installationCheck.start("op", ["--version"]); // confirming CLI is installed upon each launch, otherwise
-                appPastLaunch = true;                         // password field will not appear.
-                versionCheckTimer.start();
+                installationCheck.start("op", ["--version"]);   // confirming CLI is installed upon each launch, otherwise
+                versionCheckTimer.start();                      // password field will not appear.
+                appPastLaunch = true;
 
             }
 
@@ -119,23 +121,6 @@ Page {
 
             Row {
 
-                id: errorSeparator
-                visible: false
-                spacing: 0
-
-                Separator {
-
-                    color: Theme.errorColor
-                    width: statusLabel.width
-                    horizontalAlignment: Qt.AlignHCenter
-                    x: (page.width - statusLabel.width) / 2
-
-                }
-
-            }
-
-            Row {
-
                 id: signinRow
                 width: parent.width * 0.7
                 height: passwordField.height
@@ -152,7 +137,7 @@ Page {
                     placeholderText: qsTr("Enter Master Password")
                     showEchoModeToggle: false
                     opacity: Theme.highlightBackgroundOpacity
-                    passwordMaskDelay: 0  // don't want character to be visible at all
+                    passwordMaskDelay: 0  // need zero visibility for master password
 
                     Behavior on opacity {
 
@@ -162,7 +147,7 @@ Page {
 
                     onTextChanged: {
 
-                        if (text === "") {
+                        if (text === "" || text === "0000000000000000000000000000000000000000000000000000000000000000") {
 
                             loginButton.opacity = 0.0;
                             loginButton.enabled = false;
@@ -173,6 +158,7 @@ Page {
                         else {
 
                             statusLabel.text = "";
+                            statusLabel.color = Theme.primaryColor; // back to default color
                             loginButton.enabled = true;
                             loginButton.opacity = 1.0;
                             EnterKey.enabled = true;
@@ -183,7 +169,9 @@ Page {
 
                     EnterKey.onClicked: {
 
+                        errorReadout = "";
                         processOne.start("op", ["signin", "quaycentsfos", "--raw"]);
+                        statusLabel.text = qsTr("Unlocking...");
                         processOne.write(passwordField.text + "\n");
                         passwordField.focus = false;
                         passwordField.opacity = 0.0;
@@ -192,7 +180,6 @@ Page {
                         loginButton.enabled = false;
                         passwordField.text = "0000000000000000000000000000000000000000000000000000000000000000";
                         passwordField.text = "";
-                        statusLabel.text = qsTr("Unlocking...");
                         loggingInBusy.running = true;
 
                     }
@@ -227,7 +214,9 @@ Page {
 
                         onClicked: {
 
+                            errorReadout = "";
                             processOne.start("op", ["signin", "quaycentsfos", "--raw"]);
+                            statusLabel.text = qsTr("Unlocking...");
                             processOne.write(passwordField.text + "\n");
                             passwordField.focus = false;
                             passwordField.opacity = 0.0;
@@ -236,7 +225,6 @@ Page {
                             loginButton.enabled = false;
                             passwordField.text = "0000000000000000000000000000000000000000000000000000000000000000";
                             passwordField.text = "";
-                            statusLabel.text = qsTr("Unlocking...");
                             loggingInBusy.running = true;
 
                         }
@@ -267,12 +255,13 @@ Page {
 
         onReadyReadStandardError: {
 
+            errorReadout = readAllStandardError();
             versionCheckTimer.stop();
-            titleLabel.color = "grey"
-            appVersionLabel.color = "grey"
-            statusLabel.text = qsTr("Unable to communicate with CLI.\n\nPlease confirm that 1Password CLI has been installed in /usr/local/bin and relaunch QuayCentral.")
+            titleLabel.color = "grey";
+            appVersionLabel.color = "grey";
+            statusLabel.color = Theme.errorColor;
+            statusLabel.text = qsTr("Unable to communicate with CLI.\n\nPlease confirm that 1Password CLI has been installed in /usr/local/bin and relaunch QuayCentral.");
             statusRow.height = statusLabel.paintedHeight;
-            errorSeparator.visible = true;
 
         }
 
@@ -326,6 +315,7 @@ Page {
             if (errorReadout.indexOf("Unauthorized") !== -1) {
 
                 loggingInBusy.running = false;
+                statusLabel.color = Theme.errorColor;
                 statusLabel.text = qsTr("Incorrect Password");
                 passwordField.visible = true;
                 passwordField.opacity = 1.0;
@@ -335,22 +325,22 @@ Page {
             else if (errorReadout.indexOf("Account not found") !== -1) {
 
                 loggingInBusy.running = false;
-                statusLabel.text = qsTr("1Password command-line tool has not been configured.\n\nPlease setup tool to accept QuayCentral requests and relaunch app.");
+                statusLabel.color = Theme.errorColor;
+                statusLabel.text = qsTr("QuayCentral shorthand has not been added to 1Password command-line tool.\n\nPlease setup tool to accept QuayCentral requests and relaunch app.");
                 titleLabel.color = "grey"
                 appVersionLabel.color = "grey"
                 statusRow.height = statusLabel.height;
-                errorSeparator.visible = true;
 
             }
 
             else {
 
                 loggingInBusy.running = false;
-                statusLabel.text = qsTr("Unknown error:\n") + errorReadout;
+                statusLabel.color = Theme.errorColor;
+                statusLabel.text = qsTr("Error: ") + errorReadout.slice(28);
                 titleLabel.color = "grey"
                 appVersionLabel.color = "grey"
                 statusRow.height = statusLabel.height;
-                errorSeparator.visible = true;
 
             }
 
@@ -405,6 +395,7 @@ Page {
         onReadyReadStandardError: {
 
             sessionExpiryTimer.stop();
+            statusLabel.color = Theme.errorColor;
             statusLabel.text = qsTr("Error occurred when gathering Vault data.");
 
         }
@@ -429,9 +420,9 @@ Page {
 
             titleLabel.color = "grey"
             appVersionLabel.color = "grey"
+            statusLabel.color = Theme.errorColor;
             statusLabel.text = qsTr("No response from CLI.\n\nPlease confirm that 1Password CLI has been installed in /usr/local/bin and relaunch QuayCentral.")
             statusRow.height = statusLabel.height;
-            errorSeparator.visible = true;
 
         }
 
