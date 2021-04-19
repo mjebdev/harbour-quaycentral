@@ -217,7 +217,7 @@ Page {
             else { // Just the password to be copied to clipboard.
 
                 Clipboard.text = readAllStandardOutput();
-                passwordCopied.previewSummary = itemCopied + qsTr(" copied.");
+                passwordCopied.previewSummary = qsTr("%1 copied.").arg(itemCopied);
                 passwordCopied.publish();
 
             }
