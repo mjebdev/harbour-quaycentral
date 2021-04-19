@@ -106,7 +106,7 @@ Page {
 
         onReadyReadStandardError: {
 
-            sessionExpiryTimer.restart();
+            sessionExpiryTimer.stop();
             errorReadout = readAllStandardError();
 
             if (errorReadout.indexOf("not currently signed in") !== -1) {
