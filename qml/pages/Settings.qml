@@ -8,7 +8,7 @@ Page {
     allowedOrientations: Orientation.PortraitMask
     property bool signOutError: false
 
-    /*  to be enabled when there is a Sailfish-Secrets implementation on the app, which will in turn allow
+    /*  to be enabled in some form when there is a Sailfish-Secrets implementation on the app, which will in turn allow
         the secure storage of the default vault UUID.
     Component.onCompleted: {
 
@@ -51,7 +51,7 @@ Page {
 
             ComboBox {
 
-                label: "Enter key"
+                label: qsTr("Enter key")
                 id: enterKeyCombo
                 width: parent.width
                 currentIndex: settings.enterKeyLoadsDetails ? 0 : 1
@@ -60,7 +60,7 @@ Page {
 
                     MenuItem {
 
-                        text: "loads top item details"
+                        text: qsTr("loads top item details")
 
                         onClicked: {
 
@@ -73,7 +73,7 @@ Page {
 
                     MenuItem {
 
-                        text: "copies top item password"
+                        text: qsTr("copies top item password")
 
                         onClicked: {
 
@@ -90,7 +90,7 @@ Page {
 
             ComboBox {
 
-                label: "Tapping item"
+                label: qsTr("Tapping item")
                 id: tappingCombo
                 width: parent.width
                 currentIndex: settings.tapToCopy ? 1 : 0
@@ -99,7 +99,7 @@ Page {
 
                     MenuItem {
 
-                        text: "loads details"
+                        text: qsTr("loads details")
 
                         onClicked: {
 
@@ -112,7 +112,7 @@ Page {
 
                     MenuItem {
 
-                        text: "copies password"
+                        text: qsTr("copies password")
 
                         onClicked: {
 
@@ -132,14 +132,14 @@ Page {
                 id: pressAndHoldInfoLabel
                 font.pixelSize: Theme.fontSizeExtraSmall
                 width: parent.width
-                text: tappingCombo.currentIndex === 1 ? "Press and hold for item details." : "Press and hold to copy password."
+                text: tappingCombo.currentIndex === 1 ? qsTr("Press and hold for item details.") : qsTr("Press and hold to copy password.")
                 wrapMode: Text.Wrap
                 leftPadding: sessionExpiryNotifySwitch.leftMargin
                 //topPadding: 0
 
             }
 
-            /*  to be enabled when there is a Sailfish-Secrets implementation on the app, which will in turn allow
+            /*  to be enabled in some form when there is a Sailfish-Secrets implementation on the app, which will in turn allow
                 the secure storage of the default vault UUID.
 
             ComboBox {
@@ -176,13 +176,13 @@ Page {
 
             SectionHeader {
 
-                text: "Login Session"
+                text: qsTr("Login Session")
 
             }
 
             ComboBox {
 
-                label: "Lock when CLI is inactive for"
+                label: qsTr("Lock when CLI is inactive for")
                 id: sessionLengthCombo
                 currentIndex: settings.sessionTimeIndex
 
@@ -190,7 +190,7 @@ Page {
 
                     MenuItem {
 
-                        text: "30 seconds"
+                        text: qsTr("30 seconds")
 
                         onClicked: {
 
@@ -205,7 +205,7 @@ Page {
 
                     MenuItem {
 
-                        text: "2 minutes"
+                        text: qsTr("2 minutes")
 
                         onClicked: {
 
@@ -220,7 +220,7 @@ Page {
 
                     MenuItem {
 
-                        text: "5 minutes"
+                        text: qsTr("5 minutes")
 
                         onClicked: {
 
@@ -235,7 +235,7 @@ Page {
 
                     MenuItem {
 
-                        text: "15 minutes"
+                        text: qsTr("15 minutes")
 
                         onClicked: {
 
@@ -250,7 +250,7 @@ Page {
 
                     MenuItem {
 
-                        text: "30 minutes"
+                        text: qsTr("30 minutes")
 
                         onClicked: {
 
@@ -267,7 +267,7 @@ Page {
 
             }
 
-            // To be enabled when there is a Sailfish-Secrets implementation in the app, with which the default vault UUID can be stored securely.
+            // To be enabled in some form when there is a Sailfish-Secrets implementation in the app, with which the default vault UUID can be stored securely.
             /*
             TextSwitch {
 
@@ -288,7 +288,7 @@ Page {
 
             TextSwitch {
 
-                text: "Notify when session expires"
+                text: qsTr("Notify when session expires")
                 id: sessionExpiryNotifySwitch
                 checked: settings.sessionExpiryNotify
 
@@ -330,107 +330,6 @@ Page {
             }
             */
 
-            /*          -- there's seems to be an existing CLI issue with signing out and removing an account (or shorthand).
-                        will check back with new versions and enable this as soon as it's functioning properly.
-
-                        More info regarding issue: https://1password.community/discussion/119973/can-not-signout-account
-
-                        Until issue is fixed, user would have to get into Terminal to complete signout and removal of 'quaycentsfos'
-                        anyway (following removal of CLI on device online and restarting device), so section below useless until
-                        later versions of CLI.
-
-                        Will add instructions for removal in Readme.
-
-            Row {
-
-                width: parent.width
-                spacing: Theme.paddingLarge
-
-                Label {
-
-                    id: signoutQCLabel
-                    width: parent.width
-                    text: "Forget QuayCentral on this device's CLI:"
-                    wrapMode: Text.Wrap
-                    leftPadding: sessionExpiryNotifySwitch.leftMargin
-                    rightPadding: leftPadding
-                    bottomPadding: Theme.paddingMedium
-                    verticalAlignment: Text.AlignVCenter
-
-                }
-
-            }
-
-            Row {
-
-                width: parent.width
-                height: signoutQcButton.height //+ (Theme.paddingLarge * 2)
-                spacing: Theme.paddingMedium
-                x: (parent.width - signoutQcButton.width) / 2
-
-                Button {
-
-                    id: signoutQcButton
-                    text: "Signout QuayCentral"
-                    y: Theme.paddingLarge
-
-
-                    onClicked: {
-
-                        if (text === "Signout QuayCentral") {
-
-                            errorReadout = ""; // avoid picking up an error from a past process
-                            signOutProcess.start("op", ["signout", "--account", "quaycentsfos", "--forget"]);
-                            signOutProcess.waitForFinished();
-
-                            if (signOutProcess.exitStatus() === 0) {
-
-                                signOutProcess.start("op", ["forget", "quaycentsfos"]);
-                                signOutProcess.waitForFinished();
-
-                                if (signOutProcess.exitStatus() !== 0 || errorReadout.indexOf("trying to forget") !== -1) {
-
-                                    signoutQCLabel.color = Theme.errorColor;
-                                    signoutQCLabel.text = "There was an error signing out. Please deauthorize this device's CLI at https://my.1password.com, then try again.";
-                                    text = "More Info";
-
-                                }
-
-                                else {
-
-                                    pageStack.clear();
-                                    pageStack.push(Qt.resolvedUrl("SignIn.qml"));
-
-                                }
-
-                            }
-
-                            else {
-
-                                signoutQCLabel.color = Theme.errorColor;
-                                signoutQCLabel.text = "There was an error signing out. Please deauthorize this device's CLI at https://my.1password.com, then try again.";
-                                text = "More Info";
-
-                            }
-
-                        }
-
-                        else {
-
-                            text = "Signout QuayCentral";
-                            signoutQCLabel.color = Theme.primaryColor;
-                            signoutQCLabel.text = "Forget QuayCentral on this device's CLI:";
-                            Qt.openUrlExternally("https://1password.community/discussion/119973/can-not-signout-account");
-
-                        }
-
-                    }
-
-                }
-
-            }
-            */
-
             SectionHeader {
 
                 text: qsTr("About")
@@ -455,7 +354,7 @@ Page {
 
                         Label {
 
-                            text: qsTr("QuayCentral")
+                            text: "QuayCentral"
                             width: text.width
                             height: text.height
                             horizontalAlignment: Qt.AlignHCenter
@@ -494,7 +393,7 @@ Page {
                             font.pixelSize: Theme.fontSizeExtraSmall
                             font.styleName: Theme.primaryColor
                             wrapMode: Text.Wrap
-                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nBy Michael J. Barrett\n\nVersion 0.1\nLicensed under GNU GPLv3\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion " + cliVersion + " of the 1Password command-line tool is installed on your device.")
+                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nBy Michael J. Barrett\n\nVersion 0.1\nLicensed under GNU GPLv3\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
                             bottomPadding: Theme.paddingLarge
 
                         }
@@ -580,8 +479,6 @@ Page {
 
                     }
 
-
-
                     Row {
 
                         width: viewSourceCodeLabel.paintedWidth
@@ -592,7 +489,6 @@ Page {
                         Label {
 
                             topPadding: Theme.paddingLarge
-                            //width: parent.width
                             id: viewSourceCodeLabel
                             font.pixelSize: Theme.fontSizeExtraSmall
                             font.styleName: Theme.primaryColor
@@ -615,7 +511,7 @@ Page {
                         Image {
 
                             id: linkToGitHub
-                            source: Theme.primaryColor == "#000000" ? "GitHub_Logo.png" : "GitHub_Logo_White.png"
+                            source: Theme.colorScheme == Theme.DarkOnLight ? "GitHub_Logo.png" : "GitHub_Logo_White.png"
                             fillMode: Image.PreserveAspectFit
                             height: parent.height
 
@@ -662,7 +558,7 @@ Page {
                         Image {
 
                             id: linkToBMAC
-                            source: Theme.primaryColor == "#000000" ? "BMClogowithwordmark-black.png" : "BMClogowithwordmark-white.png"
+                            source: Theme.colorScheme == Theme.DarkOnLight ? "BMClogowithwordmark-black.png" : "BMClogowithwordmark-white.png"
                             fillMode: Image.PreserveAspectFit
                             width: parent.width
 
