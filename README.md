@@ -46,7 +46,7 @@ Licensed under GNU GPLv3.
 
 <h3>Contact</h3>
 
-If you would like to send feedback regarding the app, please email mjbarrett@eml.cc
+If you would like to send feedback regarding the app, email me at mjbarrett@eml.cc
 
 If you'd like to support my work in developing native Sailfish OS apps 👍 <a href="https://buymeacoffee.com/michaeljb">buy me a coffee</a>!<br>
 <br>
