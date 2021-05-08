@@ -34,6 +34,13 @@ Page {
 
             MenuItem {
 
+                text: qsTr("Lock");
+                onClicked: lockItUp(false);
+
+            }
+
+            MenuItem {
+
                 text: qsTr("Copy Password")
                 visible: itemDetailsModel.get(0).password === "" ? false : true
 
@@ -58,22 +65,6 @@ Page {
                     Clipboard.text = totpOutput;
                     detailsPagePasswordCopied.previewSummary = qsTr("One-Time Password Copied")
                     detailsPagePasswordCopied.publish();
-
-                }
-
-            }
-
-        }
-
-        PushUpMenu {
-
-            MenuItem {
-
-                text: qsTr("Lock")
-
-                onClicked: {
-
-                    lockItUp(false);
 
                 }
 
@@ -456,6 +447,7 @@ Page {
 
                 width: parent.width
                 id: websiteRow
+                visible: websiteField.text === "" ? false : true
 
                 TextArea {
 

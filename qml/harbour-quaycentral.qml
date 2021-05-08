@@ -24,29 +24,32 @@ ApplicationWindow {
         property bool tapToCopy
         property bool enterKeyLoadsDetails
         property bool sessionExpiryNotify
+        property bool ccnumHidden: true
         property int sessionTimeLength: 900000
         property int sessionTimeIndex: 4
 
     }
 
-    property var itemList
-    property var itemDetails
+    property var vaultList // used to parse the JSON output before filling vaultListModel, also for active vault
+    property var vaultName: ["string", "string"]
+    property var vaultUUID: ["string", "string"]
+
+    property var itemList // used to parse the JSON output before filling itemListModel
     property var itemTitle: ["string", "string"]
     property var itemTitleToUpperCase: ["string", "string"]
     property var itemUUID: ["string", "string"]
-    property var itemCategory
-    property var itemWebsite
-    property var vaultList
-    property var vaultName: ["string", "string"]
-    property var vaultUUID: ["string", "string"]
-    property string itemToLoad
+
+    property var itemDetails // used to parse the JSON output before filling itemDetailsModel
     property string singleItemUsername
     property string singleItemPassword
+    property string chosenCategory
+
     property string errorReadout
     property string cliVersion
     property string currentSession
     property bool expiredSession
     property bool appPastLaunch
+    property bool justOneVault
 
     ListModel {
 
@@ -55,18 +58,6 @@ ApplicationWindow {
         ListElement {
 
             name: "Loading..."; uuid: ""
-
-        }
-
-    }
-
-    ListModel {
-
-        id: itemDetailsModel
-
-        ListElement {
-
-            uuid: ""; itemTitle: ""; username: ""; password: ""; website: "";
 
         }
 
@@ -100,6 +91,20 @@ ApplicationWindow {
 
     }
 
+    ListModel {
+
+        id: itemDetailsModel
+        dynamicRoles: true
+
+    }
+
+    ListModel {
+
+        id: sectionDetailsModel
+        dynamicRoles: true
+
+    }
+
     function lockItUp(expiredSession) {
 
         errorReadout = "";
@@ -113,6 +118,8 @@ ApplicationWindow {
             itemDetailsModel.setProperty(0, "password", "000000000000000000000000000000000000000000000000000000000000000000000000");
             itemDetailsModel.clear();
             itemListModel.clear();
+            sectionDetailsModel.clear();
+            vaultListModel.clear();
             itemTitle.length = 0;
             itemTitleToUpperCase.length = 0;
             currentSession = "000000000000000000000000000000000000000000000000000000000000000000000000";

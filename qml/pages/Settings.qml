@@ -31,6 +31,17 @@ Page {
         anchors.fill: parent
         contentHeight: column.height
 
+        PullDownMenu {
+
+            MenuItem {
+
+                text: qsTr("Lock");
+                onClicked: lockItUp(false);
+
+            }
+
+        }
+
         Column {
 
             id: column
@@ -45,7 +56,7 @@ Page {
 
             SectionHeader {
 
-                text: qsTr("Item Search")
+                text: qsTr("Login Item Search")
 
             }
 
@@ -176,7 +187,28 @@ Page {
 
             SectionHeader {
 
-                text: qsTr("Login Session")
+                text: qsTr("Item Details");
+
+            }
+
+            TextSwitch {
+
+                text: qsTr("Mask credit card account numbers")
+                id: hideCcnumSwitch
+                checked: settings.ccnumHidden
+
+                onCheckedChanged: {
+
+                    settings.ccnumHidden = checked;
+                    settings.sync();
+
+                }
+
+            }
+
+            SectionHeader {
+
+                text: qsTr("Login Session (Alpha)")
 
             }
 
@@ -393,7 +425,7 @@ Page {
                             font.pixelSize: Theme.fontSizeExtraSmall
                             font.styleName: Theme.primaryColor
                             wrapMode: Text.Wrap
-                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nBy Michael J. Barrett\n\nVersion 0.1\nLicensed under GNU GPLv3\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
+                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nBy Michael J. Barrett\n\nVersion 0.2 (alpha)\nLicensed under GNU GPLv3\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
                             bottomPadding: Theme.paddingLarge
 
                         }
@@ -411,6 +443,100 @@ Page {
 
                     Row {
 
+                        width: buyMeCoffeeLabel.paintedWidth
+                        x: (parent.width - this.width) * 0.5
+                        height: buyMeCoffeeLabel.height
+                        spacing: 0
+
+                        Label {
+
+                            topPadding: Theme.paddingLarge
+                            id: buyMeCoffeeLabel
+                            font.pixelSize: Theme.fontSizeExtraSmall
+                            font.styleName: Theme.primaryColor
+                            //font.italic: true
+                            wrapMode: Text.Wrap
+                            text: qsTr("Support")
+                            bottomPadding: Theme.paddingMedium
+
+                        }
+
+                    }
+
+                    Row {
+
+                        width: parent.width * 0.6
+                        x: parent.width * 0.2
+                        spacing: 0
+                        height: linkToBMAC.height
+
+                        Image {
+
+                            id: linkToBMAC
+                            source: Theme.colorScheme == Theme.DarkOnLight ? "BuyMeACoffee_Stroke_reduced_size.png" : "BuyMeACoffee_blue_reduced_size.png"
+                            fillMode: Image.PreserveAspectFit
+                            width: parent.width
+
+                            MouseArea {
+
+                                anchors.fill: parent
+                                onClicked: Qt.openUrlExternally("https://www.buymeacoffee.com/michaeljb");
+
+                            }
+
+                        }
+
+                    }
+
+                    Row {
+
+                        width: viewSourceCodeLabel.paintedWidth
+                        x: (parent.width - this.width) * 0.5
+                        height: viewSourceCodeLabel.height
+                        spacing: 0
+
+                        Label {
+
+                            topPadding: Theme.paddingLarge
+                            id: viewSourceCodeLabel
+                            font.pixelSize: Theme.fontSizeExtraSmall
+                            font.styleName: Theme.primaryColor
+                            //font.italic: true
+                            wrapMode: Text.Wrap
+                            text: qsTr("Source")
+                            bottomPadding: Theme.paddingMedium
+
+                        }
+
+                    }
+
+                    Row {
+
+                        width: linkToGitHub.paintedWidth
+                        x: (parent.width - this.width) * 0.5
+                        spacing: 0
+                        height: linkToBMAC.height
+
+                        Image {
+
+                            id: linkToGitHub
+                            source: Theme.colorScheme == Theme.DarkOnLight ? "GitHub_Logo.png" : "GitHub_Logo_White.png"
+                            fillMode: Image.PreserveAspectFit
+                            height: parent.height
+
+                            MouseArea {
+
+                                anchors.fill: parent
+                                onClicked: Qt.openUrlExternally("https://github.com/michaeljohnbarrett/harbour-quaycentral");
+
+                            }
+
+                        }
+
+                    }
+
+                    Row {
+
                         width: sendFeedbackLabel.paintedWidth
                         x: (parent.width - this.width) * 0.5
                         height: sendFeedbackLabel.height
@@ -423,9 +549,9 @@ Page {
                             id: sendFeedbackLabel
                             font.pixelSize: Theme.fontSizeExtraSmall
                             font.styleName: Theme.primaryColor
-                            font.italic: true
+                            //font.italic: true
                             wrapMode: Text.Wrap
-                            text: qsTr("Send feedback")
+                            text: qsTr("Feedback")
                             bottomPadding: Theme.paddingMedium
 
                         }
@@ -472,100 +598,6 @@ Page {
 
                                 anchors.fill: parent
                                 onClicked: Qt.openUrlExternally("mailto:mjbarrett@eml.cc?subject=QuayCentral Feedback");
-
-                            }
-
-                        }
-
-                    }
-
-                    Row {
-
-                        width: viewSourceCodeLabel.paintedWidth
-                        x: (parent.width - this.width) * 0.5
-                        height: viewSourceCodeLabel.height
-                        spacing: 0
-
-                        Label {
-
-                            topPadding: Theme.paddingLarge
-                            id: viewSourceCodeLabel
-                            font.pixelSize: Theme.fontSizeExtraSmall
-                            font.styleName: Theme.primaryColor
-                            font.italic: true
-                            wrapMode: Text.Wrap
-                            text: qsTr("View source code")
-                            bottomPadding: Theme.paddingMedium
-
-                        }
-
-                    }
-
-                    Row {
-
-                        width: linkToGitHub.paintedWidth
-                        x: (parent.width - this.width) * 0.5
-                        spacing: 0
-                        height: linkToBMAC.height
-
-                        Image {
-
-                            id: linkToGitHub
-                            source: Theme.colorScheme == Theme.DarkOnLight ? "GitHub_Logo.png" : "GitHub_Logo_White.png"
-                            fillMode: Image.PreserveAspectFit
-                            height: parent.height
-
-                            MouseArea {
-
-                                anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("https://github.com/michaeljohnbarrett/harbour-quaycentral");
-
-                            }
-
-                        }
-
-                    }
-
-                    Row {
-
-                        width: buyMeCoffeeLabel.paintedWidth
-                        x: (parent.width - this.width) * 0.5
-                        height: buyMeCoffeeLabel.height
-                        spacing: 0
-
-                        Label {
-
-                            topPadding: Theme.paddingLarge
-                            id: buyMeCoffeeLabel
-                            font.pixelSize: Theme.fontSizeExtraSmall
-                            font.styleName: Theme.primaryColor
-                            font.italic: true
-                            wrapMode: Text.Wrap
-                            text: qsTr("Support my work")
-                            bottomPadding: Theme.paddingMedium
-
-                        }
-
-                    }
-
-                    Row {
-
-                        width: parent.width * 0.4
-                        x: parent.width * 0.3
-                        spacing: 0
-                        height: linkToBMAC.height
-
-                        Image {
-
-                            id: linkToBMAC
-                            source: Theme.colorScheme == Theme.DarkOnLight ? "BMClogowithwordmark-black.png" : "BMClogowithwordmark-white.png"
-                            fillMode: Image.PreserveAspectFit
-                            width: parent.width
-
-                            MouseArea {
-
-                                anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("https://buymeacoff.ee/michaeljb");
 
                             }
 

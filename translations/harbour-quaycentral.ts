@@ -51,15 +51,7 @@
 <context>
     <name>Items</name>
     <message>
-        <source>Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Search items</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 copied.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -70,15 +62,45 @@
         <source>Error - Password not copied.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>%1 Copied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>OtherItemDetails</name>
+    <message>
+        <source>Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copied</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>OtherItems</name>
+    <message>
+        <source>Search items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error - Unable to load item details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Settings</name>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Item Search</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -114,10 +136,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Login Session</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Lock when CLI is inactive for</source>
         <translation type="unfinished"></translation>
     </message>
@@ -146,19 +164,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Send feedback</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>View source code</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Support my work</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Notify when session expires</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Item Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mask credit card account numbers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login Item Search</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -166,12 +184,32 @@
 
 By Michael J. Barrett
 
-Version 0.1
+Version 0.2 (alpha)
 Licensed under GNU GPLv3
 
 QuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.
 
 Version %1 of the 1Password command-line tool is installed on your device.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feedback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login Session (Alpha)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -195,10 +233,6 @@ Version %1 of the 1Password command-line tool is installed on your device.</sour
     </message>
     <message>
         <source>Vault listing complete.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Listing vault items...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

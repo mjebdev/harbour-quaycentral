@@ -1,6 +1,9 @@
 #ifndef PROCESS_H
 #define PROCESS_H
 
+// Source: http://www.xargs.com/qml/process.html
+// Copyright © 2015 John Temples
+
 #include <QObject>
 #include <QProcess>
 #include <QVariant>
@@ -17,8 +20,6 @@ public:
     Q_INVOKABLE void start(const QString &program, const QVariantList &arguments) {
 
         QStringList args;
-
-        // convert QVariantList from QML to QStringList for QProcess
 
         for (int i = 0; i < arguments.length(); i++)
 

@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.6
 import Sailfish.Silica 1.0
 import Process 1.0
 import Nemo.Notifications 1.0
@@ -28,20 +28,6 @@ Page {
 
             }
 
-            /* -- swipe back motion easier to lock
-            MenuItem {
-
-                text: "Lock"
-
-                onClicked: {
-
-                    lockItUp(false);
-
-                }
-
-            }
-            */
-
         }
 
         header: PageHeader {
@@ -50,25 +36,63 @@ Page {
 
         }
 
-        delegate: BackgroundItem {
+        delegate: ExpandingSection {
 
-            id: delegate
+            id: listOfCategories
+            title: name
+            expanded: justOneVault
+            width: parent.width
 
-            Label {
+            content.sourceComponent: Column {
 
-                x: Theme.horizontalPageMargin
-                text: name
-                font.pixelSize: Theme.fontSizeMedium
-                anchors.verticalCenter: parent.verticalCenter
-                color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
-                padding: Theme.paddingMedium
+                //height: categoryListView.height
+                //width: parent.width
 
-            }
+                anchors {
 
-            onClicked: {
+                    left: parent.left
+                    right: parent.right
 
-                gatheringBusy.running = true;
-                mainProcess.start("op", ["list", "items", "--categories", "Login", "--vault", uuid, "--session", currentSession, "--cache"]);
+                }
+
+                Repeater {
+
+                    model: categories
+                    width: parent.width
+                    id: categoryListView
+
+                    delegate: BackgroundItem {
+
+                        width: parent.width
+
+                        Label {
+
+                            text: categoryDisplayName
+                            verticalAlignment: Text.AlignVCenter
+                            font.pixelSize: Theme.fontSizeMedium
+                            width: parent.width
+                            height: parent.height
+                            leftPadding: Theme.horizontalPageMargin
+                            rightPadding: Theme.paddingMedium
+                            topPadding: Theme.paddingSmall
+                            bottomPadding: Theme.paddingSmall
+
+                        }
+
+                        onClicked: {
+
+                            // for future item grabs (fewer calls if vault is specified) - vaultUUID array no longer in use as parsed JSON go-between,
+                            // so can safely overwrite with data from ListModel each time a vault is chosen
+                            vaultUUID[0] = uuid;
+                            chosenCategory = categoryName;
+                            gatheringBusy.running = true;
+                            mainProcess.start("op", ["list", "items", "--categories", categoryName, "--vault", uuid, "--session", currentSession, "--cache"]);
+
+                        }
+
+                    }
+
+                }
 
             }
 
@@ -100,7 +124,8 @@ Page {
             }
 
             gatheringBusy.running = false;
-            pageStack.push(Qt.resolvedUrl("Items.qml"));
+            if (chosenCategory == "Login") pageStack.push(Qt.resolvedUrl("Items.qml"));
+            else pageStack.push(Qt.resolvedUrl("OtherItems.qml"));
 
         }
 

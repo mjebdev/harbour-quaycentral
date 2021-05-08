@@ -21,6 +21,8 @@ Page {
                 itemDetailsModel.setProperty(0, "password", "000000000000000000000000000000000000000000000000000000000000000000000000");
                 itemDetailsModel.clear();
                 itemListModel.clear();
+                sectionDetailsModel.clear();
+                vaultListModel.clear();
                 itemTitle.length = 0;
                 itemTitleToUpperCase.length = 0;
                 currentSession = "000000000000000000000000000000000000000000000000000000000000000000000000";
@@ -85,7 +87,7 @@ Page {
                 Label {
 
                     id: appVersionLabel
-                    text: "v0.1"
+                    text: "v0.2"
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.secondaryColor
                     width: parent.width
@@ -359,13 +361,23 @@ Page {
             sessionExpiryTimer.restart();
             var prelimOutput = readAllStandardOutput();
             vaultList = JSON.parse(prelimOutput);
+            if (vaultList.length === 1) justOneVault = true;
+
             vaultListModel.clear();
 
             for (var i = 0; i < vaultList.length; i++) {
 
                 vaultName[i] = vaultList[i].name;
                 vaultUUID[i] = vaultList[i].uuid;
-                vaultListModel.append({name: vaultName[i], uuid: vaultUUID[i]});
+                vaultListModel.append({name: vaultName[i], uuid: vaultUUID[i], categories: [{categoryName: "Login", categoryDisplayName: "Logins"},
+                    {categoryName: "Secure Note", categoryDisplayName: "Secure Notes"}, {categoryName: "Credit Card", categoryDisplayName: "Credit Cards"},
+                    {categoryName: "Identity", categoryDisplayName: "Identities"}, {categoryName: "Bank Account", categoryDisplayName: "Bank Accounts"},
+                    {categoryName: "Database", categoryDisplayName: "Databases"}, {categoryName: "Driver License", categoryDisplayName: "Driver Licenses"},
+                    {categoryName: "Email Account", categoryDisplayName: "Email Accounts"}, {categoryName: "Membership", categoryDisplayName: "Memberships"},
+                    {categoryName: "Outdoor License", categoryDisplayName: "Outdoor Licenses"}, {categoryName: "Passport", categoryDisplayName: "Passports"},
+                    {categoryName: "Reward Program", categoryDisplayName: "Reward Programs"}, {categoryName: "Server", categoryDisplayName: "Servers"},
+                    {categoryName: "Social Security Number", categoryDisplayName: "Social Security Numbers"}, {categoryName: "Software License", categoryDisplayName: "Software Licenses"},
+                    {categoryName: "Wireless Router", categoryDisplayName: "Wireless Routers"}]});
 
             }
 
@@ -373,22 +385,23 @@ Page {
 
             statusLabel.text = qsTr("Vault listing complete.");
 
-            if (settings.skipVaultScreen) {
+            // if (settings.skipVaultScreen) {
 
-                skippingVaultScreen = true;
-                statusLabel.text = qsTr("Listing vault items...");
-                processOne.start("op", ["list", "items", "--categories", "Login", "--vault", settings.defaultVaultUUID, "--session", currentSession]);
+                // skippingVaultScreen = true;
+                // statusLabel.text = qsTr("Listing vault items...");
+                // Not applicable for now, will remove settings reference either way.
+                // processOne.start("op", ["list", "items", "--categories", "Login", "--vault", settings.defaultVaultUUID, "--session", currentSession]);
 
-            }
+            // }
 
-            else {
+            // else {
 
                 // skippingVaultScreen = false;
                 loggingInBusy.running = false;
                 statusLabel.text = "";
                 pageStack.push(Qt.resolvedUrl("Vaults.qml"));
 
-            }
+            // }
 
         }
 

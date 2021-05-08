@@ -21,17 +21,10 @@ Page {
 
         PullDownMenu {
 
-            visible: settings.skipVaultScreen // will be visible should user opt to skip Vault screen, option not yet enabled.
-
             MenuItem {
 
-                text: qsTr("Settings")
-
-                onClicked: {
-
-                    pageStack.push(Qt.resolvedUrl("Settings.qml"));
-
-                }
+                text: qsTr("Lock");
+                onClicked: lockItUp(false);
 
             }
 
@@ -65,7 +58,7 @@ Page {
 
                         loadingItemBusy.running = true;
                         allItemDetails = true;
-                        getPassword.start("op", ["get", "item", itemListModel.get(0).uuid, "--session", currentSession]);
+                        getPassword.start("op", ["get", "item", "--vault", vaultUUID[0], itemListModel.get(0).uuid, "--session", currentSession]);
 
                     }
 
@@ -73,7 +66,7 @@ Page {
 
                         itemCopied = itemListModel.get(0).title;
                         allItemDetails = false;
-                        getPassword.start("op", ["get", "item", itemListModel.get(0).uuid, "--fields", "password", "--session", currentSession]);
+                        getPassword.start("op", ["get", "item", "--vault", vaultUUID[0], itemListModel.get(0).uuid, "--fields", "password", "--session", currentSession]);
 
                     }
 
@@ -125,7 +118,7 @@ Page {
 
                             itemCopied = title;
                             allItemDetails = false;
-                            getPassword.start("op", ["get", "item", uuid, "--fields", "password", "--session", currentSession]);
+                            getPassword.start("op", ["get", "item", "--vault", vaultUUID[0], uuid, "--fields", "password", "--session", currentSession]);
 
                         }
 
@@ -133,7 +126,7 @@ Page {
 
                             allItemDetails = true;
                             loadingItemBusy.running = true;
-                            getPassword.start("op", ["get", "item", uuid, "--session", currentSession]);
+                            getPassword.start("op", ["get", "item", "--vault", vaultUUID[0], uuid, "--session", currentSession]);
 
                         }
 
@@ -145,9 +138,7 @@ Page {
 
                             allItemDetails = true;
                             loadingItemBusy.running = true;
-                            getPassword.start("op", ["get", "item", uuid, "--session", currentSession]);
-
-
+                            getPassword.start("op", ["get", "item", "--vault", vaultUUID[0], uuid, "--session", currentSession]);
 
                         }
 
@@ -155,7 +146,7 @@ Page {
 
                             itemCopied = title;
                             allItemDetails = false;
-                            getPassword.start("op", ["get", "item", uuid, "--fields", "password", "--session", currentSession]);
+                            getPassword.start("op", ["get", "item", "--vault", vaultUUID[0], uuid, "--fields", "password", "--session", currentSession]);
 
                         }
 
@@ -217,7 +208,7 @@ Page {
             else { // Just the password to be copied to clipboard.
 
                 Clipboard.text = readAllStandardOutput();
-                passwordCopied.previewSummary = qsTr("%1 copied.").arg(itemCopied);
+                passwordCopied.previewSummary = qsTr("%1 Copied").arg(itemCopied);
                 passwordCopied.publish();
 
             }
