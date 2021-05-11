@@ -122,8 +122,8 @@ ApplicationWindow {
             vaultListModel.clear();
             itemTitle.length = 0;
             itemTitleToUpperCase.length = 0;
-            currentSession = "000000000000000000000000000000000000000000000000000000000000000000000000";
-            currentSession = "";
+            // currentSession = "000000000000000000000000000000000000000000000000000000000000000000000000";
+            // currentSession = "";  --unnecessary as the session key would be invalid anyway. signout was successful.
             pageStack.clear();
             pageStack.push(Qt.resolvedUrl("pages/SignIn.qml"), null, PageStackAction.Immediate);
 
