@@ -208,8 +208,8 @@ Page {
             else { // Just the password to be copied to clipboard.
 
                 Clipboard.text = readAllStandardOutput();
-                passwordCopied.previewSummary = qsTr("%1 Copied").arg(itemCopied);
-                passwordCopied.publish();
+                itemsPageNotification.previewSummary = qsTr("%1 Copied").arg(itemCopied);
+                itemsPageNotification.publish();
 
             }
 
@@ -217,27 +217,46 @@ Page {
 
         onReadyReadStandardError: {
 
-            sessionExpiryTimer.restart();
+            errorReadout = readAllStandardError();
+            sessionExpiryTimer.stop();
+            loadingItemBusy.running = false;
 
+            if (errorReadout.indexOf("session expired") !== -1) itemsPageNotification.previewSummary = "Session Expired";
+            else if (errorReadout.indexOf("not currently signed in") !== -1) itemsPageNotification.previewSummary = "Not Currently Signed In";
+
+            else {
+
+                itemsPageNotification.previewSummary = "Unknown Error - Please check network and try signing in again.";
+                Clipboard.text = errorReadout;
+
+            }
+
+            itemsPageNotification.publish();
+            pageStack.clear();
+            pageStack.replace(Qt.resolvedUrl("SignIn.qml"));
+
+            /*  this code allowed for the user to continue despite error if it wasn't sign-in related; changing
+                for sake of extra security, error of any kind will now kick user out and force re-signing in.
             if (allItemDetails) {
 
-                passwordCopied.previewSummary = qsTr("Error - Unable to load item details.");
-                passwordCopied.body = readAllStandardError();
-                passwordCopied.urgency = Notification.Medium;
-                passwordCopied.publish();
-                passwordCopied.urgency = Notification.Low; // back to normal setting
+                itemsPageNotification.previewSummary = qsTr("Error - Unable to load item details.");
+                itemsPageNotification.body = readAllStandardError();
+                itemsPageNotification.urgency = Notification.Medium;
+                itemsPageNotification.publish();
+                itemsPageNotification.urgency = Notification.Low; // back to normal setting
 
             }
 
             else {
 
-                passwordCopied.previewSummary = qsTr("Error - Password not copied.");
-                passwordCopied.body = readAllStandardError();
-                passwordCopied.urgency = Notification.Medium;
-                passwordCopied.publish();
-                passwordCopied.urgency = Notification.Low; // back to normal setting
+                itemsPageNotification.previewSummary = qsTr("Error - Password not copied.");
+                itemsPageNotification.body = readAllStandardError();
+                itemsPageNotification.urgency = Notification.Medium;
+                itemsPageNotification.publish();
+                itemsPageNotification.urgency = Notification.Low; // back to normal setting
 
             }
+            */
 
         }
 
@@ -245,7 +264,7 @@ Page {
 
     Notification {
 
-        id: passwordCopied
+        id: itemsPageNotification
         appName: "QuayCentral"
         urgency: Notification.Low
         isTransient: true
