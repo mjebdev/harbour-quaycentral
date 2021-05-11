@@ -280,20 +280,7 @@ Page {
 
                     }
 
-                    MenuItem {
-
-                        text: qsTr("30 minutes")
-
-                        onClicked: {
-
-                            settings.sessionTimeLength = 1790000; // ten-second buffer to account for any processing delay when interacting with CLI
-                            settings.sessionTimeIndex = 4;
-                            settings.sync();
-                            sessionExpiryTimer.restart();
-
-                        }
-
-                    }
+                    // removed 30 minutes option as this was the only state in which the issue with the lockout timer occurred.
 
                 }
 
