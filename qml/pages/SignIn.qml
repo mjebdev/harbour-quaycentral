@@ -7,8 +7,9 @@ Page {
     id: page
     allowedOrientations: Orientation.PortraitMask
     property bool skippingVaultScreen
-    property bool initialSetup
-    property string deviceID
+    //property bool initialSetup    // these were to be used for optional setup of CLI from within app,
+    //property string deviceID      // will probably leave out as app is best suited for those who are already
+                                    // terminal & dev-tools literate, so dev know-how will remain necessary.
 
     onStatusChanged: {
 
