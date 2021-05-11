@@ -18,39 +18,10 @@ Page {
 
         PullDownMenu {
 
-            /* - a likely feature further on in development
-            MenuItem {
-
-                text: "Edit"
-
-                onClicked: {
-
-                    usernameField.text = "Feature not yet enabled.";
-
-                }
-
-            }
-            */
-
             MenuItem {
 
                 text: qsTr("Lock");
                 onClicked: lockItUp(false);
-
-            }
-
-            MenuItem {
-
-                text: qsTr("Copy Password")
-                visible: itemDetailsModel.get(0).password === "" ? false : true
-
-                onClicked: {
-
-                    Clipboard.text = itemDetailsModel.get(0).password;
-                    detailsPagePasswordCopied.previewSummary = qsTr("Copied")
-                    detailsPagePasswordCopied.publish();
-
-                }
 
             }
 
@@ -63,8 +34,23 @@ Page {
                 onClicked: {
 
                     Clipboard.text = totpOutput;
-                    detailsPagePasswordCopied.previewSummary = qsTr("One-Time Password Copied")
-                    detailsPagePasswordCopied.publish();
+                    detailsPageNotification.previewSummary = qsTr("One-Time Password Copied")
+                    detailsPageNotification.publish();
+
+                }
+
+            }
+
+            MenuItem {
+
+                text: qsTr("Copy Password")
+                visible: itemDetailsModel.get(0).password === "" ? false : true
+
+                onClicked: {
+
+                    Clipboard.text = itemDetailsModel.get(0).password;
+                    detailsPageNotification.previewSummary = qsTr("Copied")
+                    detailsPageNotification.publish();
 
                 }
 
@@ -110,13 +96,7 @@ Page {
 
                 onReadyReadStandardOutput: {
 
-                    sessionExpiryTimer.restart();
                     totpOutput = readAllStandardOutput();
-                    totpTextField.text = totpOutput.slice(0, 3) + " " + totpOutput.slice(3);
-                    totpTextField.color = Theme.primaryColor;
-                    totpTimerField.color = Theme.primaryColor;
-                    totpCopyButton.enabled = true;
-                    gatheringTotpBusy.running = false;
 
                     if (totpRow.visible == false) { // if first time checking for totp in item
 
@@ -126,23 +106,40 @@ Page {
 
                     }
 
+                    totpTextField.text = totpOutput.slice(0, 3) + " " + totpOutput.slice(3);
+                    totpTextField.color = Theme.primaryColor;
+                    totpTimerField.color = Theme.primaryColor;
+                    totpCopyButton.enabled = true;
+                    gatheringTotpBusy.running = false;
+                    sessionExpiryTimer.restart();
+
                 }
 
                 onReadyReadStandardError: {
 
-                    sessionExpiryTimer.restart();
+                    errorReadout = readAllStandardError();
 
-                    if (totpRow.visible) { // have there already been successful TOTP grabs?
+                    if (errorReadout.indexOf("does not contain a one-time password") === -1) { // else no action needed, totpRow remains invisible, timer just restarted by previous page.
 
-                        detailsPagePasswordCopied.previewSummary = qsTr("Error loading one-time password. Please check network connection and try accessing page again.");
-                        detailsPagePasswordCopied.expireTimeout = 2500;
-                        detailsPagePasswordCopied.publish();
-                        detailsPagePasswordCopied.expireTimeout = 800; // put back to default for copying notifications
+                        sessionExpiryTimer.stop();
                         gatheringTotpBusy.running = false;
 
-                    }
+                        if (errorReadout.indexOf("session expired") !== -1) detailsPageNotification.previewSummary = "Session Expired";
+                        else if (errorReadout.indexOf("not currently signed in") !== -1) detailsPageNotification.previewSummary = "Not Currently Signed In";
 
-                    else errorReadout = readAllStandardError(); // leave TOTP row invisible.
+                        else {
+
+                            // there have already been successful TOTP grabs, possible network error.
+                            detailsPageNotification.previewSummary = "Unknown Error - Please check network and try signing in again.";
+                            Clipboard.text = errorReadout;
+
+                        }
+
+                        detailsPageNotification.publish();
+                        pageStack.clear();
+                        pageStack.replace(Qt.resolvedUrl("SignIn.qml"));
+
+                    }
 
                 }
 
@@ -211,8 +208,8 @@ Page {
                                 onClicked: {
 
                                     Clipboard.text = username;
-                                    detailsPagePasswordCopied.previewSummary = qsTr("Username Copied")
-                                    detailsPagePasswordCopied.publish();
+                                    detailsPageNotification.previewSummary = qsTr("Username Copied")
+                                    detailsPageNotification.publish();
 
                                 }
 
@@ -282,8 +279,8 @@ Page {
                                 onClicked: {
 
                                     Clipboard.text = password;
-                                    detailsPagePasswordCopied.previewSummary = qsTr("Copied")
-                                    detailsPagePasswordCopied.publish();
+                                    detailsPageNotification.previewSummary = qsTr("Copied")
+                                    detailsPageNotification.publish();
 
                                 }
 
@@ -327,6 +324,7 @@ Page {
                             label: qsTr("one-time password")
                             y: passwordCopyButton.width / 8
                             width: parent.width - Theme.paddingMedium
+                            text: "/././. /././." // seems to prevent row from showing with label in textfield prior to code.
 
                             rightItem: Label {
 
@@ -428,8 +426,8 @@ Page {
                                 onClicked: {
 
                                     Clipboard.text = totpOutput;
-                                    detailsPagePasswordCopied.previewSummary = qsTr("One-Time Password Copied")
-                                    detailsPagePasswordCopied.publish();
+                                    detailsPageNotification.previewSummary = qsTr("One-Time Password Copied")
+                                    detailsPageNotification.publish();
 
                                 }
 
@@ -482,7 +480,7 @@ Page {
 
     Notification {
 
-        id: detailsPagePasswordCopied
+        id: detailsPageNotification
         appName: "QuayCentral"
         urgency: Notification.Low
         isTransient: true
