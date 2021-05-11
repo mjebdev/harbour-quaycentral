@@ -130,10 +130,7 @@ Page {
 
         onReadyReadStandardOutput: {
 
-            // sessionExpiryTimer.restart();
-
-            // code to handle other kinds of items
-
+            sessionExpiryTimer.restart();
             itemDetailsModel.clear();
             sectionDetailsModel.clear();
             var prelimOutput = readAllStandardOutput();
@@ -145,33 +142,17 @@ Page {
 
                 for (var i = 0; i < itemDetails.details.sections.length; i++) {
 
-                    //itemDetailsModel.append({"sections": {"sectionTitle": itemDetails.details.sections[i].title}});
-
-                    //if (itemDetails.details.sections[i].title !== "") Clipboard.text = itemDetails.details.sections[i].title.toString();
-
                     if (itemDetails.details.sections[i].fields !== undefined) {
 
                         for (var j = 0; j < itemDetails.details.sections[i].fields.length; j++) {
 
                             if (itemDetails.details.sections[i].fields[j].v !== undefined && itemDetails.details.sections[i].fields[j].v !== "" && itemDetails.details.sections[i].fields[j].t !== undefined && itemDetails.details.sections[i].fields[j].k !== undefined) {
 
-                                //if (itemDetails.details.sections[i].fields[j].k !== "concealed" || itemDetails.details.sections[i].fields[j].k !== "URL" || itemDetails.details.sections[i].fields[j].k !== "notesPlain") itemDetails.details.sections[i].fields[j].k = "textfield";
-
-                                //if (itemDetails.details.sections[i].fields[j].k !== ("concealed" || "URL" || "notesPlain")) itemDetails.details.sections[i].fields[j].k = "textfield";
-
-                                // sectionDetailsModel.append({"fieldItemTitle": itemDetails.details.sections[i].fields[j].t, "fieldItemValue": itemDetails.details.sections[i].fields[j].v, "fieldItemKind": itemDetails.details.sections[i].fields[j].k});
-
                                 sectionDetailsModel.append({"fieldItemTitle": itemDetails.details.sections[i].fields[j].t, "fieldItemValue": itemDetails.details.sections[i].fields[j].v, "fieldItemKind": itemDetails.details.sections[i].fields[j].k, "fieldItemName": itemDetails.details.sections[i].fields[j].n});
 
                             }
 
                         }
-
-                    }
-
-                    else {
-
-                        // no fields in this section - remove section header?
 
                     }
 
@@ -188,11 +169,6 @@ Page {
                         for (var l = 0; l < itemDetails.sections[k].fields.length; l++) {
 
                             if (itemDetails.sections[k].fields[l].v !== undefined && itemDetails.sections[k].fields[l].v !== "" && itemDetails.sections[k].fields[l].t !== undefined && itemDetails.sections[k].fields[l].k !== undefined) {
-
-                                //if (itemDetails.sections[k].fields[l].k !== "concealed" || itemDetails.sections[k].fields[l].k !== "URL" || itemDetails.sections[k].fields[l].k !== "notesPlain") itemDetails.sections[k].fields[l].k = "textfield";
-                                // if (itemDetails.sections[k].fields[l].k !== ("concealed" || "URL" || "notesPlain")) itemDetails.sections[k].fields[l].k = "textfield";
-
-                                // sectionDetailsModel.append({"fieldItemTitle": itemDetails.sections[k].fields[l].t, "fieldItemValue": itemDetails.sections[k].fields[l].v, "fieldItemKind": itemDetails.sections[k].fields[l].k});
 
                                 sectionDetailsModel.append({"fieldItemTitle": itemDetails.sections[k].fields[l].t, "fieldItemValue": itemDetails.sections[k].fields[l].v, "fieldItemKind": itemDetails.sections[k].fields[l].k, "fieldItemName": itemDetails.details.sections[i].fields[j].n});
 
@@ -213,12 +189,23 @@ Page {
 
         onReadyReadStandardError: {
 
-            sessionExpiryTimer.restart();
-            passwordCopied.previewSummary = qsTr("Error - Unable to load item details.");
-            passwordCopied.body = readAllStandardError();
-            passwordCopied.urgency = Notification.Medium;
-            passwordCopied.publish();
-            passwordCopied.urgency = Notification.Low; // back to normal setting
+            errorReadout = readAllStandardError();
+            sessionExpiryTimer.stop();
+            loadingItemBusy.running = false;
+
+            if (errorReadout.indexOf("session expired") !== -1) itemsPageNotification.previewSummary = "Session Expired";
+            else if (errorReadout.indexOf("not currently signed in") !== -1) itemsPageNotification.previewSummary = "Not Currently Signed In";
+
+            else {
+
+                itemsPageNotification.previewSummary = "Unknown Error - Please check network and try signing in again.";
+                Clipboard.text = errorReadout;
+
+            }
+
+            itemsPageNotification.publish();
+            pageStack.clear();
+            pageStack.replace(Qt.resolvedUrl("SignIn.qml"));
 
         }
 
@@ -226,7 +213,7 @@ Page {
 
     Notification {
 
-        id: passwordCopied
+        id: itemsPageNotification
         appName: "QuayCentral"
         urgency: Notification.Low
         isTransient: true
