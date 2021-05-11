@@ -25,8 +25,9 @@ ApplicationWindow {
         property bool enterKeyLoadsDetails
         property bool sessionExpiryNotify
         property bool ccnumHidden: true
-        property int sessionTimeLength: 900000
-        property int sessionTimeIndex: 4
+        property bool enableTimer
+        property int sessionTimeLength: 120000
+        property int sessionTimeIndex: 1
 
     }
 
@@ -166,7 +167,7 @@ ApplicationWindow {
 
         onTriggered: {
 
-            lockItUp(true); // session did expire so notification will publish
+            if (settings.enableTimer) lockItUp(true); // session did expire so notification will publish if enabled
 
         }
 
