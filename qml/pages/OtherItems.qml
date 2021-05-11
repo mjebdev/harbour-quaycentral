@@ -19,14 +19,10 @@ Page {
 
         PullDownMenu {
 
-            PullDownMenu {
+            MenuItem {
 
-                MenuItem {
-
-                    text: qsTr("Lock");
-                    onClicked: lockItUp(false);
-
-                }
+                text: qsTr("Lock");
+                onClicked: lockItUp(false);
 
             }
 
