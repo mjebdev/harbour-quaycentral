@@ -67,7 +67,7 @@ Page {
 
             Component.onCompleted: {
 
-                getTotp.start("op", ["get", "totp", uuid, "--session", currentSession]);
+                getTotp.start("op", ["get", "totp", "--vault", vaultUUID[0], uuid, "--session", currentSession]);
 
             }
 
@@ -377,7 +377,7 @@ Page {
                                             totpTextField.color = "grey";
                                             totpTimerField.color = "grey";
                                             totpCopyButton.enabled = false;
-                                            getTotp.start("op", ["get", "totp", uuid, "--session", currentSession]);
+                                            getTotp.start("op", ["get", "totp", "--vault", vaultUUID[0], uuid, "--session", currentSession]);
 
                                         }
 
