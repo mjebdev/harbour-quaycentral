@@ -93,14 +93,16 @@ Page {
 
                         }
 
-                        else if (fieldItemName === ("cvv" || "pin")) {
+                        else if (fieldItemName === "cvv" || fieldItemName ===  "pin") {
 
                             itemDetailsPasswordField.font.letterSpacing = 4;
                             passwordRow.visible = true;
 
                         }
 
-                        else if (fieldItemName === ("website" || "server" || "publisher_website" || "provider_website" || "admin_console_url" || "support_contact_url")) {
+                        else if (fieldItemName === "website" || fieldItemName ===  "server" || fieldItemName ===  "publisher_website" ||
+                                 fieldItemName ===  "provider_website" || fieldItemName ===  "admin_console_url" ||
+                                 fieldItemName ===  "support_contact_url") {
 
                             websiteRow.visible = true;
 
@@ -125,7 +127,8 @@ Page {
                                 notesRow.visible = true;
                                 break;
 
-                            case "URL" || "url":
+                            case "URL":
+                            case "url":
 
                                 websiteRow.visible = true;
                                 break;
@@ -333,8 +336,8 @@ Page {
                                             onClicked: {
 
                                                 Clipboard.text = usernameField.text;
-                                                detailsPagePasswordCopied.previewSummary = qsTr("Copied")
-                                                detailsPagePasswordCopied.publish();
+                                                detailsPageNotification.previewSummary = qsTr("Copied")
+                                                detailsPageNotification.publish();
 
                                             }
 
@@ -405,8 +408,8 @@ Page {
                                             onClicked: {
 
                                                 Clipboard.text = fieldItemValue;
-                                                detailsPagePasswordCopied.previewSummary = qsTr("Copied")
-                                                detailsPagePasswordCopied.publish();
+                                                detailsPageNotification.previewSummary = qsTr("Copied")
+                                                detailsPageNotification.publish();
 
                                             }
 
@@ -510,8 +513,8 @@ Page {
                                             onClicked: {
 
                                                 Clipboard.text = fieldItemValue;
-                                                detailsPagePasswordCopied.previewSummary = qsTr("Copied")
-                                                detailsPagePasswordCopied.publish();
+                                                detailsPageNotification.previewSummary = qsTr("Copied")
+                                                detailsPageNotification.publish();
 
                                             }
 
@@ -537,7 +540,7 @@ Page {
 
     Notification {
 
-        id: detailsPagePasswordCopied
+        id: detailsPageNotification
         appName: "QuayCentral"
         urgency: Notification.Low
         isTransient: true
