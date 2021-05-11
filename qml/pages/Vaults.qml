@@ -45,9 +45,6 @@ Page {
 
             content.sourceComponent: Column {
 
-                //height: categoryListView.height
-                //width: parent.width
-
                 anchors {
 
                     left: parent.left
@@ -67,12 +64,12 @@ Page {
 
                         Label {
 
+                            x: Theme.horizontalPageMargin
                             text: categoryDisplayName
                             verticalAlignment: Text.AlignVCenter
                             font.pixelSize: Theme.fontSizeMedium
                             width: parent.width
                             height: parent.height
-                            leftPadding: Theme.horizontalPageMargin
                             rightPadding: Theme.paddingMedium
                             topPadding: Theme.paddingSmall
                             bottomPadding: Theme.paddingSmall
@@ -137,7 +134,7 @@ Page {
             if (errorReadout.indexOf("not currently signed in") !== -1) {
 
                 gatheringBusy.running = false;
-                notifySessionExpired.previewSummary = "Session has expired.";
+                notifySessionExpired.previewSummary = "Session Expired";
                 notifySessionExpired.publish();
                 pageStack.clear();
                 pageStack.replace(Qt.resolvedUrl("SignIn.qml"));
