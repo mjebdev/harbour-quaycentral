@@ -88,7 +88,7 @@ Page {
                 Label {
 
                     id: appVersionLabel
-                    text: "v0.2"
+                    text: "v0.2.1-beta"
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.secondaryColor
                     width: parent.width

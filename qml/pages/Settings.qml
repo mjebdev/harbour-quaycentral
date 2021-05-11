@@ -6,7 +6,12 @@ Page {
 
     id: page
     allowedOrientations: Orientation.PortraitMask
-    property bool signOutError: false
+
+    // was to be used for option on this page to signout and forget the --quaycentsfos shorthand, ran into issues
+    // with user having to get into terminal, and also possibly list of authorized devices online, to remove anyway, nullifying
+    // purpose of the option being included here.
+    // property bool signOutError: false
+
 
     /*  to be enabled in some form when there is a Sailfish-Secrets implementation on the app, which will in turn allow
         the secure storage of the default vault UUID.
@@ -146,7 +151,6 @@ Page {
                 text: tappingCombo.currentIndex === 1 ? qsTr("Press and hold for item details.") : qsTr("Press and hold to copy password.")
                 wrapMode: Text.Wrap
                 leftPadding: sessionExpiryNotifySwitch.leftMargin
-                //topPadding: 0
 
             }
 
@@ -208,15 +212,32 @@ Page {
 
             SectionHeader {
 
-                text: qsTr("Login Session (Alpha)")
+                text: qsTr("Login Session")
+
+            }
+
+            TextSwitch {
+
+                text: qsTr("Enable Lockout Timer - BETA")
+                id: enableTimerSwitch
+                checked: settings.enableTimer
+
+                onCheckedChanged: {
+
+                    settings.enableTimer = checked;
+                    if (checked) sessionExpiryTimer.restart();
+                    settings.sync();
+
+                }
 
             }
 
             ComboBox {
 
-                label: qsTr("Lock when CLI is inactive for")
+                label: qsTr("Lock when CLI inactive for")
                 id: sessionLengthCombo
                 currentIndex: settings.sessionTimeIndex
+                enabled: enableTimerSwitch.checked
 
                 menu: ContextMenu {
 
@@ -265,24 +286,8 @@ Page {
 
                     }
 
-                    MenuItem {
-
-                        text: qsTr("15 minutes")
-
-                        onClicked: {
-
-                            settings.sessionTimeLength = 900000;
-                            settings.sessionTimeIndex = 3;
-                            settings.sync();
-                            sessionExpiryTimer.restart();
-
-                        }
-
-                    }
-
-                    // removed 30 minutes option as this was the only state in which the issue with the lockout timer occurred.
-                    // possibly related to CLI itself also timing out at 30 mins but can't see how this would affect app, possibly a
-                    // system-level deep-sleep feature that affected timer?
+                    // removed 30 mins and 15 mins options. Unable to reproduce issue when set to 5 mins or less however will leave marked
+                    // as beta as reason for issue with longer times remains unknown.
 
                 }
 
@@ -312,6 +317,7 @@ Page {
                 text: qsTr("Notify when session expires")
                 id: sessionExpiryNotifySwitch
                 checked: settings.sessionExpiryNotify
+                enabled: enableTimerSwitch.checked
 
                 onCheckedChanged: {
 
@@ -414,7 +420,7 @@ Page {
                             font.pixelSize: Theme.fontSizeExtraSmall
                             font.styleName: Theme.primaryColor
                             wrapMode: Text.Wrap
-                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nBy Michael J. Barrett\n\nVersion 0.2 (alpha)\nLicensed under GNU GPLv3\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
+                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nBy Michael J. Barrett\n\nVersion 0.2.1-beta\nLicensed under GNU GPLv3\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
                             bottomPadding: Theme.paddingLarge
 
                         }
@@ -443,7 +449,6 @@ Page {
                             id: buyMeCoffeeLabel
                             font.pixelSize: Theme.fontSizeExtraSmall
                             font.styleName: Theme.primaryColor
-                            //font.italic: true
                             wrapMode: Text.Wrap
                             text: qsTr("Support")
                             bottomPadding: Theme.paddingMedium
@@ -469,7 +474,7 @@ Page {
                             MouseArea {
 
                                 anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("https://www.buymeacoffee.com/michaeljb");
+                                onClicked: Qt.openUrlExternally("https://www.ko-fi.com/michaeljb");
 
                             }
 
@@ -490,7 +495,6 @@ Page {
                             id: viewSourceCodeLabel
                             font.pixelSize: Theme.fontSizeExtraSmall
                             font.styleName: Theme.primaryColor
-                            //font.italic: true
                             wrapMode: Text.Wrap
                             text: qsTr("Source")
                             bottomPadding: Theme.paddingMedium
@@ -534,11 +538,9 @@ Page {
                         Label {
 
                             topPadding: Theme.paddingLarge
-                            //width: parent.width
                             id: sendFeedbackLabel
                             font.pixelSize: Theme.fontSizeExtraSmall
                             font.styleName: Theme.primaryColor
-                            //font.italic: true
                             wrapMode: Text.Wrap
                             text: qsTr("Feedback")
                             bottomPadding: Theme.paddingMedium
