@@ -1,7 +1,7 @@
 # QuayCentral
 A GUI app for the 1Password command-line tool on Sailfish OS.
 
-Still in early development (alpha) - please see Limitations & Issues below.
+Still in early development (beta) - please see Limitations & Issues below.
 
 QuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.
 
@@ -18,7 +18,7 @@ Licensed under GNU GPLv3.
 
 <h3>Limitations & Issues</h3>
 
-- Lockout timer is unreliable if device has been in sleep mode. Please lock using the button on the cover page or from within the app.
+- Lockout timer is in beta as there were issues with longer time options, since removed, for which the reason is still unclear. Possibly related to how device sleeps after a given time period. Unable to reproduce any issues with the current options (5 mins / 2 mins / 30 seconds). User will have option to leave timer disabled and lock vault(s) when they choose. Not recommended to leave unlocked obviously. (App will move user back to sign-in page should they attempt to access data from CLI after CLI's 30 min session has expired but this doesn't protect data that is already on the screen or a swipe back, and is of course not intended as any kind of a substitute for user locking the vault(s) or using the timer.)
 - Leaving the app open on an item details page that includes a TOTP (one-time password) will mean the lockout timer never times out, as it will keep resetting every 30 seconds a new code is generated. Timeout reset only applies to the app's interaction with the CLI, i.e. swiping back a page, going to Settings, or scrolling down a list, etc. will not reset the lockout timer.
 - As of now, Login item page only lists username/password/TOTP/website. All data (besides a TOTP if there is one) in other categories will display but may still have some formatting issues in some entries.
 - Items are read-only, plan to add editing capability at some point in the future.
