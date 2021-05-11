@@ -281,6 +281,8 @@ Page {
                     }
 
                     // removed 30 minutes option as this was the only state in which the issue with the lockout timer occurred.
+                    // possibly related to CLI itself also timing out at 30 mins but can't see how this would affect app, possibly a
+                    // system-level deep-sleep feature that affected timer?
 
                 }
 
