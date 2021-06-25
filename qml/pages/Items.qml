@@ -284,3 +284,5 @@ Page {
     }
 
 }
+
+// changing version tag from 0.2.2 to 0.3
