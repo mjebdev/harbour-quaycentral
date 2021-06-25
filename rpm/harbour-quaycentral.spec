@@ -9,11 +9,11 @@ Name:       harbour-quaycentral
 # << macros
 
 Summary:    QuayCentral
-Version:    0.2
+Version:    0.3
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE
-URL:        http://example.org/
+URL:        http://github.com/michaeljohnbarrett/harbour-quaycentral
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  harbour-quaycentral.yaml
 Requires:   sailfishsilica-qt5 >= 0.10.9
