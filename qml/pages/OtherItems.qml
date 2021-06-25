@@ -19,6 +19,8 @@ Page {
 
         PullDownMenu {
 
+            visible: settings.includeLockMenuItem
+
             MenuItem {
 
                 text: qsTr("Lock");
@@ -102,14 +104,14 @@ Page {
                         getPassword.start("op", ["get", "item", "--vault", vaultUUID[0], uuid, "--session", currentSession]);
 
                     }
-
+/*                  - Not necessary for other types of items that may not include a possword. -
                     onPressAndHold: {
 
                         loadingItemBusy.running = true;
                         getPassword.start("op", ["get", "item", "--vault", vaultUUID[0], uuid, "--session", currentSession]);
 
                     }
-
+*/
                 }
 
             }
