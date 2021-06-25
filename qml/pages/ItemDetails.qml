@@ -20,6 +20,7 @@ Page {
 
             MenuItem {
 
+                visible: settings.includeLockMenuItem
                 text: qsTr("Lock");
                 onClicked: lockItUp(false);
 
@@ -34,7 +35,7 @@ Page {
                 onClicked: {
 
                     Clipboard.text = totpOutput;
-                    detailsPageNotification.previewSummary = qsTr("One-Time Password Copied")
+                    detailsPageNotification.previewSummary = qsTr("Copied one-time password to clipboard")
                     detailsPageNotification.publish();
 
                 }
@@ -49,7 +50,7 @@ Page {
                 onClicked: {
 
                     Clipboard.text = itemDetailsModel.get(0).password;
-                    detailsPageNotification.previewSummary = qsTr("Copied")
+                    detailsPageNotification.previewSummary = qsTr("Copied password to clipboard")
                     detailsPageNotification.publish();
 
                 }
@@ -155,6 +156,14 @@ Page {
             Row {
 
                 width: parent.width
+                id: paddingRow
+                height: Theme.paddingLarge
+
+            }
+
+            Row {
+
+                width: parent.width
                 id: usernameRow
                 height: usernameField.height + (Theme.paddingMedium * 2)
                 spacing: 0
@@ -208,7 +217,7 @@ Page {
                                 onClicked: {
 
                                     Clipboard.text = username;
-                                    detailsPageNotification.previewSummary = qsTr("Username Copied")
+                                    detailsPageNotification.previewSummary = qsTr("Copied username to clipboard")
                                     detailsPageNotification.publish();
 
                                 }
@@ -279,7 +288,7 @@ Page {
                                 onClicked: {
 
                                     Clipboard.text = password;
-                                    detailsPageNotification.previewSummary = qsTr("Copied")
+                                    detailsPageNotification.previewSummary = qsTr("Copied password to clipboard")
                                     detailsPageNotification.publish();
 
                                 }
@@ -337,7 +346,7 @@ Page {
                                     height: gatheringTotpBusy.height + (gatheringTotpBusy.y * 2)
                                     color: "transparent"
                                     opacity: 1.0
-                                    radius: 12
+                                    radius: 20
 
                                     anchors {
 
@@ -350,7 +359,7 @@ Page {
                                     border {
 
                                         id: totpTimerBorder
-                                        width: 2
+                                        width: 3
                                         color: Theme.highlightColor
 
                                     }
@@ -426,7 +435,7 @@ Page {
                                 onClicked: {
 
                                     Clipboard.text = totpOutput;
-                                    detailsPageNotification.previewSummary = qsTr("One-Time Password Copied")
+                                    detailsPageNotification.previewSummary = qsTr("Copied one-time password to clipboard")
                                     detailsPageNotification.publish();
 
                                 }
@@ -458,9 +467,8 @@ Page {
 
                     onClicked: {
 
-                        if (text.slice(0, 4) !== "http") {
+                        if (text.slice(0, 4) !== "http") { // To avoid "Cannot open file. File was not found." error.
 
-                            // To avoid for "Cannot open file. File was not found." error.
                             var needsHttp = "https://" + text;
                             Qt.openUrlExternally(needsHttp);
 
@@ -475,6 +483,8 @@ Page {
             }
 
         }
+
+        VerticalScrollDecorator { }
 
     }
 
