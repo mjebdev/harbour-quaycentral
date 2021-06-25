@@ -13,24 +13,9 @@ Page {
         anchors.fill: parent
         model: itemDetailsModel
 
-        /*PullDownMenu {
-
-            possible feature further on in development-
-            MenuItem {
-
-                text: "Edit"
-
-                onClicked: {
-
-                    //
-
-                }
-
-            }
-
-        }*/
-
         PullDownMenu {
+
+            visible: settings.includeLockMenuItem
 
             MenuItem {
 
@@ -53,6 +38,14 @@ Page {
 
                 id: titleHeader
                 title: itemTitle
+
+            }
+
+            Row {
+
+                width: parent.width
+                id: paddingRow
+                height: Theme.paddingLarge
 
             }
 
@@ -336,7 +329,7 @@ Page {
                                             onClicked: {
 
                                                 Clipboard.text = usernameField.text;
-                                                detailsPageNotification.previewSummary = qsTr("Copied")
+                                                detailsPageNotification.previewSummary = qsTr("Copied %1 to clipboard").arg(fieldItemTitle);
                                                 detailsPageNotification.publish();
 
                                             }
@@ -377,7 +370,13 @@ Page {
                                         text: fieldItemValue
                                         label: fieldItemTitle
                                         y: passwordCopyButton.width / 8
+/*
+                                        Text { // not yet available with this version of QtQuick
 
+                                            textFormat: Text.MarkdownText
+
+                                        }
+*/
                                     }
 
                                 }
@@ -408,7 +407,7 @@ Page {
                                             onClicked: {
 
                                                 Clipboard.text = fieldItemValue;
-                                                detailsPageNotification.previewSummary = qsTr("Copied")
+                                                detailsPageNotification.previewSummary = qsTr("Copied %1 to clipboard").arg(fieldItemTitle);
                                                 detailsPageNotification.publish();
 
                                             }
@@ -513,7 +512,7 @@ Page {
                                             onClicked: {
 
                                                 Clipboard.text = fieldItemValue;
-                                                detailsPageNotification.previewSummary = qsTr("Copied")
+                                                detailsPageNotification.previewSummary = qsTr("Copied %1 to clipboard").arg(fieldItemTitle);
                                                 detailsPageNotification.publish();
 
                                             }
