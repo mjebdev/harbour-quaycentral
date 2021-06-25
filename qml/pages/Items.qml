@@ -21,6 +21,8 @@ Page {
 
         PullDownMenu {
 
+            visible: settings.includeLockMenuItem
+
             MenuItem {
 
                 text: qsTr("Lock");
