@@ -175,3 +175,5 @@ ApplicationWindow {
     }
 
 }
+
+// this line only here because wrong version number entered in GitHub and needed to amend.
