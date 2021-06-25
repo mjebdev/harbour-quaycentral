@@ -52,7 +52,11 @@ CoverBackground {
 
                 Behavior on opacity {
 
-                    FadeAnimator {}
+                    FadeAnimator {
+
+                        duration: 330
+
+                    }
 
                 }
 
