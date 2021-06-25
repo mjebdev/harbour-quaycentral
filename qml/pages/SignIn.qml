@@ -88,7 +88,7 @@ Page {
                 Label {
 
                     id: appVersionLabel
-                    text: "v0.2.1-beta"
+                    text: "v0.3"
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.secondaryColor
                     width: parent.width
@@ -319,7 +319,7 @@ Page {
 
                 loggingInBusy.running = false;
                 statusLabel.color = Theme.errorColor;
-                statusLabel.text = qsTr("Incorrect Password");
+                statusLabel.text = qsTr("Incorrect password");
                 passwordField.visible = true;
                 passwordField.opacity = 1.0;
 
@@ -374,11 +374,11 @@ Page {
                     {categoryName: "Secure Note", categoryDisplayName: "Secure Notes"}, {categoryName: "Credit Card", categoryDisplayName: "Credit Cards"},
                     {categoryName: "Identity", categoryDisplayName: "Identities"}, {categoryName: "Bank Account", categoryDisplayName: "Bank Accounts"},
                     {categoryName: "Database", categoryDisplayName: "Databases"}, {categoryName: "Driver License", categoryDisplayName: "Driver Licenses"},
-                    {categoryName: "Email Account", categoryDisplayName: "Email Accounts"}, {categoryName: "Membership", categoryDisplayName: "Memberships"},
-                    {categoryName: "Outdoor License", categoryDisplayName: "Outdoor Licenses"}, {categoryName: "Passport", categoryDisplayName: "Passports"},
-                    {categoryName: "Reward Program", categoryDisplayName: "Reward Programs"}, {categoryName: "Server", categoryDisplayName: "Servers"},
-                    {categoryName: "Social Security Number", categoryDisplayName: "Social Security Numbers"}, {categoryName: "Software License", categoryDisplayName: "Software Licenses"},
-                    {categoryName: "Wireless Router", categoryDisplayName: "Wireless Routers"}]});
+                    {categoryName: "Email Account", categoryDisplayName: "Email Accounts"}, {categoryName: "Medical Record", categoryDisplayName: "Medical Records"},
+                    {categoryName: "Membership", categoryDisplayName: "Memberships"}, {categoryName: "Outdoor License", categoryDisplayName: "Outdoor Licenses"},
+                    {categoryName: "Passport", categoryDisplayName: "Passports"}, {categoryName: "Reward Program", categoryDisplayName: "Reward Programs"},
+                    {categoryName: "Server", categoryDisplayName: "Servers"}, {categoryName: "Social Security Number", categoryDisplayName: "Social Security Numbers"},
+                    {categoryName: "Software License", categoryDisplayName: "Software Licenses"}, {categoryName: "Wireless Router", categoryDisplayName: "Wireless Routers"}]});
 
             }
 
