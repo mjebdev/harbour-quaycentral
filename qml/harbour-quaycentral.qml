@@ -26,6 +26,7 @@ ApplicationWindow {
         property bool sessionExpiryNotify
         property bool ccnumHidden: true
         property bool enableTimer
+        property bool includeLockMenuItem: true
         property int sessionTimeLength: 120000
         property int sessionTimeIndex: 1
 
@@ -34,20 +35,20 @@ ApplicationWindow {
     property var vaultList // used to parse the JSON output before filling vaultListModel, also for active vault
     property var vaultName: ["string", "string"]
     property var vaultUUID: ["string", "string"]
-
     property var itemList // used to parse the JSON output before filling itemListModel
     property var itemTitle: ["string", "string"]
     property var itemTitleToUpperCase: ["string", "string"]
     property var itemUUID: ["string", "string"]
-
     property var itemDetails // used to parse the JSON output before filling itemDetailsModel
+
     property string singleItemUsername
     property string singleItemPassword
     property string chosenCategory
-
     property string errorReadout
+    property string standardOutput
     property string cliVersion
     property string currentSession
+
     property bool expiredSession
     property bool appPastLaunch
     property bool justOneVault
