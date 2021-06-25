@@ -18,13 +18,16 @@ Page {
 
             MenuItem {
 
+                text: qsTr("Lock")
+                onClicked: lockItUp(false);
+                visible: settings.includeLockMenuItem
+
+            }
+
+            MenuItem {
+
                 text: qsTr("Settings")
-
-                onClicked: {
-
-                    pageStack.push(Qt.resolvedUrl("Settings.qml"));
-
-                }
+                onClicked: pageStack.push(Qt.resolvedUrl("Settings.qml"));
 
             }
 
