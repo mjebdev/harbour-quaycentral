@@ -68,5 +68,3 @@ public:
 };
 
 #endif // PROCESS_H
-
-// updating from v0.2.2 to v0.3 however no changes for this file
