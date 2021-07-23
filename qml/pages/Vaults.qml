@@ -27,7 +27,7 @@ Page {
             MenuItem {
 
                 text: qsTr("Settings")
-                onClicked: pageStack.push(Qt.resolvedUrl("Settings.qml"));
+                onClicked: pageStack.push(Qt.resolvedUrl("Settings.qml"))
 
             }
 
@@ -81,10 +81,7 @@ Page {
 
                         onClicked: {
 
-                            // for future item grabs (fewer calls if vault is specified) - vaultUUID array no longer in use as parsed JSON go-between,
-                            // so can safely overwrite with data from ListModel each time a vault is chosen
-                            vaultUUID[0] = uuid;
-                            chosenCategory = categoryName;
+                            itemsVault = uuid;
                             gatheringBusy.running = true;
                             mainProcess.start("op", ["list", "items", "--categories", categoryName, "--vault", uuid, "--session", currentSession, "--cache"]);
 
@@ -119,13 +116,13 @@ Page {
                 itemTitle[i] = itemList[i].overview.title;
                 itemTitleToUpperCase[i] = itemList[i].overview.title.toUpperCase();
                 itemUUID[i] = itemList[i].uuid;
-                itemListModel.append({uuid: itemUUID[i], title: itemTitle[i]});
+                itemKind[i] = itemList[i].templateUuid;
+                itemListModel.append({uuid: itemUUID[i], title: itemTitle[i], kind: itemKind[i]});
 
             }
 
             gatheringBusy.running = false;
-            if (chosenCategory == "Login") pageStack.push(Qt.resolvedUrl("Items.qml"));
-            else pageStack.push(Qt.resolvedUrl("OtherItems.qml"));
+            pageStack.push(Qt.resolvedUrl("Items.qml"));
 
         }
 
@@ -139,6 +136,17 @@ Page {
                 gatheringBusy.running = false;
                 notifySessionExpired.previewSummary = "Session Expired";
                 notifySessionExpired.publish();
+                pageStack.clear();
+                pageStack.replace(Qt.resolvedUrl("SignIn.qml"));
+
+            }
+
+            else {
+
+                gatheringBusy.running = false;
+                notifySessionExpired.previewSummary = "Unknown Error (copied to clipboard). Please sign back in.";
+                notifySessionExpired.publish();
+                Clipboard.text = errorReadout;
                 pageStack.clear();
                 pageStack.replace(Qt.resolvedUrl("SignIn.qml"));
 
