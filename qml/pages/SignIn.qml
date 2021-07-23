@@ -1,12 +1,14 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Process 1.0
+import EncryptedStorage 1.0
 
 Page {
 
     id: page
     allowedOrientations: Orientation.PortraitMask
     property bool skippingVaultScreen
+    property bool haveSessionKey
     //property bool initialSetup    // these were to be used for optional setup of CLI from within app,
     //property string deviceID      // will probably leave out as app is best suited for those who are already
                                     // terminal & dev-tools literate, so dev know-how will remain necessary.
@@ -32,6 +34,7 @@ Page {
                 statusLabel.text = "";
                 passwordField.visible = true;
                 passwordField.opacity = 1.0;
+                haveSessionKey = false;
 
             }
 
@@ -88,7 +91,7 @@ Page {
                 Label {
 
                     id: appVersionLabel
-                    text: "v0.3"
+                    text: "v0.4"
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.secondaryColor
                     width: parent.width
@@ -278,7 +281,7 @@ Page {
 
             sessionExpiryTimer.restart();
 
-            if (skippingVaultScreen) {
+            if (haveSessionKey) { // if this process is even being called again must be skipping vault screen?
 
                 itemListModel.clear();
                 processOne.waitForFinished();
@@ -290,13 +293,15 @@ Page {
                     itemTitle[i] = itemList[i].overview.title;
                     itemTitleToUpperCase[i] = itemList[i].overview.title.toUpperCase();
                     itemUUID[i] = itemList[i].uuid;
-                    itemListModel.append({uuid: itemUUID[i], title: itemTitle[i]});
+                    itemKind[i] = itemList[i].templateUuid;
+                    itemListModel.append({uuid: itemUUID[i], title: itemTitle[i], kind: itemKind[i]});
 
                 }
 
                 loggingInBusy.running = false;
                 statusLabel.text = "";
-                pageStack.push(Qt.resolvedUrl("Items.qml"));
+                itemsVault = defaultVaultUUID;
+                pageStack.push([Qt.resolvedUrl("Vaults.qml"), Qt.resolvedUrl("Items.qml")]);
 
             }
 
@@ -304,6 +309,7 @@ Page {
 
                 currentSession = readAllStandardOutput();
                 currentSession = currentSession.trim();
+                haveSessionKey = true;
                 statusLabel.text = qsTr("Unlocked, listing vaults...");
                 processTwo.start("op", ["list", "vaults", "--session", currentSession]);
 
@@ -329,7 +335,8 @@ Page {
 
                 loggingInBusy.running = false;
                 statusLabel.color = Theme.errorColor;
-                statusLabel.text = qsTr("QuayCentral shorthand has not been added to 1Password command-line tool.\n\nPlease setup tool to accept QuayCentral requests and relaunch app.");
+                statusLabel.horizontalAlignment = "AlignLeft";
+                statusLabel.text = qsTr("QuayCentral shorthand has not been added to your account on the 1Password command-line tool.\n\nPlease setup the tool to allow QuayCentral interaction, then relaunch.");
                 titleLabel.color = "grey"
                 appVersionLabel.color = "grey"
                 statusRow.height = statusLabel.height;
@@ -362,7 +369,6 @@ Page {
             sessionExpiryTimer.restart();
             var prelimOutput = readAllStandardOutput();
             vaultList = JSON.parse(prelimOutput);
-            if (vaultList.length === 1) justOneVault = true;
 
             vaultListModel.clear();
 
@@ -370,39 +376,106 @@ Page {
 
                 vaultName[i] = vaultList[i].name;
                 vaultUUID[i] = vaultList[i].uuid;
-                vaultListModel.append({name: vaultName[i], uuid: vaultUUID[i], categories: [{categoryName: "Login", categoryDisplayName: "Logins"},
-                    {categoryName: "Secure Note", categoryDisplayName: "Secure Notes"}, {categoryName: "Credit Card", categoryDisplayName: "Credit Cards"},
-                    {categoryName: "Identity", categoryDisplayName: "Identities"}, {categoryName: "Bank Account", categoryDisplayName: "Bank Accounts"},
-                    {categoryName: "Database", categoryDisplayName: "Databases"}, {categoryName: "Driver License", categoryDisplayName: "Driver Licenses"},
-                    {categoryName: "Email Account", categoryDisplayName: "Email Accounts"}, {categoryName: "Medical Record", categoryDisplayName: "Medical Records"},
-                    {categoryName: "Membership", categoryDisplayName: "Memberships"}, {categoryName: "Outdoor License", categoryDisplayName: "Outdoor Licenses"},
-                    {categoryName: "Passport", categoryDisplayName: "Passports"}, {categoryName: "Reward Program", categoryDisplayName: "Reward Programs"},
-                    {categoryName: "Server", categoryDisplayName: "Servers"}, {categoryName: "Social Security Number", categoryDisplayName: "Social Security Numbers"},
-                    {categoryName: "Software License", categoryDisplayName: "Software Licenses"}, {categoryName: "Wireless Router", categoryDisplayName: "Wireless Routers"}]});
+                vaultListModel.append({name: vaultName[i], uuid: vaultUUID[i],
+                categories: categoryListModel});
 
             }
 
-            // need to assign default vault as first vault if no default exists.
+            if (vaultList.length === 1) justOneVault = true;
+            else justOneVault = false; // user could conceivably create a second vault with app open and so need to switch back to false if this occurs
 
             statusLabel.text = qsTr("Vault listing complete.");
 
-            // if (settings.skipVaultScreen) {
+            if (settings.skipVaultScreen) {
 
-                // skippingVaultScreen = true;
-                // statusLabel.text = qsTr("Listing vault items...");
-                // Not applicable for now, will remove settings reference either way.
-                // processOne.start("op", ["list", "items", "--categories", "Login", "--vault", settings.defaultVaultUUID, "--session", currentSession]);
+                skippingVaultScreen = true;
+                statusLabel.text = qsTr("Listing items in vault...");
 
-            // }
+                if (justOneVault) { // don't need sf-secrets to access default UUID if only one vault.
 
-            // else {
+                    defaultVaultIndex = 0;
+                    defaultVaultTitle = vaultName[0];
 
-                // skippingVaultScreen = false;
+                }
+
+                else {
+
+                    defaultVaultUUID = encryptedUUID.get("Default Vault UUID");
+                    defaultVaultUUID = defaultVaultUUID.trim();
+
+                    if (defaultVaultUUID !== "") {
+
+                        // go through existing list to make sure default vault still exists, if not, revert to no default chosen in Settings
+                        var defaultInList = false;
+
+                        for (var j = 0; j < vaultUUID.length; j++) {
+
+                            if (vaultUUID[j] === defaultVaultUUID) {
+
+                                defaultVaultTitle = vaultName[j];
+                                defaultVaultIndex = j;
+                                defaultInList = true;
+
+                            }
+
+                        }
+
+                        if (defaultInList === false) { // change settings to reflect that there's no current default, will not skip vault screen.
+
+                            skippingVaultScreen = false;
+                            settings.loadAllItems = true;
+                            settings.skipVaultScreen = false;
+                            settings.sync();
+
+                        }
+
+                    }
+
+                    else { // there's no default assigned, will not be skipping vault screen.
+
+                        skippingVaultScreen = false;
+                        settings.loadAllItems = true;
+                        settings.skipVaultScreen = false;
+                        settings.sync();
+
+                    }
+
+                }
+
+                if (skippingVaultScreen) { // confirm we're still skipping vault screen
+
+                    if (settings.loadAllItems) {
+
+                        processOne.start("op", ["list", "items", "--vault", defaultVaultUUID, "--session", currentSession]);
+
+                    }
+
+                    else {
+
+                        processOne.start("op", ["list", "items", "--vault", defaultVaultUUID, "--categories", settings.whichItemsToLoad, "--session", currentSession]);
+
+                    }
+
+                }
+
+                else {
+
+                    loggingInBusy.running = false;
+                    statusLabel.text = "";
+                    pageStack.push(Qt.resolvedUrl("Vaults.qml"));
+
+                }
+
+            }
+
+            else {
+
+                skippingVaultScreen = false;
                 loggingInBusy.running = false;
                 statusLabel.text = "";
                 pageStack.push(Qt.resolvedUrl("Vaults.qml"));
 
-            // }
+            }
 
         }
 
@@ -410,7 +483,7 @@ Page {
 
             sessionExpiryTimer.stop();
             statusLabel.color = Theme.errorColor;
-            statusLabel.text = qsTr("Error occurred when gathering Vault data.");
+            statusLabel.text = qsTr("Error occurred while accessing vault data.");
 
         }
 
@@ -439,6 +512,12 @@ Page {
             statusRow.height = statusLabel.height;
 
         }
+
+    }
+
+    EncryptedStorage {
+
+        id: encryptedUUID
 
     }
 
