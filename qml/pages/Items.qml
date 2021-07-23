@@ -25,8 +25,8 @@ Page {
 
             MenuItem {
 
-                text: qsTr("Lock");
-                onClicked: lockItUp(false);
+                text: qsTr("Lock")
+                onClicked: lockItUp(false)
 
             }
 
@@ -56,11 +56,11 @@ Page {
                 // needs to be at least one result to work with and not a full list / empty field.
                 if (itemListModel.count > 0 && text.length > 0) {
 
-                    if (settings.enterKeyLoadsDetails) {
+                    if (settings.enterKeyLoadsDetails || itemListModel.get(0).kind !== "001") {
 
                         loadingItemBusy.running = true;
                         allItemDetails = true;
-                        getPassword.start("op", ["get", "item", "--vault", vaultUUID[0], itemListModel.get(0).uuid, "--session", currentSession]);
+                        getPassword.start("op", ["get", "item", itemListModel.get(0).uuid, "--vault", itemsVault, "--session", currentSession, "--cache"]);
 
                     }
 
@@ -68,7 +68,7 @@ Page {
 
                         itemCopied = itemListModel.get(0).title;
                         allItemDetails = false;
-                        getPassword.start("op", ["get", "item", "--vault", vaultUUID[0], itemListModel.get(0).uuid, "--fields", "password", "--session", currentSession]);
+                        getPassword.start("op", ["get", "item", itemListModel.get(0).uuid, "--vault", itemsVault, "--fields", "password", "--session", currentSession, "--cache"]);
 
                     }
 
@@ -116,11 +116,11 @@ Page {
 
                     onClicked: {
 
-                        if (settings.tapToCopy) {
+                        if (settings.tapToCopy && kind === "001") {
 
                             itemCopied = title;
                             allItemDetails = false;
-                            getPassword.start("op", ["get", "item", "--vault", vaultUUID[0], uuid, "--fields", "password", "--session", currentSession]);
+                            getPassword.start("op", ["get", "item", uuid, "--vault", itemsVault, "--fields", "password", "--session", currentSession, "--cache"]);
 
                         }
 
@@ -128,7 +128,7 @@ Page {
 
                             allItemDetails = true;
                             loadingItemBusy.running = true;
-                            getPassword.start("op", ["get", "item", "--vault", vaultUUID[0], uuid, "--session", currentSession]);
+                            getPassword.start("op", ["get", "item", uuid, "--vault", itemsVault, "--session", currentSession, "--cache"]);
 
                         }
 
@@ -136,11 +136,11 @@ Page {
 
                     onPressAndHold: {
 
-                        if (settings.tapToCopy) {
+                        if (settings.tapToCopy || kind !== "001") {
 
                             allItemDetails = true;
                             loadingItemBusy.running = true;
-                            getPassword.start("op", ["get", "item", "--vault", vaultUUID[0], uuid, "--session", currentSession]);
+                            getPassword.start("op", ["get", "item", uuid, "--vault", itemsVault, "--session", currentSession, "--cache"]);
 
                         }
 
@@ -148,7 +148,7 @@ Page {
 
                             itemCopied = title;
                             allItemDetails = false;
-                            getPassword.start("op", ["get", "item", "--vault", vaultUUID[0], uuid, "--fields", "password", "--session", currentSession]);
+                            getPassword.start("op", ["get", "item", uuid, "--vault", itemsVault, "--fields", "password", "--session", currentSession, "--cache"]);
 
                         }
 
@@ -171,39 +171,98 @@ Page {
         onReadyReadStandardOutput: {
 
             sessionExpiryTimer.restart();
+            itemDetailsModel.clear();
+            var prelimOutput = readAllStandardOutput();
+            itemDetails = JSON.parse(prelimOutput);
 
             if (allItemDetails) { // load item details and move to itemDetails page
 
                 singleItemUsername = ""; // incase none is returned from CLI
                 singleItemPassword = "";
-                itemDetailsModel.clear();
-                var prelimOutput = readAllStandardOutput();
-                itemDetails = JSON.parse(prelimOutput);
 
-                for (var i = 0; i < itemDetails.details.fields.length; i++) {
+                if (itemDetails.templateUuid === "001") { // login item
 
-                    switch (itemDetails.details.fields[i].designation) {
+                    for (var i = 0; i < itemDetails.details.fields.length; i++) {
 
-                    case "username":
+                        switch (itemDetails.details.fields[i].designation) {
 
-                        singleItemUsername = itemDetails.details.fields[i].value;
-                        break;
+                        case "username":
 
-                    case "password":
+                            singleItemUsername = itemDetails.details.fields[i].value;
+                            break;
 
-                        singleItemPassword = itemDetails.details.fields[i].value;
+                        case "password":
+
+                            singleItemPassword = itemDetails.details.fields[i].value;
+
+                        }
 
                     }
 
+                    itemDetailsModel.append({"uuid": itemDetails.uuid, "itemTitle": itemDetails.overview.title, "username": singleItemUsername, "password": singleItemPassword, "website": itemDetails.overview.url});
+                    singleItemPassword = "0000000000000000000000000000000000000000000000000000000000000000";
+                    singleItemPassword = "";
+                    singleItemUsername = "0000000000000000000000000000000000000000000000000000000000000000";
+                    singleItemUsername = "";
+                    loadingItemBusy.running = false;
+                    pageStack.push(Qt.resolvedUrl("ItemDetails.qml"));
+
                 }
 
-                itemDetailsModel.append({"uuid": itemDetails.uuid, "itemTitle": itemDetails.overview.title, "username": singleItemUsername, "password": singleItemPassword, "website": itemDetails.overview.url});
-                singleItemPassword = "0000000000000000000000000000000000000000000000000000000000000000";
-                singleItemPassword = "";
-                singleItemUsername = "0000000000000000000000000000000000000000000000000000000000000000";
-                singleItemUsername = "";
-                loadingItemBusy.running = false;
-                pageStack.push(Qt.resolvedUrl("ItemDetails.qml"));
+                else { // non-login item
+
+                    sectionDetailsModel.clear();
+
+                    itemDetailsModel.append({"uuid": itemDetails.uuid, "itemTitle": itemDetails.overview.title});
+
+                    if (itemDetails.details.sections !== undefined) {
+
+                        for (var m = 0; m < itemDetails.details.sections.length; m++) {
+
+                            if (itemDetails.details.sections[m].fields !== undefined) {
+
+                                for (var j = 0; j < itemDetails.details.sections[m].fields.length; j++) {
+
+                                    if (itemDetails.details.sections[m].fields[j].v !== undefined && itemDetails.details.sections[m].fields[j].v !== "" && itemDetails.details.sections[m].fields[j].t !== undefined && itemDetails.details.sections[m].fields[j].k !== undefined) {
+
+                                        sectionDetailsModel.append({"fieldItemTitle": itemDetails.details.sections[m].fields[j].t, "fieldItemValue": itemDetails.details.sections[m].fields[j].v, "fieldItemKind": itemDetails.details.sections[m].fields[j].k, "fieldItemName": itemDetails.details.sections[m].fields[j].n});
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                    if (itemDetails.sections !== undefined) {
+
+                        for (var k = 0; k < itemDetails.sections.length; k++) {
+
+                            if (itemDetails.sections[k].fields !== undefined) {
+
+                                for (var l = 0; l < itemDetails.sections[k].fields.length; l++) {
+
+                                    if (itemDetails.sections[k].fields[l].v !== undefined && itemDetails.sections[k].fields[l].v !== "" && itemDetails.sections[k].fields[l].t !== undefined && itemDetails.sections[k].fields[l].k !== undefined) {
+
+                                        sectionDetailsModel.append({"fieldItemTitle": itemDetails.sections[k].fields[l].t, "fieldItemValue": itemDetails.sections[k].fields[l].v, "fieldItemKind": itemDetails.sections[k].fields[l].k, "fieldItemName": itemDetails.details.sections[i].fields[j].n});
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                    loadingItemBusy.running = false;
+                    pageStack.push(Qt.resolvedUrl("OtherItemDetails.qml"));
+
+                }
 
             }
 
@@ -228,7 +287,7 @@ Page {
 
             else {
 
-                itemsPageNotification.previewSummary = "Unknown Error - Please check network and try signing in again.";
+                itemsPageNotification.previewSummary = "Unknown Error (copied to clipboard). Please sign back in.";
                 Clipboard.text = errorReadout;
 
             }
@@ -236,29 +295,6 @@ Page {
             itemsPageNotification.publish();
             pageStack.clear();
             pageStack.replace(Qt.resolvedUrl("SignIn.qml"));
-
-            /*  this code allowed for the user to continue despite error if it wasn't sign-in related; changing
-                for sake of extra security, error of any kind will now kick user out and force re-signing in.
-            if (allItemDetails) {
-
-                itemsPageNotification.previewSummary = qsTr("Error - Unable to load item details.");
-                itemsPageNotification.body = readAllStandardError();
-                itemsPageNotification.urgency = Notification.Medium;
-                itemsPageNotification.publish();
-                itemsPageNotification.urgency = Notification.Low; // back to normal setting
-
-            }
-
-            else {
-
-                itemsPageNotification.previewSummary = qsTr("Error - Password not copied.");
-                itemsPageNotification.body = readAllStandardError();
-                itemsPageNotification.urgency = Notification.Medium;
-                itemsPageNotification.publish();
-                itemsPageNotification.urgency = Notification.Low; // back to normal setting
-
-            }
-            */
 
         }
 
@@ -284,5 +320,3 @@ Page {
     }
 
 }
-
-// changing version tag from 0.2.2 to 0.3
