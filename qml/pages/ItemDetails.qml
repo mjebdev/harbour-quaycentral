@@ -68,7 +68,7 @@ Page {
 
             Component.onCompleted: {
 
-                getTotp.start("op", ["get", "totp", "--vault", vaultUUID[0], uuid, "--session", currentSession]);
+                getTotp.start("op", ["get", "totp", uuid, "--vault", itemsVault, "--session", currentSession]);
 
             }
 
@@ -98,6 +98,7 @@ Page {
                 onReadyReadStandardOutput: {
 
                     totpOutput = readAllStandardOutput();
+                    totpOutput = totpOutput.trim();
 
                     if (totpRow.visible == false) { // if first time checking for totp in item
 
@@ -329,11 +330,11 @@ Page {
 
                             id: totpTextField
                             font.letterSpacing: 6
+                            text: "/././. /././."
                             readOnly: true
                             label: qsTr("one-time password")
                             y: passwordCopyButton.width / 8
                             width: parent.width - Theme.paddingMedium
-                            text: "/././. /././." // seems to prevent row from showing with label in textfield prior to code.
 
                             rightItem: Label {
 
@@ -386,7 +387,7 @@ Page {
                                             totpTextField.color = "grey";
                                             totpTimerField.color = "grey";
                                             totpCopyButton.enabled = false;
-                                            getTotp.start("op", ["get", "totp", "--vault", vaultUUID[0], uuid, "--session", currentSession]);
+                                            getTotp.start("op", ["get", "totp", uuid, "--vault", itemsVault, "--session", currentSession]);
 
                                         }
 
