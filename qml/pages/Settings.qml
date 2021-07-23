@@ -3,6 +3,7 @@ import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 import Nemo.Notifications 1.0
 import Process 1.0
+import EncryptedStorage 1.0
 
 Page {
 
@@ -14,8 +15,6 @@ Page {
 
     Component.onCompleted: {
 
-        // checking for version so that text in 'About' is as up-to-date as we can have it. Avoiding any discrepancy between that
-        // and output from 'Update CLI' button.
         versionCheck.start("op", ["--version"]);
 
     }
@@ -34,29 +33,31 @@ Page {
 
     }
 
-    // was to be used for option on this page to signout and forget the --quaycentsfos shorthand, ran into issues
-    // with user having to get into terminal, and also possibly list of authorized devices online, to remove anyway, nullifying
-    // purpose of the option being included here.
-    // property bool signOutError: false
+    ListModel {
 
+        id: allItemsOrOneCategoryModel
 
-    /*  to be enabled in some form when there is a Sailfish-Secrets implementation on the app, which will in turn allow
-        the secure storage of the default vault UUID.
-    Component.onCompleted: {
-
-        // determine current index of default vault combo by confirming place in list of current default.
-        for (var i = 0; i < vaultUUID.length; i++) {
-
-            if (settings.defaultVaultUUID === vaultUUID[i]) {
-
-                defaultVaultCombo.currentIndex = i;
-
-            }
-
-        }
+        ListElement {categoryName: ""; categoryDisplayName: "All Categories"}
+        ListElement {categoryName: "Login"; categoryDisplayName: "Logins"}
+        ListElement {categoryName: "Secure Note"; categoryDisplayName: "Secure Notes"}
+        ListElement {categoryName: "Credit Card"; categoryDisplayName: "Credit Cards"}
+        ListElement {categoryName: "Identity"; categoryDisplayName: "Identities"}
+        ListElement {categoryName: "Bank Account"; categoryDisplayName: "Bank Accounts"}
+        ListElement {categoryName: "Database"; categoryDisplayName: "Databases"}
+        ListElement {categoryName: "Driver License"; categoryDisplayName: "Driver Licenses"}
+        ListElement {categoryName: "Email Account"; categoryDisplayName: "Email Accounts"}
+        ListElement {categoryName: "Medical Record"; categoryDisplayName: "Medical Records"}
+        ListElement {categoryName: "Membership"; categoryDisplayName: "Memberships"}
+        ListElement {categoryName: "Outdoor License"; categoryDisplayName: "Outdoor Licenses"}
+        ListElement {categoryName: "Passport"; categoryDisplayName: "Passports"}
+        ListElement {categoryName: "Password"; categoryDisplayName: "Passwords"}
+        ListElement {categoryName: "Reward Program"; categoryDisplayName: "Reward Programs"}
+        ListElement {categoryName: "Server"; categoryDisplayName: "Servers"}
+        ListElement {categoryName: "Social Security Number"; categoryDisplayName: "Social Security Numbers"}
+        ListElement {categoryName: "Software License"; categoryDisplayName: "Software Licenses"}
+        ListElement {categoryName: "Wireless Router"; categoryDisplayName: "Wireless Routers"}
 
     }
-    */
 
     SilicaFlickable {
 
@@ -177,48 +178,13 @@ Page {
             Label {
 
                 id: pressAndHoldInfoLabel
-                font.pixelSize: Theme.fontSizeExtraSmall
+                font.pixelSize: Theme.fontSizeTiny
                 width: parent.width
-                text: tappingCombo.currentIndex === 1 ? qsTr("Long press will load item details") : qsTr("Long press will copy password")
+                text: tappingCombo.currentIndex === 1 ? qsTr("Long press will load item details.") : qsTr("Long press will copy password.")
                 wrapMode: Text.Wrap
                 leftPadding: Theme.horizontalPageMargin
 
             }
-
-            /*  to be enabled in some form when there is a Sailfish-Secrets implementation on the app, which will in turn allow
-                the secure storage of the default vault UUID.
-
-            ComboBox {
-
-                label: "Default Vault"
-                id: defaultVaultCombo
-                width: parent.width
-
-                menu: ContextMenu {
-
-                    Repeater {
-
-                        model: vaultName
-
-                        MenuItem {
-
-                            text: modelData
-
-                            onClicked: {
-
-                                settings.defaultVaultUUID = vaultUUID[index];
-                                settings.sync();
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-            }
-            */
 
             SectionHeader {
 
@@ -250,7 +216,7 @@ Page {
 
             TextSwitch {
 
-                text: qsTr("Enable Lockout Timer")
+                text: qsTr("Enable lockout timer")
                 id: enableTimerSwitch
                 checked: settings.enableTimer
                 leftMargin: Theme.horizontalPageMargin
@@ -270,8 +236,8 @@ Page {
                 label: qsTr("Lock when CLI inactive for")
                 id: sessionLengthCombo
                 currentIndex: settings.sessionTimeIndex
-                enabled: enableTimerSwitch.checked
-                leftMargin: Theme.horizontalPageMargin
+                visible: enableTimerSwitch.checked
+                leftMargin: Theme.horizontalPageMargin * 2
 
                 menu: ContextMenu {
 
@@ -324,32 +290,13 @@ Page {
 
             }
 
-            // To be enabled in some form when there is a Sailfish-Secrets implementation in the app, with which the default vault UUID can be stored securely.
-            /*
-            TextSwitch {
-
-                text: "Skip vault selection screen and go directly to item listing for default vault."
-                id: skipVaultScreenSwitch
-                enabled: settings.moreThanOneVault
-                checked: settings.skipVaultScreen
-
-                onCheckedChanged: {
-
-                    settings.skipVaultScreen = checked;
-                    settings.sync();
-
-                }
-
-            }
-            */
-
             TextSwitch {
 
                 text: qsTr("Notify when session expires")
                 id: sessionExpiryNotifySwitch
                 checked: settings.sessionExpiryNotify
-                enabled: enableTimerSwitch.checked
-                leftMargin: Theme.horizontalPageMargin
+                visible: enableTimerSwitch.checked
+                leftMargin: Theme.horizontalPageMargin * 2
 
                 onCheckedChanged: {
 
@@ -362,13 +309,13 @@ Page {
 
             SectionHeader {
 
-                text: qsTr("Layout")
+                text: qsTr("Navigation")
 
             }
 
             TextSwitch {
 
-                text: qsTr("Show 'Lock' menu on every screen")
+                text: qsTr("Show 'Lock' menu on each screen")
                 id: showLockMenuItemSwitch
                 checked: settings.includeLockMenuItem
                 leftMargin: Theme.horizontalPageMargin
@@ -385,13 +332,153 @@ Page {
             Label {
 
                 id: noLockMenuInfoLabel
-                font.pixelSize: Theme.fontSizeExtraSmall
-                width: parent.width
+                font.pixelSize: Theme.fontSizeTiny
+                width: parent.width - (Theme.horizontalPageMargin * 2)
                 visible: !showLockMenuItemSwitch.checked
-                text: "Use padlock on cover or swipe back to sign-in screen."
+                text: qsTr("To lock, tap padlock on cover or swipe back to sign-in screen.")
                 wrapMode: Text.Wrap
                 leftPadding: Theme.horizontalPageMargin
-                rightPadding: Theme.horizontalPageMargin
+
+            }
+
+            TextSwitch {
+
+                id: skipVaultScreenSwitch
+                text: "Bypass Vaults page on sign-in"
+                checked: settings.skipVaultScreen
+
+                onCheckedChanged: {
+
+                    settings.skipVaultScreen = checked;
+                    settings.sync();
+
+                    if (justOneVault === false) {
+
+                        if (checked) { // need to assign first vault incase user doesn't interact with list
+
+                            defaultVaultIndex = 0;
+                            defaultVaultUUID = vaultUUID[0];
+                            defaultVaultTitle = vaultName[0];
+                            defaultVaultCombo.currentIndex = 0;
+                            encryptedUUID.deleteSecret();
+
+                            if (encryptedUUID.save("Default Vault UUID", vaultUUID[0]) === false) {
+
+                                processStatus.previewSummary = "Error saving default vault UUID. Please try again.";
+                                processStatus.publish();
+                                settings.skipVaultScreen = false;
+                                settings.sync();
+                                this.checked = false;
+
+                            }
+
+                        }
+
+                        else { // delete existing default UUID
+
+                            encryptedUUID.deleteSecret();
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+            ComboBox {
+
+                id: defaultVaultCombo
+                label: qsTr("Default vault")
+                width: parent.width
+                currentIndex: defaultVaultIndex
+                visible: skipVaultScreenSwitch.checked
+                enabled: !justOneVault
+                x: Theme.horizontalPageMargin
+
+                menu: ContextMenu {
+
+                    Repeater {
+
+                        model: vaultListModel
+
+                        MenuItem {
+
+                            text: name
+
+                            onClicked: {
+
+                                if (index !== defaultVaultIndex) {
+
+                                    encryptedUUID.deleteSecret(); // delete existing
+
+                                    if (encryptedUUID.save("Default Vault UUID", vaultUUID[index])) {
+
+                                        defaultVaultIndex = index;
+                                        defaultVaultTitle = vaultName[index];
+                                        defaultVaultUUID = vaultUUID[index];
+
+                                    }
+
+                                    else {
+
+                                        // error saving secret.
+                                        processStatus.previewSummary = qsTr("Error saving default vault UUID. Please try again.");
+                                        processStatus.publish();
+                                        skipVaultScreenSwitch.checked = false;
+                                        settings.skipVaultScreen = false;
+                                        settings.sync();
+                                        allItemsOrOneCategory.visible = false;
+                                        this.visible = false;
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+            ComboBox {
+
+                id: allItemsOrOneCategory
+                label: qsTr("Display")
+                width: parent.width
+                currentIndex: settings.whichItemsToLoadIndex
+                visible: skipVaultScreenSwitch.checked
+                x: Theme.horizontalPageMargin
+
+                menu: ContextMenu {
+
+                    Repeater {
+
+                        model: allItemsOrOneCategoryModel
+
+                        MenuItem {
+
+                            text: categoryDisplayName
+
+                            onClicked: {
+
+                                if (index === 0) settings.loadAllItems = true;
+                                else settings.loadAllItems = false;
+                                settings.whichItemsToLoad = categoryName
+                                settings.whichItemsToLoadIndex = index;
+                                settings.sync();
+
+                            }
+
+                        }
+
+                    }
+
+                }
 
             }
 
@@ -404,7 +491,7 @@ Page {
             Row {
 
                 width: updateButton.width
-                height: updateButton.height + (Theme.paddingLarge * 2)
+                height: updateButton.height + (Theme.paddingMedium * 2)
                 spacing: 0
                 x: (page.width - updateButton.width) * 0.5
 
@@ -412,7 +499,16 @@ Page {
 
                     text: qsTr("Update CLI")
                     id: updateButton
-                    y: Theme.paddingLarge
+                    y: Theme.paddingMedium
+
+                    BusyIndicator {
+
+                        id: updatingIndicator
+                        size: BusyIndicatorSize.Medium
+                        anchors.centerIn: parent
+                        running: false
+
+                    }
 
                     onClicked: {
 
@@ -615,7 +711,7 @@ Page {
             Row {
 
                 width: accountsButton.width
-                height: accountsButton.height + (Theme.paddingLarge * 2)
+                height: accountsButton.height + (Theme.paddingMedium * 2)
                 // spacing: Theme.paddingMedium
                 x: (page.width - accountsButton.width) * 0.5
 
@@ -623,14 +719,14 @@ Page {
 
                     text: qsTr("CLI Accounts");
                     id: accountsButton
-                    y: Theme.paddingLarge
+                    y: Theme.paddingMedium
 
                     onClicked: {
 
                         if (text === qsTr("CLI Accounts")) {
 
                             updateCLI.start("op", ["signin", "--list"]);
-                            text = qsTr("Hide Accounts");
+                            text = qsTr("Done");
                             accountsLabelRow.visible = true;
 
                         }
@@ -722,7 +818,7 @@ Page {
                             horizontalAlignment: Qt.AlignHCenter
                             id: appTitleLabel
                             font.pixelSize: Theme.fontSizeLarge
-                            font.bold: true
+                            // font.bold: true
                             color: Theme.highlightColor
                             bottomPadding: Theme.paddingMedium
 
@@ -755,7 +851,7 @@ Page {
                             font.pixelSize: Theme.fontSizeExtraSmall
                             color: Theme.highlightColor
                             wrapMode: Text.Wrap
-                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nBy Michael J. Barrett\n\nVersion 0.3\nLicensed under GNU GPLv3\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
+                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nBy Michael J. Barrett\n\nVersion 0.4\nLicensed under GNU GPLv3\n\nApp icon by JSEHV @ GitHub. Thank you for the contribution!\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
                             bottomPadding: Theme.paddingLarge
 
                         }
@@ -826,9 +922,7 @@ Page {
                         }
 
                     }
-*/
 
-/*
                     Row {
 
                         width: buyMeCoffeeLabel2.paintedWidth
@@ -1048,7 +1142,6 @@ Page {
                 updateDownloadTimer.stop();
                 processStatus.previewSummary = qsTr("Download complete");
                 processStatus.publish();
-                updateButton.enabled = false;
                 updateDownloadCompletedLabel.text = "<pre>" + standardOutput + "</pre>";
                 updateDownloadCompletedRow.visible = true;
                 furtherActionRow.visible = true;
@@ -1063,6 +1156,7 @@ Page {
 
             else if (standardOutput.indexOf("is now available") !== -1) {
 
+                updateButton.enabled = false;
                 updateAvailable = true;
                 releaseNotesURL = standardOutput.slice(standardOutput.indexOf("<") + 1, standardOutput.indexOf(">"));
                 updateResponseLabel.text = "<pre>" + standardOutput.slice(0, standardOutput.indexOf("<")) + "<a href=\"" + releaseNotesURL + "\">" + releaseNotesURL + "</a></pre>";
@@ -1115,23 +1209,13 @@ Page {
 
     }
 
-    BusyIndicator {
-
-        id: updatingIndicator
-        size: BusyIndicatorSize.Medium
-        anchors.centerIn: updateResponseLabel
-        running: false
-
-    }
-
     Timer { // if update installer (so far just a few MBs) isn't done in 45 seconds, will notify user and let it continue in background.
 
         id: updateDownloadTimer
         interval: 45000
 
-        onTriggered: {
+        onTriggered: { // notify that download should continue etc.
 
-            // notify that download should continue etc.
             updateButton.enabled = false;
             updatingIndicator.running = false;
             updateDownloadStatusLabel.text = updateDownloadStatusLabel.text + qsTr("\n\nDownload has taken longer than 45 seconds. Please check Downloads folder for completed ZIP file or check network & relaunch app to try again, if download has failed.");
@@ -1140,6 +1224,12 @@ Page {
             processStatus.publish();
 
         }
+
+    }
+
+    EncryptedStorage {
+
+        id: encryptedUUID
 
     }
 
