@@ -14,7 +14,8 @@ TARGET = harbour-quaycentral
 
 CONFIG += sailfishapp
 
-SOURCES += src/harbour-quaycentral.cpp
+SOURCES += src/harbour-quaycentral.cpp \
+    src/encryptedStorage.cpp
 
 DISTFILES += qml/harbour-quaycentral.qml \
     qml/cover/CoverPage.qml \
@@ -30,11 +31,13 @@ DISTFILES += qml/harbour-quaycentral.qml \
     translations/*.ts \
     harbour-quaycentral.desktop
 
-SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
+SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172 256x256
 
 # to disable building translations every time, comment out the
 # following CONFIG line
 CONFIG += sailfishapp_i18n
+
+PKGCONFIG += sailfishsecrets
 
 QT += core
 
@@ -47,4 +50,5 @@ QT += core
 # TRANSLATIONS += translations/harbour-quaycentral-de.ts
 
 HEADERS += \
+    src/encryptedStorage.h \
     src/process.h
