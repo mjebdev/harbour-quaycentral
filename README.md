@@ -1,15 +1,18 @@
 # QuayCentral
 A GUI app for the 1Password command-line tool on Sailfish OS.
 
-Version 0.3 - <b>Still in early development</b> - please see Limitations & Issues below.
+Version 0.4 - <b>Still in early development</b> - please see Limitations & Issues below.
 
 QuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.
 
 Licensed under GNU GPLv3.
 
+App icon by JSEHV @ GitHub. Thanks for the contribution!
+
 <h3>Requirements</h3>
 
 - A 1Password.com account (paid, free trial available).
+- An active network connection. As of now, at least, the CLI needs to be online to access data. While it can cache items, it still needs to check if it's the latest version of the item.
 - Installation of the 1Password command-line tool in /usr/local/bin or another directory in your $PATH. (The app has not been tested with the tool in a location other than /usr/local/bin). Permission for "op" to run as an executable. More info and download link:<br>
     https://support.1password.com/command-line-getting-started/<br>
     https://app-updates.agilebits.com/product_history/CLI
@@ -25,7 +28,6 @@ Licensed under GNU GPLv3.
 - Items are read-only, may get around to adding editing functionality down the road.
 - No support for multiple accounts or for groups. (No plans for this, app is designed for individual use.)
 - Items are not listed alphabetically so search method is, for now, necessary as opposed to scrolling through a list.
-- Option to select a default vault and possibly more vault management, similar to the official app, is on hold until I have a Sailfish Secrets implementation to provide the secure storage that may be required for data such as a default vault UUID.
 - Clipboard icon on item details page may be somewhat misaligned if text size is enlarged on a device's Display Settings. Will edit code to work around this somehow, prefer the medium clipboard icon to the small one, there is no small-plus icon size for the clipboard icon as of now.
 - Lock icon on cover may appear somewhat smaller than other standard cover icons. No lock icon available under the Cover category so went with the small icon for now.
 
@@ -47,9 +49,9 @@ Licensed under GNU GPLv3.
 
 <h3>Contact</h3>
 
-If you would like to send feedback regarding the app, email mjbdev@eml.cc
+If you would like to send feedback regarding the app, please email: mjbdev@eml.cc
 
-Found the app useful as a user or developer? 👍 <a href="https://ko-fi.com/michaeljb">Buy me a coffee</a>.<br>
+If you've found the app useful as a user or developer 👍 you can <a href="https://ko-fi.com/michaeljb">buy me a coffee</a>!<br>
 
 Thanks,<br>
 Michael B.
