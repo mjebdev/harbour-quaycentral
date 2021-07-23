@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Process 1.0
+import EncryptedStorage 1.0
 import Nemo.Notifications 1.0
 import Nemo.Configuration 1.0
 import "pages"
@@ -17,9 +18,6 @@ ApplicationWindow {
         id: settings
         path: "/apps/harbour-quaycentral"
 
-        // Below option in Settings to be enabled when there is a Sailfish-Secrets implementation
-        // in the app, with which the default vault UUID can be stored securely.
-        // property string defaultVaultUUID: ""
         property bool skipVaultScreen: false
         property bool tapToCopy
         property bool enterKeyLoadsDetails
@@ -27,8 +25,11 @@ ApplicationWindow {
         property bool ccnumHidden: true
         property bool enableTimer
         property bool includeLockMenuItem: true
+        property bool loadAllItems: true
         property int sessionTimeLength: 120000
         property int sessionTimeIndex: 1
+        property int whichItemsToLoadIndex: 0
+        property string whichItemsToLoad: ""
 
     }
 
@@ -38,9 +39,14 @@ ApplicationWindow {
     property var itemList // used to parse the JSON output before filling itemListModel
     property var itemTitle: ["string", "string"]
     property var itemTitleToUpperCase: ["string", "string"]
-    property var itemUUID: ["string", "string"]
+    property var itemUUID: ["string"]
+    property var itemKind: ["string"]
     property var itemDetails // used to parse the JSON output before filling itemDetailsModel
 
+    property int defaultVaultIndex
+
+    property string defaultVaultUUID: ""
+    property string defaultVaultTitle
     property string singleItemUsername
     property string singleItemPassword
     property string chosenCategory
@@ -48,10 +54,37 @@ ApplicationWindow {
     property string standardOutput
     property string cliVersion
     property string currentSession
+    property string categoriesSelected
+    property string itemsVault
 
     property bool expiredSession
     property bool appPastLaunch
     property bool justOneVault
+
+    ListModel {
+
+        id: categoryListModel
+
+        ListElement {categoryName: "Login"; categoryDisplayName: "Logins"}
+        ListElement {categoryName: "Secure Note"; categoryDisplayName: "Secure Notes"}
+        ListElement {categoryName: "Credit Card"; categoryDisplayName: "Credit Cards"}
+        ListElement {categoryName: "Identity"; categoryDisplayName: "Identities"}
+        ListElement {categoryName: "Bank Account"; categoryDisplayName: "Bank Accounts"}
+        ListElement {categoryName: "Database"; categoryDisplayName: "Databases"}
+        ListElement {categoryName: "Driver License"; categoryDisplayName: "Driver Licenses"}
+        ListElement {categoryName: "Email Account"; categoryDisplayName: "Email Accounts"}
+        ListElement {categoryName: "Medical Record"; categoryDisplayName: "Medical Records"}
+        ListElement {categoryName: "Membership"; categoryDisplayName: "Memberships"}
+        ListElement {categoryName: "Outdoor License"; categoryDisplayName: "Outdoor Licenses"}
+        ListElement {categoryName: "Passport"; categoryDisplayName: "Passports"}
+        ListElement {categoryName: "Password"; categoryDisplayName: "Passwords"}
+        ListElement {categoryName: "Reward Program"; categoryDisplayName: "Reward Programs"}
+        ListElement {categoryName: "Server"; categoryDisplayName: "Servers"}
+        ListElement {categoryName: "Social Security Number"; categoryDisplayName: "Social Security Numbers"}
+        ListElement {categoryName: "Software License"; categoryDisplayName: "Software Licenses"}
+        ListElement {categoryName: "Wireless Router"; categoryDisplayName: "Wireless Routers"}
+
+    }
 
     ListModel {
 
@@ -71,7 +104,7 @@ ApplicationWindow {
 
         ListElement {
 
-            uuid: "Loading..."; title: ""
+            uuid: "Loading..."; title: ""; kind: ""
 
         }
 
@@ -83,7 +116,7 @@ ApplicationWindow {
 
                 if (searchFieldText === "" || itemTitleToUpperCase[i].indexOf(searchFieldText.toUpperCase()) >= 0) {
 
-                    append({uuid: itemUUID[i], title: itemTitle[i]});
+                    append({uuid: itemUUID[i], title: itemTitle[i], kind: itemKind[i]});
 
                 }
 
@@ -175,5 +208,3 @@ ApplicationWindow {
     }
 
 }
-
-// this line only here because wrong version number entered in GitHub and needed to amend.
