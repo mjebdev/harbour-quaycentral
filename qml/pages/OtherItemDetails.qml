@@ -61,7 +61,6 @@ Page {
                 delegate: Row {
 
                     width: parent.width
-                    //height: parent.height
                     spacing: 0
 
                     Component.onCompleted: {
