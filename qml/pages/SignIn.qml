@@ -91,7 +91,7 @@ Page {
                 Label {
 
                     id: appVersionLabel
-                    text: "v0.4"
+                    text: "v0.4.1"
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.secondaryColor
                     width: parent.width
@@ -294,7 +294,7 @@ Page {
                     itemTitleToUpperCase[i] = itemList[i].overview.title.toUpperCase();
                     itemUUID[i] = itemList[i].uuid;
                     itemKind[i] = itemList[i].templateUuid;
-                    itemListModel.append({uuid: itemUUID[i], title: itemTitle[i], kind: itemKind[i]});
+                    itemListModel.append({uuid: itemUUID[i], title: itemTitle[i], templateUuid: itemKind[i]});
 
                 }
 
@@ -389,7 +389,7 @@ Page {
             if (settings.skipVaultScreen) {
 
                 skippingVaultScreen = true;
-                statusLabel.text = qsTr("Listing items in vault...");
+                statusLabel.text = qsTr("Listing vault's items...");
 
                 if (justOneVault) { // don't need sf-secrets to access default UUID if only one vault.
 
