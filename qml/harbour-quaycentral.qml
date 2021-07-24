@@ -104,7 +104,7 @@ ApplicationWindow {
 
         ListElement {
 
-            uuid: "Loading..."; title: ""; kind: ""
+            uuid: "Loading..."; title: ""; templateUuid: "";
 
         }
 
@@ -116,7 +116,7 @@ ApplicationWindow {
 
                 if (searchFieldText === "" || itemTitleToUpperCase[i].indexOf(searchFieldText.toUpperCase()) >= 0) {
 
-                    append({uuid: itemUUID[i], title: itemTitle[i], kind: itemKind[i]});
+                    append({uuid: itemUUID[i], title: itemTitle[i], templateUuid: itemKind[i]});
 
                 }
 
