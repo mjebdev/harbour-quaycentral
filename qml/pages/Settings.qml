@@ -346,11 +346,12 @@ Page {
                 id: skipVaultScreenSwitch
                 text: "Bypass Vaults page on sign-in"
                 checked: settings.skipVaultScreen
+                automaticCheck: false
 
-                onCheckedChanged: {
+                onClicked: {
 
+                    checked = !checked;
                     settings.skipVaultScreen = checked;
-                    settings.sync();
 
                     if (justOneVault === false) {
 
@@ -367,8 +368,7 @@ Page {
                                 processStatus.previewSummary = "Error saving default vault UUID. Please try again.";
                                 processStatus.publish();
                                 settings.skipVaultScreen = false;
-                                settings.sync();
-                                this.checked = false;
+                                checked = false;
 
                             }
 
@@ -381,6 +381,8 @@ Page {
                         }
 
                     }
+
+                    settings.sync();
 
                 }
 
@@ -851,7 +853,7 @@ Page {
                             font.pixelSize: Theme.fontSizeExtraSmall
                             color: Theme.highlightColor
                             wrapMode: Text.Wrap
-                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nBy Michael J. Barrett\n\nVersion 0.4\nLicensed under GNU GPLv3\n\nApp icon by JSEHV @ GitHub. Thank you for the contribution!\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
+                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nBy Michael J. Barrett\n\nVersion 0.4.1\nLicensed under GNU GPLv3\n\nApp icon by JSEHV @ GitHub. Thank you for the contribution!\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
                             bottomPadding: Theme.paddingLarge
 
                         }
