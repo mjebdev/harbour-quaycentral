@@ -126,13 +126,12 @@ Page {
                         sessionExpiryTimer.stop();
                         gatheringTotpBusy.running = false;
 
-                        if (errorReadout.indexOf("session expired") !== -1) detailsPageNotification.previewSummary = "Session Expired";
-                        else if (errorReadout.indexOf("not currently signed in") !== -1) detailsPageNotification.previewSummary = "Not Currently Signed In";
+                        if (errorReadout.indexOf("not currently signed in") !== -1 || errorReadout.indexOf("session expired") !== -1) detailsPageNotification.previewSummary = "Session Expired";
 
                         else {
 
                             // there have already been successful TOTP grabs, possible network error.
-                            detailsPageNotification.previewSummary = "Unknown Error - Please check network and try signing in again.";
+                            detailsPageNotification.previewSummary = "Unknown Error (copied to clipboard) - Please check network and try signing in again.";
                             Clipboard.text = errorReadout;
 
                         }
