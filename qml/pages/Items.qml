@@ -56,7 +56,7 @@ Page {
                 // needs to be at least one result to work with and not a full list / empty field.
                 if (itemListModel.count > 0 && text.length > 0) {
 
-                    if (settings.enterKeyLoadsDetails || itemListModel.get(0).kind !== "001") {
+                    if (settings.enterKeyLoadsDetails || itemListModel.get(0).templateUuid !== "001") {
 
                         loadingItemBusy.running = true;
                         allItemDetails = true;
@@ -68,7 +68,7 @@ Page {
 
                         itemCopied = itemListModel.get(0).title;
                         allItemDetails = false;
-                        getPassword.start("op", ["get", "item", itemListModel.get(0).uuid, "--vault", itemsVault, "--fields", "password", "--session", currentSession, "--cache"]);
+                        getPassword.start("op", ["get", "item", itemListModel.get(0).uuid, "--vault", itemsVault, "--fields", "password", "--session", currentSession]);
 
                     }
 
@@ -116,11 +116,11 @@ Page {
 
                     onClicked: {
 
-                        if (settings.tapToCopy && kind === "001") {
+                        if (settings.tapToCopy && templateUuid === "001") {
 
                             itemCopied = title;
                             allItemDetails = false;
-                            getPassword.start("op", ["get", "item", uuid, "--vault", itemsVault, "--fields", "password", "--session", currentSession, "--cache"]);
+                            getPassword.start("op", ["get", "item", uuid, "--fields", "password", "--vault", itemsVault, "--session", currentSession]);
 
                         }
 
@@ -136,7 +136,7 @@ Page {
 
                     onPressAndHold: {
 
-                        if (settings.tapToCopy || kind !== "001") {
+                        if (settings.tapToCopy || templateUuid !== "001") {
 
                             allItemDetails = true;
                             loadingItemBusy.running = true;
@@ -148,7 +148,7 @@ Page {
 
                             itemCopied = title;
                             allItemDetails = false;
-                            getPassword.start("op", ["get", "item", uuid, "--vault", itemsVault, "--fields", "password", "--session", currentSession, "--cache"]);
+                            getPassword.start("op", ["get", "item", uuid, "--fields", "password", "--vault", itemsVault, "--session", currentSession]);
 
                         }
 
@@ -173,10 +173,10 @@ Page {
             sessionExpiryTimer.restart();
             itemDetailsModel.clear();
             var prelimOutput = readAllStandardOutput();
-            itemDetails = JSON.parse(prelimOutput);
 
             if (allItemDetails) { // load item details and move to itemDetails page
 
+                itemDetails = JSON.parse(prelimOutput);
                 singleItemUsername = ""; // incase none is returned from CLI
                 singleItemPassword = "";
 
@@ -268,7 +268,7 @@ Page {
 
             else { // Just the password to be copied to clipboard.
 
-                Clipboard.text = readAllStandardOutput();
+                Clipboard.text = prelimOutput;
                 itemsPageNotification.previewSummary = qsTr("%1 Copied").arg(itemCopied);
                 itemsPageNotification.publish();
 
@@ -282,8 +282,7 @@ Page {
             sessionExpiryTimer.stop();
             loadingItemBusy.running = false;
 
-            if (errorReadout.indexOf("session expired") !== -1) itemsPageNotification.previewSummary = "Session Expired";
-            else if (errorReadout.indexOf("not currently signed in") !== -1) itemsPageNotification.previewSummary = "Not Currently Signed In";
+            if (errorReadout.indexOf("not currently signed in") !== -1 || errorReadout.indexOf("session expired") !== -1) itemsPageNotification.previewSummary = "Session Expired";
 
             else {
 
