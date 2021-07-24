@@ -117,7 +117,7 @@ Page {
                 itemTitleToUpperCase[i] = itemList[i].overview.title.toUpperCase();
                 itemUUID[i] = itemList[i].uuid;
                 itemKind[i] = itemList[i].templateUuid;
-                itemListModel.append({uuid: itemUUID[i], title: itemTitle[i], kind: itemKind[i]});
+                itemListModel.append({uuid: itemUUID[i], title: itemTitle[i], templateUuid: itemKind[i]});
 
             }
 
@@ -131,7 +131,7 @@ Page {
             sessionExpiryTimer.stop();
             errorReadout = readAllStandardError();
 
-            if (errorReadout.indexOf("not currently signed in") !== -1) {
+            if (errorReadout.indexOf("not currently signed in") !== -1 || errorReadout.indexOf("session expired") !== -1) {
 
                 gatheringBusy.running = false;
                 notifySessionExpired.previewSummary = "Session Expired";
