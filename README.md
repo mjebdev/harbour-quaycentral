@@ -7,7 +7,7 @@ QuayCentral is an unofficial application and is in no way associated with 1Passw
 
 Licensed under GNU GPLv3.
 
-App icon by JSEHV. Thanks for the contribution!
+App icon by <a href="https://github.com/JSEHV">JSEHV</a>. Thanks for the contribution!
 
 <h3>Requirements</h3>
 
@@ -51,7 +51,7 @@ App icon by JSEHV. Thanks for the contribution!
 
 If you would like to send feedback regarding the app, please email: mjbdev@eml.cc
 
-If you've found the app useful as a user or developer 👍 you can <a href="https://ko-fi.com/michaeljb">buy me a coffee</a>!<br>
+If you've found the app useful as a user or developer 👍 you can <a href="https://ko-fi.com/michaeljb">buy me a coffee</a>.<br>
 
 Thanks,<br>
 Michael B.
