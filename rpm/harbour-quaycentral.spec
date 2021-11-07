@@ -9,7 +9,7 @@ Name:       harbour-quaycentral
 # << macros
 
 Summary:    QuayCentral
-Version:    0.4.1
+Version:    0.5
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE
@@ -17,12 +17,10 @@ URL:        http://github.com/michaeljohnbarrett/harbour-quaycentral
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  harbour-quaycentral.yaml
 Requires:   sailfishsilica-qt5 >= 0.10.9
-Requires:   sailfishsecretsdaemon-secretsplugins-default
 BuildRequires:  pkgconfig(sailfishapp) >= 1.0.2
 BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Quick)
-BuildRequires:  pkgconfig(sailfishsecrets)
 BuildRequires:  desktop-file-utils
 
 %description
