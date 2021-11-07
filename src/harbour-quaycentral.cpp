@@ -5,7 +5,6 @@
 #include <QtQml>
 #include <sailfishapp.h>
 #include "process.h"
-#include "encryptedStorage.h"
 
 int main(int argc, char *argv[]) {
 
@@ -20,7 +19,6 @@ int main(int argc, char *argv[]) {
     // To display the view, call "show()" (will show fullscreen on device).
 
     qmlRegisterType<Process>("Process", 1, 0, "Process");
-    qmlRegisterType<EncryptedStorage>("EncryptedStorage", 1, 0, "EncryptedStorage");
     return SailfishApp::main(argc, argv);
 
 }
