@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Process 1.0
-import EncryptedStorage 1.0
+// import EncryptedStorage 1.0
 import Nemo.Notifications 1.0
 import Nemo.Configuration 1.0
 import "pages"
@@ -22,7 +22,7 @@ ApplicationWindow {
         property bool tapToCopy
         property bool enterKeyLoadsDetails
         property bool sessionExpiryNotify
-        property bool ccnumHidden: true
+        //property bool ccnumHidden: true
         property bool enableTimer
         property bool includeLockMenuItem: true
         property bool loadAllItems: true
@@ -42,9 +42,7 @@ ApplicationWindow {
     property var itemUUID: ["string"]
     property var itemKind: ["string"]
     property var itemDetails // used to parse the JSON output before filling itemDetailsModel
-
     property int defaultVaultIndex
-
     property string defaultVaultUUID: ""
     property string defaultVaultTitle
     property string singleItemUsername
@@ -56,10 +54,10 @@ ApplicationWindow {
     property string currentSession
     property string categoriesSelected
     property string itemsVault
-
     property bool expiredSession
     property bool appPastLaunch
     property bool justOneVault
+    property bool itemsInAllVaults
 
     ListModel {
 
@@ -157,8 +155,6 @@ ApplicationWindow {
             vaultListModel.clear();
             itemTitle.length = 0;
             itemTitleToUpperCase.length = 0;
-            // currentSession = "000000000000000000000000000000000000000000000000000000000000000000000000";
-            // currentSession = "";  --unnecessary as the session key would be invalid anyway. signout was successful.
             pageStack.clear();
             pageStack.push(Qt.resolvedUrl("pages/SignIn.qml"), null, PageStackAction.Immediate);
 

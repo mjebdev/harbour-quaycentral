@@ -3,7 +3,6 @@ import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 import Nemo.Notifications 1.0
 import Process 1.0
-import EncryptedStorage 1.0
 
 Page {
 
@@ -138,6 +137,7 @@ Page {
             ComboBox {
 
                 label: qsTr("Tapping item")
+                description: currentIndex === 1 ? qsTr("Long press will load item details") : qsTr("Long press will copy password")
                 id: tappingCombo
                 width: parent.width
                 currentIndex: settings.tapToCopy ? 1 : 0
@@ -175,39 +175,6 @@ Page {
 
             }
 
-            Label {
-
-                id: pressAndHoldInfoLabel
-                font.pixelSize: Theme.fontSizeTiny
-                width: parent.width
-                text: tappingCombo.currentIndex === 1 ? qsTr("Long press will load item details.") : qsTr("Long press will copy password.")
-                wrapMode: Text.Wrap
-                leftPadding: Theme.horizontalPageMargin
-
-            }
-
-            SectionHeader {
-
-                text: qsTr("Item Details");
-
-            }
-
-            TextSwitch {
-
-                text: qsTr("Mask credit card account numbers")
-                id: hideCcnumSwitch
-                checked: settings.ccnumHidden
-                leftMargin: Theme.horizontalPageMargin
-
-                onCheckedChanged: {
-
-                    settings.ccnumHidden = checked;
-                    settings.sync();
-
-                }
-
-            }
-
             SectionHeader {
 
                 text: qsTr("Login Session")
@@ -233,11 +200,11 @@ Page {
 
             ComboBox {
 
-                label: qsTr("Lock when CLI inactive for")
+                label: qsTr("Lock when CLI is inactive for")
                 id: sessionLengthCombo
                 currentIndex: settings.sessionTimeIndex
-                visible: enableTimerSwitch.checked
-                leftMargin: Theme.horizontalPageMargin * 2
+                enabled: enableTimerSwitch.checked
+                leftMargin: Theme.horizontalPageMargin
 
                 menu: ContextMenu {
 
@@ -295,8 +262,8 @@ Page {
                 text: qsTr("Notify when session expires")
                 id: sessionExpiryNotifySwitch
                 checked: settings.sessionExpiryNotify
-                visible: enableTimerSwitch.checked
-                leftMargin: Theme.horizontalPageMargin * 2
+                enabled: enableTimerSwitch.checked
+                leftMargin: Theme.horizontalPageMargin
 
                 onCheckedChanged: {
 
@@ -315,7 +282,8 @@ Page {
 
             TextSwitch {
 
-                text: qsTr("Show 'Lock' menu on each screen")
+                text: qsTr("Include 'Lock' menu on each screen")
+                description: qsTr("Alternatively, tap padlock on cover or swipe back to sign-in screen.")
                 id: showLockMenuItemSwitch
                 checked: settings.includeLockMenuItem
                 leftMargin: Theme.horizontalPageMargin
@@ -326,18 +294,6 @@ Page {
                     settings.sync();
 
                 }
-
-            }
-
-            Label {
-
-                id: noLockMenuInfoLabel
-                font.pixelSize: Theme.fontSizeTiny
-                width: parent.width - (Theme.horizontalPageMargin * 2)
-                visible: !showLockMenuItemSwitch.checked
-                text: qsTr("To lock, tap padlock on cover or swipe back to sign-in screen.")
-                wrapMode: Text.Wrap
-                leftPadding: Theme.horizontalPageMargin
 
             }
 
@@ -352,7 +308,7 @@ Page {
 
                     checked = !checked;
                     settings.skipVaultScreen = checked;
-
+/*
                     if (justOneVault === false) {
 
                         if (checked) { // need to assign first vault incase user doesn't interact with list
@@ -381,7 +337,7 @@ Page {
                         }
 
                     }
-
+*/
                     settings.sync();
 
                 }
@@ -390,71 +346,12 @@ Page {
 
             ComboBox {
 
-                id: defaultVaultCombo
-                label: qsTr("Default vault")
-                width: parent.width
-                currentIndex: defaultVaultIndex
-                visible: skipVaultScreenSwitch.checked
-                enabled: !justOneVault
-                x: Theme.horizontalPageMargin
-
-                menu: ContextMenu {
-
-                    Repeater {
-
-                        model: vaultListModel
-
-                        MenuItem {
-
-                            text: name
-
-                            onClicked: {
-
-                                if (index !== defaultVaultIndex) {
-
-                                    encryptedUUID.deleteSecret(); // delete existing
-
-                                    if (encryptedUUID.save("Default Vault UUID", vaultUUID[index])) {
-
-                                        defaultVaultIndex = index;
-                                        defaultVaultTitle = vaultName[index];
-                                        defaultVaultUUID = vaultUUID[index];
-
-                                    }
-
-                                    else {
-
-                                        // error saving secret.
-                                        processStatus.previewSummary = qsTr("Error saving default vault UUID. Please try again.");
-                                        processStatus.publish();
-                                        skipVaultScreenSwitch.checked = false;
-                                        settings.skipVaultScreen = false;
-                                        settings.sync();
-                                        allItemsOrOneCategory.visible = false;
-                                        this.visible = false;
-
-                                    }
-
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-            }
-
-            ComboBox {
-
                 id: allItemsOrOneCategory
-                label: qsTr("Display")
+                label: qsTr("List")
                 width: parent.width
                 currentIndex: settings.whichItemsToLoadIndex
-                visible: skipVaultScreenSwitch.checked
-                x: Theme.horizontalPageMargin
+                enabled: skipVaultScreenSwitch.checked
+                //x: Theme.horizontalPageMargin
 
                 menu: ContextMenu {
 
@@ -499,9 +396,10 @@ Page {
 
                 Button {
 
-                    text: qsTr("Update CLI")
+                    text: qsTr("Check for CLI Update")
                     id: updateButton
                     y: Theme.paddingMedium
+                    preferredWidth: Theme.buttonWidthLarge
 
                     BusyIndicator {
 
@@ -714,18 +612,18 @@ Page {
 
                 width: accountsButton.width
                 height: accountsButton.height + (Theme.paddingMedium * 2)
-                // spacing: Theme.paddingMedium
                 x: (page.width - accountsButton.width) * 0.5
 
                 Button {
 
-                    text: qsTr("CLI Accounts");
+                    text: qsTr("List CLI Accounts");
                     id: accountsButton
                     y: Theme.paddingMedium
+                    preferredWidth: Theme.buttonWidthLarge
 
                     onClicked: {
 
-                        if (text === qsTr("CLI Accounts")) {
+                        if (text === qsTr("List CLI Accounts")) {
 
                             updateCLI.start("op", ["signin", "--list"]);
                             text = qsTr("Done");
@@ -735,7 +633,7 @@ Page {
 
                         else {
 
-                            text = qsTr("CLI Accounts");
+                            text = qsTr("List CLI Accounts");
                             accountsLabel.text = "";
                             accountsLabelRow.visible = false;
 
@@ -790,6 +688,15 @@ Page {
 
             }
 
+            Row {
+
+                id: paddingRow
+                width: parent.width
+                height: Theme.paddingLarge
+                visible: !accountsLabelRow.visible
+
+            }
+
             SectionHeader {
 
                 text: qsTr("About")
@@ -821,7 +728,7 @@ Page {
                             id: appTitleLabel
                             font.pixelSize: Theme.fontSizeLarge
                             // font.bold: true
-                            color: Theme.highlightColor
+                            color: Theme.primaryColor
                             bottomPadding: Theme.paddingMedium
 
                         }
@@ -834,7 +741,7 @@ Page {
                         width: appTitleLabel.width
                         x: (page.width - this.width) * 0.5
                         horizontalAlignment: Separator.Center
-                        color: Theme.primaryColor
+                        color: Theme.highlightColor
 
                     }
 
@@ -851,10 +758,10 @@ Page {
                             width: parent.width
                             id: aboutTextLabel
                             font.pixelSize: Theme.fontSizeExtraSmall
-                            color: Theme.highlightColor
+                            color: Theme.primaryColor
                             wrapMode: Text.Wrap
-                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nBy Michael J. Barrett\n\nVersion 0.4.1\nLicensed under GNU GPLv3\n\nApp icon by JSEHV @ GitHub. Thank you for the contribution!\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
-                            bottomPadding: Theme.paddingLarge
+                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\n\nVersion 0.5\nLicensed under GNU GPLv3\n\nApp icon by JSEHV @ GitHub. Thank you for the contribution!\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
+                            bottomPadding: Theme.paddingMedium
 
                         }
 
@@ -875,77 +782,13 @@ Page {
                             font.letterSpacing: 2
                             color: Theme.highlightColor
                             wrapMode: Text.Wrap
-                            text: qsTr("SUPPORT APP DEVELOPMENT")
+                            text: qsTr("DONATE")
                             bottomPadding: Theme.paddingMedium
 
                         }
 
                     }
-/*
-                    Row {
 
-                        width: parent.width * 0.6
-                        x: parent.width * 0.2
-                        spacing: 0
-                        height: linkToBMAC.height
-
-                        Image {
-
-                            id: linkToBMAC
-                            source: Theme.colorScheme == Theme.DarkOnLight ? "BMClogowithwordmark-black.png" : "BMClogowithwordmark-white.png"
-                            fillMode: Image.PreserveAspectFit
-                            width: parent.width
-
-                            MouseArea {
-
-                                anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("https://www.buymeacoffee.com/michaeljb");
-
-                            }
-
-                        }
-
-                    }
-
-                    Row {
-
-                        width: parent.width * 0.5
-                        x: parent.width * 0.25
-                        spacing: 0
-                        height: Theme.paddingMedium * 3
-
-                        Separator {
-
-                            width: parent.width
-                            y: (Theme.paddingMedium * 1.5) - (this.height * 0.5)
-                            horizontalAlignment: Separator.Center
-                            color: Theme.primaryColor
-
-                        }
-
-                    }
-
-                    Row {
-
-                        width: buyMeCoffeeLabel2.paintedWidth
-                        x: (parent.width - this.width) * 0.5
-                        height: buyMeCoffeeLabel2.height
-                        spacing: 0
-
-                        Label {
-
-                            topPadding: Theme.paddingLarge
-                            id: buyMeCoffeeLabel2
-                            font.pixelSize: Theme.fontSizeExtraSmall
-                            color: Theme.highlightColor
-                            wrapMode: Text.Wrap
-                            text: qsTr("-or-")
-                            bottomPadding: Theme.paddingMedium
-
-                        }
-
-                    }
-*/
                     Row {
 
                         id: linkToBMAC2Row
@@ -957,7 +800,7 @@ Page {
                         Image {
 
                             id: linkToBMAC2
-                            source: Theme.colorScheme == Theme.DarkOnLight ? "SupportMe_dark@2x.png" : "SupportMe_yellow@2x.png"
+                            source: Theme.colorScheme == Theme.DarkOnLight ? "BMClogowithwordmark-black.png" : "BMClogowithwordmark-white.png"
                             fillMode: Image.PreserveAspectFit
                             width: parent.width
                             y: Theme.paddingMedium // (linkToBMAC.height - this.paintedHeight) * 0.5
@@ -965,7 +808,7 @@ Page {
                             MouseArea {
 
                                 anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("https://www.ko-fi.com/michaeljb");
+                                onClicked: Qt.openUrlExternally("https://www.buymeacoffee.com/michaeljb");
 
                             }
 
@@ -988,7 +831,7 @@ Page {
                             font.letterSpacing: 2
                             color: Theme.highlightColor
                             wrapMode: Text.Wrap
-                            text: qsTr("SEND FEEDBACK")
+                            text: qsTr("FEEDBACK")
                             bottomPadding: Theme.paddingMedium
 
                         }
@@ -1013,7 +856,7 @@ Page {
                             MouseArea {
 
                                 anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("mailto:mjbdev@eml.cc?subject=QuayCentral Feedback");
+                                onClicked: Qt.openUrlExternally("mailto:qc@mjbdev.net?subject=QuayCentral Feedback");
 
                             }
 
@@ -1025,17 +868,17 @@ Page {
                             height: parent.height
                             font.pixelSize: Theme.fontSizeLarge
                             color: Theme.primaryColor
-                            text: "mjbdev@eml.cc"
+                            text: "qc@mjbdev.net"
                             font.bold: true
                             topPadding: 0
-                            bottomPadding: this.paintedHeight * 0.1 // making this adjustment to keep vertically centered look with lowercase email.
+                            bottomPadding: this.paintedHeight * 0.1
                             leftPadding: Theme.paddingSmall
                             verticalAlignment: Text.AlignVCenter
 
                             MouseArea {
 
                                 anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("mailto:mjbdev@eml.cc?subject=QuayCentral Feedback");
+                                onClicked: Qt.openUrlExternally("mailto:qc@mjbdev.net?subject=QuayCentral Feedback");
 
                             }
 
@@ -1058,7 +901,7 @@ Page {
                             font.letterSpacing: 2
                             color: Theme.highlightColor
                             wrapMode: Text.Wrap
-                            text: qsTr("VIEW SOURCE")
+                            text: qsTr("SOURCE")
                             bottomPadding: Theme.paddingMedium
 
                         }
@@ -1115,7 +958,7 @@ Page {
             cliVersion = readAllStandardOutput();
             cliVersion = cliVersion.trim();
 
-        } // alreay signed-in to the app so there shouldn't be any error with just gathering version number.
+        }
 
     }
 
@@ -1222,16 +1065,10 @@ Page {
             updatingIndicator.running = false;
             updateDownloadStatusLabel.text = updateDownloadStatusLabel.text + qsTr("\n\nDownload has taken longer than 45 seconds. Please check Downloads folder for completed ZIP file or check network & relaunch app to try again, if download has failed.");
             updateDownloadStatusRow.visible = true;
-            processStatus.previewSummary = qsTr("Download of update still in progress");
+            processStatus.previewSummary = qsTr("Downloading of update still in progress");
             processStatus.publish();
 
         }
-
-    }
-
-    EncryptedStorage {
-
-        id: encryptedUUID
 
     }
 

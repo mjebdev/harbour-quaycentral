@@ -54,7 +54,7 @@ CoverBackground {
 
                     FadeAnimator {
 
-                        duration: 330
+                        duration: 250
 
                     }
 

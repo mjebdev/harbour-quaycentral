@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Process 1.0
-import EncryptedStorage 1.0
+// import EncryptedStorage 1.0
 
 Page {
 
@@ -91,7 +91,7 @@ Page {
                 Label {
 
                     id: appVersionLabel
-                    text: "v0.4.1"
+                    text: "v0.5"
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.secondaryColor
                     width: parent.width
@@ -266,7 +266,7 @@ Page {
             titleLabel.color = "grey";
             appVersionLabel.color = "grey";
             statusLabel.color = Theme.errorColor;
-            statusLabel.text = qsTr("Unable to communicate with CLI.\n\nPlease confirm that 1Password CLI has been installed in /usr/local/bin and relaunch QuayCentral.");
+            statusLabel.text = qsTr("Unable to communicate with CLI.\n\nPlease confirm that 1Password CLI has been installed in /usr/bin or /usr/local/bin and relaunch QuayCentral.");
             statusRow.height = statusLabel.paintedHeight;
 
         }
@@ -287,6 +287,10 @@ Page {
                 processOne.waitForFinished();
                 var prelimOutput = readAllStandardOutput();
                 itemList = JSON.parse(prelimOutput);
+                itemTitle = [];
+                itemTitleToUpperCase = [];
+                itemUUID = [];
+                itemKind = [];
 
                 for (var i = 0; i < itemList.length; i++) {
 
@@ -343,6 +347,30 @@ Page {
 
             }
 
+            else if (errorReadout.indexOf("dial tcp") !== -1) {
+
+                if (errorReadout.indexOf("i/o timeout") !== -1) {
+
+                    loggingInBusy.running = false;
+                    statusLabel.color = Theme.errorColor;
+                    statusLabel.text = qsTr("Connection to server timed out. Please check device's network connection.");
+                    passwordField.visible = true;
+                    passwordField.opacity = 1.0;
+
+                }
+
+                else {
+
+                    loggingInBusy.running = false;
+                    statusLabel.color = Theme.errorColor;
+                    statusLabel.text = qsTr("Network connection error");
+                    passwordField.visible = true;
+                    passwordField.opacity = 1.0;
+
+                }
+
+            }
+
             else {
 
                 loggingInBusy.running = false;
@@ -372,6 +400,14 @@ Page {
 
             vaultListModel.clear();
 
+            if (vaultList.length === 1) justOneVault = true;
+            else { // user could conceivably create a second vault (e.g. on web) with app still open and so need to switch back to false if this occurs
+
+                justOneVault = false;
+                vaultListModel.append({name: "All Vaults", uuid: "ALL_VAULTS", categories: categoryListModel});
+
+            }
+
             for (var i = 0; i < vaultList.length; i++) {
 
                 vaultName[i] = vaultList[i].name;
@@ -381,15 +417,16 @@ Page {
 
             }
 
-            if (vaultList.length === 1) justOneVault = true;
-            else justOneVault = false; // user could conceivably create a second vault with app open and so need to switch back to false if this occurs
-
             statusLabel.text = qsTr("Vault listing complete.");
 
             if (settings.skipVaultScreen) {
 
                 skippingVaultScreen = true;
-                statusLabel.text = qsTr("Listing vault's items...");
+                statusLabel.text = qsTr("Listing items...");
+
+                // will not be able to single out vaults, just categories
+
+                /*
 
                 if (justOneVault) { // don't need sf-secrets to access default UUID if only one vault.
 
@@ -426,6 +463,7 @@ Page {
                             settings.loadAllItems = true;
                             settings.skipVaultScreen = false;
                             settings.sync();
+                            skippingVaultScreen = false;
 
                         }
 
@@ -437,27 +475,32 @@ Page {
                         settings.loadAllItems = true;
                         settings.skipVaultScreen = false;
                         settings.sync();
+                        skippingVaultScreen = false;
 
                     }
 
                 }
 
-                if (skippingVaultScreen) { // confirm we're still skipping vault screen
+                */
+
+                //if (skippingVaultScreen) { // confirm we're still skipping vault screen // no longer necessary
+
+                    itemsInAllVaults = true; // as there's no default vault value, it's all vaults
 
                     if (settings.loadAllItems) {
 
-                        processOne.start("op", ["list", "items", "--vault", defaultVaultUUID, "--session", currentSession]);
+                        processOne.start("op", ["list", "items", "--session", currentSession]); // did include: "--vault", defaultVaultUUID,
 
                     }
 
                     else {
 
-                        processOne.start("op", ["list", "items", "--vault", defaultVaultUUID, "--categories", settings.whichItemsToLoad, "--session", currentSession]);
+                        processOne.start("op", ["list", "items", "--categories", settings.whichItemsToLoad, "--session", currentSession]); // did include: "--vault", defaultVaultUUID,
 
                     }
 
-                }
-
+                //}
+/*
                 else {
 
                     loggingInBusy.running = false;
@@ -465,7 +508,7 @@ Page {
                     pageStack.push(Qt.resolvedUrl("Vaults.qml"));
 
                 }
-
+*/
             }
 
             else {
@@ -508,16 +551,10 @@ Page {
             titleLabel.color = "grey"
             appVersionLabel.color = "grey"
             statusLabel.color = Theme.errorColor;
-            statusLabel.text = qsTr("No response from CLI.\n\nPlease confirm that 1Password CLI has been installed in /usr/local/bin and relaunch QuayCentral.")
+            statusLabel.text = qsTr("No response from CLI.\n\nPlease confirm that 1Password CLI has been installed in /usr/bin or /usr/local/bin and relaunch QuayCentral.")
             statusRow.height = statusLabel.height;
 
         }
-
-    }
-
-    EncryptedStorage {
-
-        id: encryptedUUID
 
     }
 

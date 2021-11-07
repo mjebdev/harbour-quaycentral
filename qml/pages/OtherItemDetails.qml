@@ -1,17 +1,28 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import Process 1.0
 import Nemo.Notifications 1.0
 
 Page {
 
     id: page
     allowedOrientations: Orientation.PortraitMask
+    property bool pageIncludesPassword
+    property int secondsCountdown
+    property string totpOutput
 
     SilicaListView {
 
         id: itemDetailsView
         anchors.fill: parent
         model: itemDetailsModel
+        contentHeight: column.height
+
+        VerticalScrollDecorator {
+
+            flickable: itemDetailsView
+
+        }
 
         PullDownMenu {
 
@@ -21,6 +32,38 @@ Page {
 
                 text: qsTr("Lock");
                 onClicked: lockItUp(false);
+                visible: settings.includeLockMenuItem
+
+            }
+
+            MenuItem {
+
+                id: copyTotpMenu
+                text: qsTr("Copy One-Time Password")
+                visible: false
+
+                onClicked: {
+
+                    Clipboard.text = totpOutput;
+                    detailsPageNotification.previewSummary = qsTr("Copied one-time password to clipboard");
+                    detailsPageNotification.publish();
+
+                }
+
+            }
+
+            MenuItem {
+
+                text: qsTr("Copy Password")
+                visible: itemDetailsModel.get(0).password === "" ? false : true
+
+                onClicked: {
+
+                    Clipboard.text = itemDetailsModel.get(0).password;
+                    detailsPageNotification.previewSummary = qsTr("Copied password to clipboard");
+                    detailsPageNotification.publish();
+
+                }
 
             }
 
@@ -29,10 +72,17 @@ Page {
         delegate: Column {
 
             id: column
-            anchors.fill: parent
             spacing: 0
             width: page.width
-            height: page.height
+            height: titleHeader.height + paddingRow.height + fieldItemsView.height + Theme.paddingMedium
+
+            anchors {
+
+                top: parent
+                left: parent
+                right: parent
+
+            }
 
             PageHeader {
 
@@ -53,10 +103,10 @@ Page {
 
                 model: sectionDetailsModel
                 width: parent.width
-                height: page.height - titleHeader.height
+                height: contentHeight // page.height - titleHeader.height
                 id: fieldItemsView
                 spacing: Theme.paddingMedium
-                VerticalScrollDecorator{flickable: fieldItemsView}
+                interactive: false
 
                 delegate: Row {
 
@@ -67,14 +117,14 @@ Page {
 
                         if (fieldItemName === "ccnum") {
 
-                            if (settings.ccnumHidden) {
+                            //if (settings.ccnumHidden) {
 
                                 itemDetailsPasswordField.text = fieldItemValue.slice(0, 4) + " " + fieldItemValue.slice(4, 8) + " " + fieldItemValue.slice(8, 12) + " " + fieldItemValue.slice(12);
                                 itemDetailsPasswordField.font.letterSpacing = 4;
                                 passwordRow.visible = true;
 
-                            }
-
+                            //}
+/*
                             else {
 
                                 usernameField.text = fieldItemValue.slice(0, 4) + " " + fieldItemValue.slice(4, 8) + " " + fieldItemValue.slice(8, 12) + " " + fieldItemValue.slice(12);
@@ -82,7 +132,7 @@ Page {
                                 usernameRow.visible = true;
 
                             }
-
+*/
                         }
 
                         else if (fieldItemName === "cvv" || fieldItemName ===  "pin") {
@@ -106,7 +156,13 @@ Page {
 
                             case "concealed":
 
-                                if (fieldItemTitle.toUpperCase() !== "ONE-TIME PASSWORD") {
+                                if (fieldItemName.slice(0, 5).toUpperCase() === "TOTP_") { // title is not always 'one-time password' (have an item that contains TOTP with this field blank), need to check beginning of name to be certain.
+
+                                    totpRow.visible = true;
+
+                                }
+
+                                else {
 
                                     passwordRow.visible = true;
 
@@ -201,17 +257,17 @@ Page {
 
                                     case "loc":
 
-                                        usernameField.text = "Line of Credit";
+                                        usernameField.text = qsTr("Line of Credit");
                                         break;
 
                                     case "money_market":
 
-                                        usernameField.text = "Money Market";
+                                        usernameField.text = qsTr("Money Market");
                                         break;
 
                                     case "atm":
 
-                                        usernameField.text = "ATM";
+                                        usernameField.text = qsTr("ATM");
                                         break;
 
                                     default:
@@ -269,7 +325,7 @@ Page {
                     Column {
 
                         width: parent.width
-                        height: visibleChildren.height
+                        height: visibleChildren.height + Theme.paddingLarge
                         spacing: 0
 
                         Row {
@@ -424,7 +480,237 @@ Page {
                         Row {
 
                             width: parent.width
+                            id: totpRow
+                            visible: false
+                            height: itemDetailsPasswordField.height + (Theme.paddingMedium * 2) // since text may not yet be filled in
+                            spacing: 0
+
+                            onVisibleChanged: {
+
+                                if (visible) {
+
+                                    if(itemsInAllVaults) getTotp.start("op", ["get", "totp", uuid, "--session", currentSession]);
+                                    else getTotp.start("op", ["get", "totp", uuid, "--vault", itemsVault, "--session", currentSession]);
+
+                                }
+
+                            }
+
+                            Timer {
+
+                                id: totpTimer
+                                interval: 500
+                                repeat: true
+                                triggeredOnStart: false
+
+                                onTriggered: {
+
+                                    var totpCurrentTime = new Date;
+                                    secondsCountdown = totpCurrentTime.getSeconds();
+                                    if (secondsCountdown > 29) secondsCountdown = secondsCountdown - 30;
+                                    secondsCountdown = (secondsCountdown - 30) * -1;
+                                    totpTimerField.text = secondsCountdown.toString();
+
+                                }
+
+                            }
+
+                            Process {
+
+                                id: getTotp
+
+                                onReadyReadStandardOutput: {
+
+                                    totpOutput = readAllStandardOutput();
+                                    totpOutput = totpOutput.trim();
+
+                                    if (copyTotpMenu.visible == false) { // if first time checking for totp in item
+
+                                        copyTotpMenu.visible = true;
+                                        totpTimer.start();
+
+                                    }
+
+                                    totpTextField.text = totpOutput.slice(0, 3) + " " + totpOutput.slice(3);
+                                    totpTextField.color = Theme.primaryColor;
+                                    totpTimerField.color = Theme.primaryColor;
+                                    totpCopyButton.enabled = true;
+                                    gatheringTotpBusy.running = false;
+                                    sessionExpiryTimer.restart();
+
+                                }
+
+                                onReadyReadStandardError: {
+
+                                    errorReadout = readAllStandardError();
+
+                                    if (errorReadout.indexOf("does not contain a one-time password") === -1) { // else no action needed, totpRow remains invisible, timer just restarted by previous page.
+
+                                        sessionExpiryTimer.stop();
+                                        gatheringTotpBusy.running = false;
+
+                                        if (errorReadout.indexOf("not currently signed in") !== -1 || errorReadout.indexOf("session expired") !== -1) detailsPageNotification.previewSummary = "Session Expired";
+
+                                        else {
+
+                                            // there have already been successful TOTP grabs, possible network error.
+                                            detailsPageNotification.previewSummary = "Unknown Error (copied to clipboard) - Please check network and try signing in again.";
+                                            Clipboard.text = errorReadout;
+
+                                        }
+
+                                        detailsPageNotification.publish();
+                                        pageStack.clear();
+                                        pageStack.replace(Qt.resolvedUrl("SignIn.qml"));
+
+                                    }
+
+                                }
+
+                            }
+
+                            Column {
+
+                                height: parent.height
+                                width: parent.width - passwordCopyButton.width - itemDetailsPasswordField.textLeftMargin - Theme.paddingMedium + (passwordCopyButton.width / 8)
+                                spacing: 0
+
+                                Row {
+
+                                    width: parent.width
+                                    spacing: Theme.paddingMedium
+
+                                    TextField {
+
+                                        id: totpTextField
+                                        font.letterSpacing: 6
+                                        text: ". . .  . . ."
+                                        readOnly: true
+                                        label: qsTr("one-time password")
+                                        y: passwordCopyButton.width / 8
+                                        width: parent.width - Theme.paddingMedium
+
+                                        rightItem: Label {
+
+                                            id: totpTimerField
+                                            horizontalAlignment: Qt.AlignHCenter
+                                            width: totpCopyButton.width * 0.75
+
+                                            Rectangle {
+
+                                                height: gatheringTotpBusy.height + (gatheringTotpBusy.y * 2)
+                                                color: "transparent"
+                                                opacity: 1.0
+                                                radius: 20
+
+                                                anchors {
+
+                                                    top: parent.top
+                                                    left: parent.left
+                                                    right: parent.right
+
+                                                }
+
+                                                border {
+
+                                                    id: totpTimerBorder
+                                                    width: 3
+                                                    color: Theme.highlightColor
+
+                                                }
+
+                                            }
+
+                                            onTextChanged: {
+
+                                                var digit = parseInt(text);
+
+                                                if (digit < 11) {
+
+                                                    totpTimerBorder.color = Theme.errorColor;
+
+                                                }
+
+                                                else {
+
+                                                    totpTimerBorder.color = Theme.highlightColor;
+
+                                                    if (digit === 30) {
+
+                                                        gatheringTotpBusy.running = true;
+                                                        totpTextField.color = "grey";
+                                                        totpTimerField.color = "grey";
+                                                        totpCopyButton.enabled = false;
+                                                        if (itemsInAllVaults) getTotp.start("op", ["get", "totp", uuid, "--session", currentSession]);
+                                                        else getTotp.start("op", ["get", "totp", uuid, "--vault", itemsVault, "--session", currentSession]);
+
+                                                    }
+
+                                                }
+
+                                            }
+
+                                            BusyIndicator {
+
+                                                id: gatheringTotpBusy
+                                                size: BusyIndicatorSize.Small
+                                                anchors.centerIn: parent
+                                                running: false
+
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                            Column {
+
+                                height: parent.height
+                                width: totpCopyButton.width
+                                spacing: Theme.paddingMedium
+
+                                Row {
+
+                                    spacing: 0
+                                    width: parent.width
+
+                                    Image {
+
+                                        id: totpCopyButton
+                                        source: "image://theme/icon-m-clipboard"
+                                        y: 0
+
+                                        MouseArea {
+
+                                            anchors.fill: parent
+
+                                            onClicked: {
+
+                                                Clipboard.text = totpOutput;
+                                                detailsPageNotification.previewSummary = qsTr("Copied one-time password to clipboard");
+                                                detailsPageNotification.publish();
+
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                        Row {
+
+                            width: parent.width
                             id: websiteRow
+                            height: websiteField.height + (Theme.paddingMedium * 2)
                             visible: false
 
                             TextArea {
@@ -440,7 +726,7 @@ Page {
 
                                     if (text.slice(0, 4) !== "http") {
 
-                                        // To avoid for "Cannot open file. File was not found." error.
+                                        // To avoid "Cannot open file. File was not found." error.
                                         var needsHttp = "https://" + text;
                                         Qt.openUrlExternally(needsHttp);
 
@@ -473,13 +759,16 @@ Page {
                                     width: parent.width
                                     spacing: Theme.paddingMedium
 
-                                    TextField {
+                                    TextArea {
 
                                         id: notesArea
                                         label: fieldItemTitle
                                         readOnly: true
+                                        height: contentHeight
                                         text: fieldItemValue
                                         y: notesCopyButton.width / 8
+                                        //autoScrollEnabled: true
+                                        //wrapMode: Text.Wrap
 
                                     }
 

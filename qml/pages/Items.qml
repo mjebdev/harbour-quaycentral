@@ -60,7 +60,8 @@ Page {
 
                         loadingItemBusy.running = true;
                         allItemDetails = true;
-                        getPassword.start("op", ["get", "item", itemListModel.get(0).uuid, "--vault", itemsVault, "--session", currentSession, "--cache"]);
+                        if (itemsInAllVaults) getPassword.start("op", ["get", "item", itemListModel.get(0).uuid, "--session", currentSession, "--cache"]);
+                        else getPassword.start("op", ["get", "item", itemListModel.get(0).uuid, "--vault", itemsVault, "--session", currentSession, "--cache"]);
 
                     }
 
@@ -68,7 +69,8 @@ Page {
 
                         itemCopied = itemListModel.get(0).title;
                         allItemDetails = false;
-                        getPassword.start("op", ["get", "item", itemListModel.get(0).uuid, "--vault", itemsVault, "--fields", "password", "--session", currentSession]);
+                        if (itemsInAllVaults) getPassword.start("op", ["get", "item", itemListModel.get(0).uuid, "--fields", "password", "--session", currentSession]);
+                        else getPassword.start("op", ["get", "item", itemListModel.get(0).uuid, "--vault", itemsVault, "--fields", "password", "--session", currentSession]);
 
                     }
 
@@ -120,7 +122,8 @@ Page {
 
                             itemCopied = title;
                             allItemDetails = false;
-                            getPassword.start("op", ["get", "item", uuid, "--fields", "password", "--vault", itemsVault, "--session", currentSession]);
+                            if (itemsInAllVaults) getPassword.start("op", ["get", "item", uuid, "--fields", "password", "--session", currentSession]);
+                            else getPassword.start("op", ["get", "item", uuid, "--fields", "password", "--vault", itemsVault, "--session", currentSession]);
 
                         }
 
@@ -128,7 +131,8 @@ Page {
 
                             allItemDetails = true;
                             loadingItemBusy.running = true;
-                            getPassword.start("op", ["get", "item", uuid, "--vault", itemsVault, "--session", currentSession, "--cache"]);
+                            if (itemsInAllVaults) getPassword.start("op", ["get", "item", uuid, "--session", currentSession, "--cache"]);
+                            else getPassword.start("op", ["get", "item", uuid, "--vault", itemsVault, "--session", currentSession, "--cache"]);
 
                         }
 
@@ -140,7 +144,8 @@ Page {
 
                             allItemDetails = true;
                             loadingItemBusy.running = true;
-                            getPassword.start("op", ["get", "item", uuid, "--vault", itemsVault, "--session", currentSession, "--cache"]);
+                            if (itemsInAllVaults) getPassword.start("op", ["get", "item", uuid, "--session", currentSession, "--cache"]);
+                            else getPassword.start("op", ["get", "item", uuid, "--vault", itemsVault, "--session", currentSession, "--cache"]);
 
                         }
 
@@ -148,7 +153,8 @@ Page {
 
                             itemCopied = title;
                             allItemDetails = false;
-                            getPassword.start("op", ["get", "item", uuid, "--fields", "password", "--vault", itemsVault, "--session", currentSession]);
+                            if (itemsInAllVaults) getPassword.start("op", ["get", "item", uuid, "--fields", "password", "--session", currentSession]);
+                            else getPassword.start("op", ["get", "item", uuid, "--fields", "password", "--vault", itemsVault, "--session", currentSession]);
 
                         }
 
@@ -204,16 +210,20 @@ Page {
                     singleItemPassword = "";
                     singleItemUsername = "0000000000000000000000000000000000000000000000000000000000000000";
                     singleItemUsername = "";
-                    loadingItemBusy.running = false;
-                    pageStack.push(Qt.resolvedUrl("ItemDetails.qml"));
 
-                }
-
-                else { // non-login item
+                    // beginning of added code from non-login section (line that added first model data entry removed)
 
                     sectionDetailsModel.clear();
 
-                    itemDetailsModel.append({"uuid": itemDetails.uuid, "itemTitle": itemDetails.overview.title});
+                    if (itemDetails.overview.URLs.length > 1) { // get any additional website URLs
+
+                        for (var y = 0; y < (itemDetails.overview.URLs.length - 1); y++) {
+
+                            sectionDetailsModel.append({"fieldItemTitle": "website", "fieldItemValue": itemDetails.overview.URLs[y+1].u, "fieldItemKind": "url", "fieldItemName": "website"});
+
+                        }
+
+                    }
 
                     if (itemDetails.details.sections !== undefined) {
 
@@ -247,7 +257,7 @@ Page {
 
                                     if (itemDetails.sections[k].fields[l].v !== undefined && itemDetails.sections[k].fields[l].v !== "" && itemDetails.sections[k].fields[l].t !== undefined && itemDetails.sections[k].fields[l].k !== undefined) {
 
-                                        sectionDetailsModel.append({"fieldItemTitle": itemDetails.sections[k].fields[l].t, "fieldItemValue": itemDetails.sections[k].fields[l].v, "fieldItemKind": itemDetails.sections[k].fields[l].k, "fieldItemName": itemDetails.details.sections[i].fields[j].n});
+                                        sectionDetailsModel.append({"fieldItemTitle": itemDetails.sections[k].fields[l].t, "fieldItemValue": itemDetails.sections[k].fields[l].v, "fieldItemKind": itemDetails.sections[k].fields[l].k, "fieldItemName": itemDetails.details.sections[k].fields[l].n});
 
                                     }
 
@@ -258,6 +268,79 @@ Page {
                         }
 
                     }
+
+                    // get notesPlain
+
+                    if (itemDetails.details.notesPlain !== undefined && itemDetails.details.notesPlain !== "") sectionDetailsModel.append({"fieldItemTitle": "notes", "fieldItemValue": itemDetails.details.notesPlain, "fieldItemKind": "notesPlain", "fieldItemName": "notes"});
+
+                    // -- end of added code from non-login section
+
+                    loadingItemBusy.running = false;
+                    pageStack.push(Qt.resolvedUrl("ItemDetails.qml"));
+
+                }
+
+                else { // non-login item
+
+                    sectionDetailsModel.clear();
+
+                    itemDetailsModel.append({"uuid": itemDetails.uuid, "itemTitle": itemDetails.overview.title});
+
+                    if (itemDetails.overview.URLs !== undefined && itemDetails.overview.URLs.length > 1) { // get any additional website URLs
+
+                        for (var z = 0; z < (itemDetails.overview.URLs.length - 1); z++) {
+
+                            sectionDetailsModel.append({"fieldItemTitle": "website", "fieldItemValue": itemDetails.overview.URLs[z+1].u, "fieldItemKind": "url", "fieldItemName": "website"});
+
+                        }
+
+                    }
+
+                    if (itemDetails.details.sections !== undefined) {
+
+                        for (var n = 0; n < itemDetails.details.sections.length; n++) {
+
+                            if (itemDetails.details.sections[n].fields !== undefined) {
+
+                                for (var p = 0; p < itemDetails.details.sections[n].fields.length; p++) {
+
+                                    if (itemDetails.details.sections[n].fields[p].v !== undefined && itemDetails.details.sections[n].fields[p].v !== "" && itemDetails.details.sections[n].fields[p].t !== undefined && itemDetails.details.sections[n].fields[p].k !== undefined) {
+
+                                        sectionDetailsModel.append({"fieldItemTitle": itemDetails.details.sections[n].fields[p].t, "fieldItemValue": itemDetails.details.sections[n].fields[p].v, "fieldItemKind": itemDetails.details.sections[n].fields[p].k, "fieldItemName": itemDetails.details.sections[n].fields[p].n});
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                    if (itemDetails.sections !== undefined) {
+
+                        for (var q = 0; q < itemDetails.sections.length; q++) {
+
+                            if (itemDetails.sections[q].fields !== undefined) {
+
+                                for (var r = 0; r < itemDetails.sections[q].fields.length; r++) {
+
+                                    if (itemDetails.sections[q].fields[r].v !== undefined && itemDetails.sections[q].fields[r].v !== "" && itemDetails.sections[q].fields[r].t !== undefined && itemDetails.sections[q].fields[r].k !== undefined) {
+
+                                        sectionDetailsModel.append({"fieldItemTitle": itemDetails.sections[q].fields[r].t, "fieldItemValue": itemDetails.sections[q].fields[r].v, "fieldItemKind": itemDetails.sections[q].fields[r].k, "fieldItemName": itemDetails.details.sections[q].fields[r].n});
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                    if (itemDetails.details.notesPlain !== undefined && itemDetails.details.notesPlain !== "") sectionDetailsModel.append({"fieldItemTitle": "notes", "fieldItemValue": itemDetails.details.notesPlain, "fieldItemKind": "notesPlain", "fieldItemName": "notes"});
 
                     loadingItemBusy.running = false;
                     pageStack.push(Qt.resolvedUrl("OtherItemDetails.qml"));

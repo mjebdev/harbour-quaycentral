@@ -35,6 +35,7 @@ Page {
 
         header: PageHeader {
 
+            id: vaultsPageHeader
             title: qsTr("Vaults")
 
         }
@@ -81,9 +82,23 @@ Page {
 
                         onClicked: {
 
-                            itemsVault = uuid;
                             gatheringBusy.running = true;
-                            mainProcess.start("op", ["list", "items", "--categories", categoryName, "--vault", uuid, "--session", currentSession, "--cache"]);
+                            itemsVault = uuid;
+
+                            if (uuid === "ALL_VAULTS") {
+
+                                itemsInAllVaults = true;
+                                mainProcess.start("op", ["list", "items", "--categories", categoryName, "--session", currentSession, "--cache"]);
+
+                            }
+
+                            else {
+
+                                itemsInAllVaults = false;
+                                itemsVault = uuid;
+                                mainProcess.start("op", ["list", "items", "--categories", categoryName, "--vault", uuid, "--session", currentSession, "--cache"]);
+
+                            }
 
                         }
 
@@ -110,6 +125,10 @@ Page {
             mainProcess.waitForFinished();
             var prelimOutput = readAllStandardOutput();
             itemList = JSON.parse(prelimOutput);
+            itemTitle = [];
+            itemTitleToUpperCase = [];
+            itemUUID = [];
+            itemKind = [];
 
             for (var i = 0; i < itemList.length; i++) {
 
