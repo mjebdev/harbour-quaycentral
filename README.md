@@ -46,6 +46,6 @@ App icon by <a href="https://github.com/JSEHV">JSEHV</a>. Thanks for the contrib
 
 <h3>Contact</h3>
 
-Feedback: <a href="mailto:qc@mjbdev.net" subject="QuayCentral feedback">qc@mjbdev.net</a>
+Feedback: <a href="mailto:qc@mjbdev.net">qc@mjbdev.net</a>
 
-Like the app? <a href="https://buymeacoffee.com/michaeljb">Buy me a coffee</a> or <a href="https://ko-fi.com/michaeljb">Support me on Ko-fi</a><br>
+Like the app? - <a href="https://buymeacoffee.com/michaeljb">Buy me a coffee</a> or <a href="https://ko-fi.com/michaeljb">Support me on Ko-fi</a><br>
