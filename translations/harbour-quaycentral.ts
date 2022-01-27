@@ -239,14 +239,6 @@ Download has taken longer than 45 seconds. Please check Downloads folder for com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source><p>Extract, verify and move updated tool to complete installation. More info @ <a href=\"https://support.1password.com/command-line-getting-started/#set-up-the-command-line-tool\">1Password Support</a></p></source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copied file path to clipboard</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Include 'Lock' menu on each screen</source>
         <translation type="unfinished"></translation>
     </message>
