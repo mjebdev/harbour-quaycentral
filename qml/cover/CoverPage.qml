@@ -27,7 +27,6 @@ CoverBackground {
 
     }
 
-    // @disable-check M301
     Label {
 
         id: lowerLabel
@@ -38,10 +37,6 @@ CoverBackground {
         opacity: 0.0
         font.pixelSize: Theme.fontSizeLarge
         font.bold: true
-        //width: parent.width
-        //height: parent.height
-        //verticalAlignment: Text.AlignVCenter
-        //horizontalAlignment: Text.AlignHCenter
 
         Behavior on opacity {
 
@@ -55,74 +50,6 @@ CoverBackground {
 
     }
 
-/*
-    Column {
-
-        height: coverBackground.height
-        anchors.fill: parent
-        spacing: Theme.horizontalPageMargin
-/*
-        Row {
-
-            width: parent.width
-            height: parent.height * 0.4
-            spacing: 0
-
-            // @disable-check M301
-            Label {
-
-                id: label
-                text: "QuayCentral"
-                wrapMode: Text.Wrap
-                font.pixelSize: Theme.fontSizeLarge
-                //font.bold: true
-                width: parent.width
-                height: parent.height
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignBottom
-
-            }
-
-        }
-* /
-        Row {
-
-            width: parent.width
-            height: parent.height // * 0.3
-            spacing: 0
-            y: (parent.height * 0.5) - (lowerLabel.height / 2)
-
-            // @disable-check M301
-            Label {
-
-                id: lowerLabel
-                text: ""
-                color: Theme.highlightColor
-                wrapMode: Text.Wrap
-                opacity: 0.0
-                font.pixelSize: Theme.fontSizeExtraLarge
-                font.bold: true
-                width: parent.width
-                //height: parent.height
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-
-                Behavior on opacity {
-
-                    FadeAnimator {
-
-                        duration: 250
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    }
-*/
     CoverActionList {
 
         id: coverActionList
