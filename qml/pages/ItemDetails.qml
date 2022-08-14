@@ -7,24 +7,122 @@ Page {
 
     id: page
     allowedOrientations: Orientation.PortraitMask
-    property int secondsCountdown
     property string totpOutput
-    property int listViewFixedHeightFigure: 1300
+
+    ListModel {
+
+        id: itemFieldsModel
+
+        ListElement {
+
+            fieldID: ""; fieldType: ""; fieldLabel: ""; fieldValue: ""; fieldTotp: ""
+
+        }
+
+    }
+
+    Process {
+
+        id: loadItemData
+
+        onReadyReadStandardOutput: {
+
+            sessionExpiryTimer.restart();
+            var prelimOutput = readAllStandardOutput();
+            itemDetails = JSON.parse(prelimOutput);
+
+            for (var i = 0; i < itemDetails.fields.length; i++) {
+
+                if (itemDetails.fields[i].id !== "" && itemDetails.fields[i].value !== undefined) itemFieldsModel.append({"fieldID": itemDetails.fields[i].id, "fieldType": itemDetails.fields[i].type, "fieldLabel": itemDetails.fields[i].label, "fieldValue": itemDetails.fields[i].value, "fieldTotp": itemDetails.fields[i].totp !== undefined ? itemDetails.fields[i].totp : ""});
+
+            }
+
+            if (itemDetails.urls !== undefined) {
+
+                for (var j = 0; j < itemDetails.urls.length; j++) itemFieldsModel.append({"fieldID": "URL", "fieldType": "URL", "fieldLabel": itemDetails.urls[j].label, "fieldValue": itemDetails.urls[j].href, "fieldTotp": ""});
+
+            }
+
+            loadingDataBusy.running = false;
+
+        }
+
+        onReadyReadStandardError: {
+
+            errorReadout = readAllStandardError();
+            sessionExpiryTimer.stop();
+            loadingDataBusy.running = false;
+
+            if (errorReadout.indexOf("not currently signed in") !== -1 || errorReadout.indexOf("session expired") !== -1) lockItUp(true);
+
+            else if (errorReadout.indexOf("network") !== -1) {
+
+                detailsPageNotification.previewSummary = "Network-related error (copied). Please check connection.";
+                Clipboard.text = errorReadout;
+                detailsPageNotification.publish();
+
+            }
+
+            else {
+
+                detailsPageNotification.previewSummary = "Unknown error (copied to clipboard). Please sign back in.";
+                Clipboard.text = errorReadout;
+                detailsPageNotification.publish();
+                lockItUp(false);
+
+            }
+
+        }
+
+    }
 
     SilicaListView {
 
         id: itemDetailsView
         anchors.fill: parent
-        contentHeight: column.height
         model: itemDetailsModel
+        contentHeight: page.height
+
+        VerticalScrollDecorator {
+
+            flickable: itemDetailsView
+
+        }
 
         PullDownMenu {
 
+            //visible: settings.includeLockMenuItem
+            visible: itemDetailsModel.get(0).itemType === "LOGIN" ? true : settings.includeLockMenuItem ? true : false
+
+
             MenuItem {
 
-                visible: settings.includeLockMenuItem
                 text: qsTr("Lock");
                 onClicked: lockItUp(false);
+                visible: settings.includeLockMenuItem
+
+            }
+
+            MenuItem {
+
+                id: passwordLargeTypeMenu
+                text: qsTr("Show Password in Large Type")
+                visible: false
+
+                onClicked: {
+
+                    largeTypeModel.clear();
+                    var pwdString = itemDetailsModel.get(0).itemPassword;
+
+                    for (var i = 0; i < pwdString.length; i++) {
+
+                        largeTypeModel.append({"character": pwdString.slice(i, i + 1)});
+
+                    }
+
+                    pageStack.push(Qt.resolvedUrl("LargeType.qml"));
+
+                }
 
             }
 
@@ -37,7 +135,7 @@ Page {
                 onClicked: {
 
                     Clipboard.text = totpOutput;
-                    detailsPageNotification.previewSummary = ("Copied one-time password to clipboard");
+                    detailsPageNotification.previewSummary = qsTr("Copied one-time password to clipboard");
                     detailsPageNotification.publish();
 
                 }
@@ -46,12 +144,13 @@ Page {
 
             MenuItem {
 
+                id: copyPasswordMenu
                 text: qsTr("Copy Password")
-                visible: itemDetailsModel.get(0).password === "" ? false : true
+                visible: false
 
                 onClicked: {
 
-                    Clipboard.text = itemDetailsModel.get(0).password;
+                    Clipboard.text = itemDetailsModel.get(0).itemPassword;
                     detailsPageNotification.previewSummary = qsTr("Copied password to clipboard");
                     detailsPageNotification.publish();
 
@@ -64,91 +163,22 @@ Page {
         delegate: Column {
 
             id: column
-            //anchors.fill: parent
-            spacing: 0
+            //spacing: 0
             width: page.width
-            height: visibleChildren.height
+            height: titleHeader.height + paddingRow.height + fieldItemsView.height + notesHeaderRow.height + notesRow.height
+/*
+            anchors {
 
-            VerticalScrollDecorator { }
+                top: parent
+                left: parent
+                right: parent
 
+            }
+*/
             Component.onCompleted: {
 
-                if(itemsInAllVaults) getTotp.start("op", ["get", "totp", uuid, "--session", currentSession]);
-                else getTotp.start("op", ["get", "totp", uuid, "--vault", itemsVault, "--session", currentSession]);
-
-            }
-
-            Timer {
-
-                id: totpTimer
-                interval: 500
-                repeat: true
-                triggeredOnStart: false
-
-                onTriggered: {
-
-                    var totpCurrentTime = new Date;
-                    secondsCountdown = totpCurrentTime.getSeconds();
-                    if (secondsCountdown > 29) secondsCountdown = secondsCountdown - 30;
-                    secondsCountdown = (secondsCountdown - 30) * -1;
-                    totpTimerField.text = secondsCountdown.toString();
-
-                }
-
-            }
-
-            Process {
-
-                id: getTotp
-
-                onReadyReadStandardOutput: {
-
-                    totpOutput = readAllStandardOutput();
-                    totpOutput = totpOutput.trim();
-
-                    if (totpRow.visible == false) { // if first time checking for totp in item
-
-                        totpRow.visible = true;
-                        copyTotpMenu.visible = true;
-                        totpTimer.start();
-
-                    }
-
-                    totpTextField.text = totpOutput.slice(0, 3) + " " + totpOutput.slice(3);
-                    totpTextField.color = Theme.primaryColor;
-                    totpTimerField.color = Theme.primaryColor;
-                    totpCopyButton.enabled = true;
-                    gatheringTotpBusy.running = false;
-                    sessionExpiryTimer.restart();
-
-                }
-
-                onReadyReadStandardError: {
-
-                    errorReadout = readAllStandardError();
-
-                    if (errorReadout.indexOf("does not contain a one-time password") === -1) { // else no action needed, totpRow remains invisible, timer just restarted by previous page.
-
-                        sessionExpiryTimer.stop();
-                        gatheringTotpBusy.running = false;
-
-                        if (errorReadout.indexOf("not currently signed in") !== -1 || errorReadout.indexOf("session expired") !== -1) detailsPageNotification.previewSummary = "Session Expired";
-
-                        else {
-
-                            // there have already been successful TOTP grabs, possible network error.
-                            detailsPageNotification.previewSummary = "Unknown Error (copied to clipboard) - Please check network and try signing in again.";
-                            Clipboard.text = errorReadout;
-
-                        }
-
-                        detailsPageNotification.publish();
-                        pageStack.clear();
-                        pageStack.replace(Qt.resolvedUrl("SignIn.qml"));
-
-                    }
-
-                }
+                itemFieldsModel.clear();
+                loadItemData.start("op", ["item", "get", itemID, "--vault", itemVaultID, "--format", "json", "--session", currentSession, "--cache"]);
 
             }
 
@@ -167,554 +197,225 @@ Page {
 
             }
 
-            Row {
+            ListView {
 
+                id: fieldItemsView
+                model: itemFieldsModel
                 width: parent.width
-                id: usernameRow
-                height: usernameField.height + (Theme.paddingMedium * 2)
-                spacing: 0
+                height: contentHeight //+ notesHeaderRow.height + notesRow.height
+                spacing: Theme.paddingMedium
+                interactive: false
 
-                Column {
+                delegate: Row {
 
-                    height: parent.height
-                    width: parent.width - usernameCopyButton.width - usernameField.textLeftMargin - Theme.paddingMedium + (usernameCopyButton.width / 8)
-                    spacing: 0
-
-                    Row {
-
-                        width: parent.width
-                        spacing: Theme.paddingMedium
-
-                        TextField {
-
-                            id: usernameField
-                            label: qsTr("username")
-                            readOnly: true
-                            text: username
-                            y: passwordCopyButton.width / 8
-
-                        }
-
-                    }
-
-                }
-
-                Column {
-
-                    height: parent.height
-                    width: usernameCopyButton.width
-                    spacing: Theme.paddingMedium
-
-                    Row {
-
-                        spacing: 0
-                        width: parent.width
-
-                        Image {
-
-                            id: usernameCopyButton
-                            source: "image://theme/icon-m-clipboard"
-                            y: 0
-
-                            MouseArea {
-
-                                anchors.fill: parent
-
-                                onClicked: {
-
-                                    Clipboard.text = username;
-                                    detailsPageNotification.previewSummary = qsTr("Copied username to clipboard");
-                                    detailsPageNotification.publish();
-
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-            }
-
-            Row {
-
-                width: parent.width
-                id: passwordRow
-                height: itemDetailsPasswordField.height + (Theme.paddingMedium * 2)
-                spacing: 0
-
-                Column {
-
-                    height: parent.height
-                    width: parent.width - passwordCopyButton.width - itemDetailsPasswordField.textLeftMargin - Theme.paddingMedium + (passwordCopyButton.width / 8)
-                    spacing: 0
-
-                    Row {
-
-                        width: parent.width
-                        spacing: Theme.paddingMedium
-
-                        PasswordField {
-
-                            id: itemDetailsPasswordField
-                            readOnly: true
-                            text: password
-                            label: qsTr("password")
-                            y: passwordCopyButton.width / 8
-
-                        }
-
-                    }
-
-                }
-
-                Column {
-
-                    height: parent.height
-                    width: passwordCopyButton.width
-                    spacing: Theme.paddingMedium
-
-                    Row {
-
-                        spacing: 0
-                        width: parent.width
-
-                        Image {
-
-                            id: passwordCopyButton
-                            source: "image://theme/icon-m-clipboard"
-                            y: 0
-
-                            MouseArea {
-
-                                anchors.fill: parent
-
-                                onClicked: {
-
-                                    Clipboard.text = password;
-                                    detailsPageNotification.previewSummary = qsTr("Copied password to clipboard");
-                                    detailsPageNotification.publish();
-
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-            }
-
-            // To account for difference in size between show-password button and the copy button (48x48 and 64x64 respectively),
-            // nudging down the fields to align correctly with copy button (passwordCopyButton.width / 8).
-
-            Row {
-
-                width: parent.width
-                id: totpRow
-                visible: false
-                height: itemDetailsPasswordField.height + (Theme.paddingMedium * 2) // since text may not yet be filled in
-                spacing: 0
-
-                Column {
-
-                    height: parent.height
-                    width: parent.width - passwordCopyButton.width - itemDetailsPasswordField.textLeftMargin - Theme.paddingMedium + (passwordCopyButton.width / 8)
-                    spacing: 0
-
-                    Row {
-
-                        width: parent.width
-                        spacing: Theme.paddingMedium
-
-                        TextField {
-
-                            id: totpTextField
-                            font.letterSpacing: 6
-                            text: "/././. /././."
-                            readOnly: true
-                            label: qsTr("one-time password")
-                            y: passwordCopyButton.width / 8
-                            width: parent.width - Theme.paddingMedium
-
-                            rightItem: Label {
-
-                                id: totpTimerField
-                                horizontalAlignment: Qt.AlignHCenter
-                                width: totpCopyButton.width * 0.75
-
-                                Rectangle {
-
-                                    height: gatheringTotpBusy.height + (gatheringTotpBusy.y * 2)
-                                    color: "transparent"
-                                    opacity: 1.0
-                                    radius: 20
-
-                                    anchors {
-
-                                        top: parent.top
-                                        left: parent.left
-                                        right: parent.right
-
-                                    }
-
-                                    border {
-
-                                        id: totpTimerBorder
-                                        width: 3
-                                        color: Theme.highlightColor
-
-                                    }
-
-                                }
-
-                                onTextChanged: {
-
-                                    var digit = parseInt(text);
-
-                                    if (digit < 11) {
-
-                                        totpTimerBorder.color = Theme.errorColor;
-
-                                    }
-
-                                    else {
-
-                                        totpTimerBorder.color = Theme.highlightColor;
-
-                                        if (digit === 30) {
-
-                                            gatheringTotpBusy.running = true;
-                                            totpTextField.color = "grey";
-                                            totpTimerField.color = "grey";
-                                            totpCopyButton.enabled = false;
-                                            if (itemsInAllVaults) getTotp.start("op", ["get", "totp", uuid, "--session", currentSession]);
-                                            else getTotp.start("op", ["get", "totp", uuid, "--vault", itemsVault, "--session", currentSession]);
-
-                                        }
-
-                                    }
-
-                                }
-
-                                BusyIndicator {
-
-                                    id: gatheringTotpBusy
-                                    size: BusyIndicatorSize.Small
-                                    anchors.centerIn: parent
-                                    running: false
-
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-                Column {
-
-                    height: parent.height
-                    width: totpCopyButton.width
-                    spacing: Theme.paddingMedium
-
-                    Row {
-
-                        spacing: 0
-                        width: parent.width
-
-                        Image {
-
-                            id: totpCopyButton
-                            source: "image://theme/icon-m-clipboard"
-                            y: 0
-
-                            MouseArea {
-
-                                anchors.fill: parent
-
-                                onClicked: {
-
-                                    Clipboard.text = totpOutput;
-                                    detailsPageNotification.previewSummary = qsTr("Copied one-time password to clipboard");
-                                    detailsPageNotification.publish();
-
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-            }
-
-            Row {
-
-                width: parent.width
-                id: websiteRow
-                height: websiteField.height + (Theme.paddingMedium * 2)
-                visible: websiteField.text === "" ? false : true
-
-                TextArea {
-
-                    id: websiteField
-                    label: qsTr("website")
-                    readOnly: true
-                    text: website
-                    color: Theme.highlightColor
-                    y: passwordCopyButton.width / 8
-
-                    onClicked: {
-
-                        if (text.slice(0, 4) !== "http") { // To avoid "Cannot open file. File was not found." error.
-
-                            var needsHttp = "https://" + text;
-                            Qt.openUrlExternally(needsHttp);
-
-                        }
-
-                        else Qt.openUrlExternally(text);
-
-                    }
-
-                }
-
-            }
-
-            Row {
-
-                width: parent.width
-                //height: 250 //visibleChildren.height
-
-                Column {
-
-                    id: fieldItemsColumn
-                    y: Theme.paddingMedium
                     width: parent.width
-                    height: fieldItemsView.contentHeight // listViewFixedHeightFigure + Theme.paddingLarge
 
-                    ListView {
+                    Component.onCompleted: {
 
-                        id: fieldItemsView
-                        model: sectionDetailsModel
-                        width: parent.width
-                        interactive: false
-                        spacing: Theme.paddingMedium
-                        height: contentHeight
-                        //height: page.height - titleHeader.height - paddingRow.height - usernameRow.height - passwordRow.height - totpRow.height - websiteRow.height
-                        //y: titleHeader.height + paddingRow.height + usernameRow.height + passwordRow.height + websiteRow.height
+                        if (fieldID === "username") {
 
-                        delegate: Row {
+                            usernameField.label = "username" // need to force this as output came up with odd and/or random labels sometimes e.g. imembernameeasi
+                            usernameField.text = fieldValue;
+                            usernameRow.visible = true;
 
-                            width: parent.width
-                            height: visibleChildren.height
-                            spacing: 0
+                        }
 
-                            Component.onCompleted: {
+                        else if (fieldID === "password") {
 
-                                if (fieldItemName === "ccnum") {
+                            itemDetailsModel.set(0, {"itemPassword": fieldValue});
+                            copyPasswordMenu.visible = true;
+                            itemDetailsPasswordField.label = "password" // see same reason for forcing username label above
+                            passwordRow.visible = true;
+                            passwordLargeTypeMenu.visible = true;
 
-                                    //if (settings.ccnumHidden) {
+                        }
 
-                                        itemDetailsPasswordField2.text = fieldItemValue.slice(0, 4) + " " + fieldItemValue.slice(4, 8) + " " + fieldItemValue.slice(8, 12) + " " + fieldItemValue.slice(12);
-                                        itemDetailsPasswordField2.font.letterSpacing = 4;
-                                        passwordRow2.visible = true;
+                        else if (fieldID === "notesPlain") {
 
-                                    //}
-/*
-                                    else {
+                            if (fieldValue !== "") {
 
-                                        usernameField2.text = fieldItemValue.slice(0, 4) + " " + fieldItemValue.slice(4, 8) + " " + fieldItemValue.slice(8, 12) + " " + fieldItemValue.slice(12);
-                                        usernameField2.font.letterSpacing = 4;
-                                        usernameRow2.visible = true;
+                                notesArea.text = fieldValue;
+                                notesHeaderRow.visible = true;
+                                notesRow.visible = true;
 
-                                    }
-*/
-                                }
+                            }
 
-                                else if (fieldItemName === "cvv" || fieldItemName ===  "pin") {
+                        }
 
-                                    itemDetailsPasswordField2.font.letterSpacing = 4;
-                                    passwordRow2.visible = true;
+                        else {
 
-                                }
+                            switch (fieldType) {
 
-                                else if (fieldItemName === "website" || fieldItemName ===  "server" || fieldItemName ===  "publisher_website" ||
-                                         fieldItemName ===  "provider_website" || fieldItemName ===  "admin_console_url" ||
-                                         fieldItemName ===  "support_contact_url") {
+                                case "OTP":
 
-                                    websiteRow2.visible = true;
+                                    // just leave as first value for now.
+                                    totpModel.set(0, {"totp": fieldTotp, "totpPart1": fieldTotp.slice(0, 3), "totpPart2": fieldTotp.slice(3), "active": true});
+                                    copyTotpMenu.visible = true;
+                                    totpOutput = fieldTotp; // to be replaced by output from process when timer expires.
+                                    mainTotpTimer.start();
+                                    totpRow.visible = true;
+                                    break;
 
-                                }
+                                case "CONCEALED":
 
-                                else {
+                                    passwordRow.visible = true;
+                                    break;
 
-                                    switch (fieldItemKind) {
+                                case "URL":
 
-                                    case "concealed":
+                                    websiteRow.visible = true;
+                                    break;
 
-                                        if (fieldItemName.slice(0, 5).toUpperCase() !== "TOTP_") { // title is not always 'one-time password' (have an item that contains TOTP with this field blank), need to check beginning of name to be certain.
+                                case "CREDIT_CARD_TYPE":
 
-                                            passwordRow2.visible = true;
-
-                                        }
-
-                                        break;
-
-                                    case "notesPlain":
-
-                                        notesRow.visible = true;
-                                        break;
-
-                                    case "URL":
-                                    case "url":
-
-                                        websiteRow2.visible = true;
-                                        break;
-
-                                    case "cctype":
-
-                                        switch (fieldItemValue) {
+                                    switch (fieldValue) {
 
                                         case "mc":
 
-                                            usernameField2.text = "Mastercard";
+                                            usernameField.text = "Mastercard";
                                             break;
 
                                         case "amex":
 
-                                            usernameField2.text = "American Express";
+                                            usernameField.text = "American Express";
                                             break;
 
                                         case "visa":
 
-                                            usernameField2.text = "Visa";
+                                            usernameField.text = "Visa";
                                             break;
 
                                         case "diners":
 
-                                            usernameField2.text = "Diners Club";
+                                            usernameField.text = "Diners Club";
                                             break;
 
                                         case "carteblanche":
 
-                                            usernameField2.text = "Carte Blanche";
+                                            usernameField.text = "Carte Blanche";
                                             break;
 
                                         case "discover":
 
-                                            usernameField2.text = "Discover";
+                                            usernameField.text = "Discover";
                                             break;
 
                                         case "jcb":
 
-                                            usernameField2.text = "JCB";
+                                            usernameField.text = "JCB";
                                             break;
 
                                         case "maestro":
 
-                                            usernameField2.text = "Maestro";
+                                            usernameField.text = "Maestro";
                                             break;
 
                                         case "visaelectron":
 
-                                            usernameField2.text = "Visa Electron";
+                                            usernameField.text = "Visa Electron";
                                             break;
 
                                         case "laser":
 
-                                            usernameField2.text = "Laser";
+                                            usernameField.text = "Laser";
                                             break;
 
                                         case "unionpay":
 
-                                            usernameField2.text = "UnionPay";
+                                            usernameField.text = "UnionPay";
                                             break;
 
                                         default:
 
-                                            usernameField2.text = fieldItemValue;
+                                            usernameField.text = fieldValue;
 
-                                        }
+                                    }
 
-                                        usernameRow2.visible = true;
-                                        break;
+                                    usernameRow.visible = true;
+                                    break;
 
-                                    case "menu":
+                                case ("MENU"):
 
-                                        if (fieldItemName === "accountType") {
+                                    switch (fieldValue) {
 
-                                            switch (fieldItemValue) {
+                                        case "loc":
 
-                                            case "loc":
+                                            usernameField.text = qsTr("Line of Credit");
+                                            break;
 
-                                                usernameField2.text = "Line of Credit";
-                                                break;
+                                        case "money_market":
 
-                                            case "money_market":
+                                            usernameField.text = qsTr("Money Market");
+                                            break;
 
-                                                usernameField2.text = "Money Market";
-                                                break;
+                                        case "atm":
 
-                                            case "atm":
+                                            usernameField.text = qsTr("ATM");
+                                            break;
 
-                                                usernameField2.text = "ATM";
-                                                break;
+                                        default:
 
-                                            default:
+                                            usernameField.text = fieldValue.charAt(0).toUpperCase() + fieldValue.slice(1);
 
-                                                usernameField2.text = fieldItemValue.charAt(0).toUpperCase() + fieldItemValue.slice(1);
+                                    }
 
-                                            }
+                                    usernameRow.visible = true;
+                                    break;
 
-                                        }
+                                case ("MONTH_YEAR"):
 
-                                        else {
+                                    //usernameField.text = fieldValue.toString();
+                                    usernameField.text = fieldValue.slice(4) + "/" + fieldValue.slice(0, 4);
+                                    usernameRow.visible = true;
+                                    break;
 
-                                            usernameField2.text = fieldItemValue;
+                                case ("DATE"):
 
-                                        }
+                                    var date = new Date(parseInt(fieldValue) * 1000);
+                                    usernameField.text = date.toLocaleDateString(Locale.ShortFormat);
+                                    usernameRow.visible = true;
+                                    break;
 
-                                        usernameRow2.visible = true;
-                                        break;
+                                default:
 
-                                    case "monthYear":
+                                    usernameField.text = fieldValue;
+                                    usernameRow.visible = true;
+                                    // plain text field
 
-                                        if (fieldItemValue !== 0) {
+                            }
 
-                                            usernameField2.text = fieldItemValue.toString();
-                                            usernameField2.text = usernameField2.text.slice(4) + "/" + usernameField2.text.slice(0, 4);
-                                            usernameRow2.visible = true;
+                        }
 
-                                        }
+                    }
 
-                                        break;
+                    Column {
 
-                                    case "date":
+                        width: parent.width
+                        height: visibleChildren.height + Theme.paddingLarge
 
-                                        if (fieldItemValue !== 0) {
+                        Row {
 
-                                            var date = new Date(fieldItemValue * 1000);
-                                            usernameField2.text = date.toLocaleDateString(Locale.ShortFormat);
-                                            usernameRow2.visible = true;
+                            width: parent.width
+                            id: usernameRow
+                            height: usernameField.height + (Theme.paddingMedium * 2)
+                            visible: false
 
-                                        }
+                            Column {
 
-                                        break;
+                                height: parent.height
+                                width: parent.width - usernameCopyButton.width - usernameField.textLeftMargin - Theme.paddingMedium + (usernameCopyButton.width / 8)
 
-                                    default: // all other types, simple textfield
+                                Row {
 
-                                        usernameField2.text = fieldItemValue;
-                                        usernameRow2.visible = true;
+                                    width: parent.width
+                                    spacing: Theme.paddingMedium
+
+                                    TextField {
+
+                                        id: usernameField
+                                        label: fieldLabel
+                                        readOnly: true
+                                        y: passwordCopyButton.width / 8
 
                                     }
 
@@ -724,25 +425,186 @@ Page {
 
                             Column {
 
-                                width: parent.width
-                                height: visibleChildren.height
-                                spacing: 0
+                                height: parent.height
+                                width: usernameCopyButton.width
+                                spacing: Theme.paddingMedium
 
-                                Component.onCompleted: listViewFixedHeightFigure = listViewFixedHeightFigure + this.height;
+                                Row {
+
+                                    //spacing: 0
+                                    width: parent.width
+
+                                    Image {
+
+                                        id: usernameCopyButton
+                                        source: "image://theme/icon-m-clipboard"
+                                        y: 0
+
+                                        MouseArea {
+
+                                            anchors.fill: parent
+
+                                            onClicked: {
+
+                                                Clipboard.text = usernameField.text;
+                                                detailsPageNotification.previewSummary = qsTr("Copied %1 to clipboard").arg(fieldLabel);
+                                                detailsPageNotification.publish();
+
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                        Row {
+
+                            width: parent.width
+                            id: passwordRow
+                            height: itemDetailsPasswordField.height + (Theme.paddingMedium * 2)
+                            visible: false
+
+                            Column {
+
+                                height: parent.height
+                                width: parent.width - passwordCopyButton.width - passwordLargeButton.width - itemDetailsPasswordField.textLeftMargin - (Theme.paddingMedium * 3)
 
                                 Row {
 
                                     width: parent.width
-                                    id: usernameRow2
-                                    height: usernameField2.height + (Theme.paddingMedium * 2)
-                                    spacing: 0
-                                    visible: false
+                                    spacing: Theme.paddingMedium
+
+                                    PasswordField {
+
+                                        id: itemDetailsPasswordField
+                                        readOnly: true
+                                        text: fieldValue
+                                        label: fieldLabel
+                                        y: passwordCopyButton.width / 8
+
+                                    }
+
+                                }
+
+                            }
+
+                            Column {
+
+                                height: parent.height
+                                width: passwordLargeButton.width + (Theme.paddingMedium * 2) + (passwordCopyButton.width / 8)
+                                spacing: Theme.paddingMedium
+
+                                Row {
+
+                                    width: parent.width
+
+                                    Image {
+
+                                        id: passwordLargeButton
+                                        source: "image://theme/icon-m-search"
+                                        y: 0
+
+                                        MouseArea {
+
+                                            anchors.fill: parent
+
+                                            onClicked: {
+
+                                                largeTypeModel.clear();
+                                                var pwdString = itemDetailsPasswordField.text;
+
+                                                for (var i = 0; i < pwdString.length; i++) {
+
+                                                    largeTypeModel.append({"character": pwdString.slice(i, i + 1)});
+
+                                                }
+
+                                                pageStack.push(Qt.resolvedUrl("LargeType.qml"));
+
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                            Column {
+
+                                height: parent.height
+                                width: passwordCopyButton.width
+                                spacing: Theme.paddingMedium
+
+                                Row {
+
+                                    //spacing: 0
+                                    width: parent.width
+
+                                    Image {
+
+                                        id: passwordCopyButton
+                                        source: "image://theme/icon-m-clipboard"
+                                        y: 0
+
+                                        MouseArea {
+
+                                            anchors.fill: parent
+
+                                            onClicked: {
+
+                                                Clipboard.text = fieldValue;
+                                                detailsPageNotification.previewSummary = qsTr("Copied %1 to clipboard").arg(fieldLabel);
+                                                detailsPageNotification.publish();
+
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                        Row {
+
+                            id: totpRow
+                            width: parent.width
+                            height: totpListView.height
+                            visible: false
+
+                            onVisibleChanged: {
+
+                                if (visible) mainGetTotp.start("op", ["item", "get", itemDetailsModel.get(0).itemID, "--otp", "--vault", itemDetailsModel.get(0).itemVaultID, "--session", currentSession]);
+
+                            }
+
+                            ListView {
+
+                                id: totpListView
+                                model: totpModel
+                                width: parent.width
+                                height: itemDetailsPasswordField.height + (Theme.paddingMedium * 2)
+                                interactive: false
+
+                                delegate: Row {
+
+                                    width: parent.width
+                                    height: itemDetailsPasswordField.height + (Theme.paddingMedium * 2)
 
                                     Column {
 
                                         height: parent.height
-                                        width: parent.width - usernameCopyButton2.width - usernameField2.textLeftMargin - Theme.paddingMedium + (usernameCopyButton2.width / 8)
-                                        spacing: 0
+                                        width: parent.width - passwordCopyButton.width - itemDetailsPasswordField.textLeftMargin - Theme.paddingMedium + (passwordCopyButton.width / 8)
 
                                         Row {
 
@@ -751,43 +613,54 @@ Page {
 
                                             TextField {
 
-                                                id: usernameField2
-                                                label: fieldItemTitle
+                                                id: totpTextField
+                                                font.letterSpacing: 6
+                                                text: totpPart1 + " " + totpPart2;
+                                                color: primaryColor ? Theme.primaryColor : "grey"
                                                 readOnly: true
-                                                y: passwordCopyButton2.width / 8
+                                                label: qsTr("one-time password")
+                                                y: passwordCopyButton.width / 8
+                                                width: parent.width - Theme.paddingMedium
 
-                                            }
+                                                rightItem: Label {
 
-                                        }
+                                                    id: totpTimerField
+                                                    horizontalAlignment: Qt.AlignHCenter
+                                                    width: totpCopyButton.width * 0.75
+                                                    color: primaryColor ? Theme.primaryColor : "grey"
+                                                    text: secondsLeft
 
-                                    }
+                                                    Rectangle {
 
-                                    Column {
+                                                        height: gatheringTotpBusy.height + (gatheringTotpBusy.y * 2)
+                                                        color: "transparent"
+                                                        opacity: 1.0
+                                                        radius: 20
 
-                                        height: parent.height
-                                        width: usernameCopyButton2.width
-                                        spacing: Theme.paddingMedium
+                                                        anchors {
 
-                                        Row {
+                                                            top: parent.top
+                                                            left: parent.left
+                                                            right: parent.right
 
-                                            spacing: 0
-                                            width: parent.width
+                                                        }
 
-                                            Image {
+                                                        border {
 
-                                                id: usernameCopyButton2
-                                                source: "image://theme/icon-m-clipboard"
-                                                y: 0
+                                                            id: totpTimerBorder
+                                                            width: 3
+                                                            color: secondsLeft < 11 ? Theme.errorColor : Theme.highlightColor
 
-                                                MouseArea {
+                                                        }
 
-                                                    anchors.fill: parent
+                                                    }
 
-                                                    onClicked: {
+                                                    BusyIndicator {
 
-                                                        Clipboard.text = usernameField2.text;
-                                                        detailsPageNotification.previewSummary = qsTr("Copied %1 to clipboard").arg(fieldItemTitle);
-                                                        detailsPageNotification.publish();
+                                                        id: gatheringTotpBusy
+                                                        size: BusyIndicatorSize.Small
+                                                        anchors.centerIn: parent
+                                                        running: !primaryColor
 
                                                     }
 
@@ -799,61 +672,19 @@ Page {
 
                                     }
 
-                                }
-
-                                Row {
-
-                                    width: parent.width
-                                    id: passwordRow2
-                                    height: itemDetailsPasswordField2.height + (Theme.paddingMedium * 2)
-                                    spacing: 0
-                                    visible: false
-
                                     Column {
 
                                         height: parent.height
-                                        width: parent.width - passwordCopyButton2.width - itemDetailsPasswordField2.textLeftMargin - Theme.paddingMedium + (passwordCopyButton2.width / 8)
-                                        spacing: 0
-
-                                        Row {
-
-                                            width: parent.width
-                                            spacing: Theme.paddingMedium
-
-                                            PasswordField {
-
-                                                id: itemDetailsPasswordField2
-                                                readOnly: true
-                                                text: fieldItemValue
-                                                label: fieldItemTitle
-                                                y: passwordCopyButton2.width / 8
-        /*
-                                                Text { // not yet available with this version of QtQuick
-
-                                                    textFormat: Text.MarkdownText
-
-                                                }
-        */
-                                            }
-
-                                        }
-
-                                    }
-
-                                    Column {
-
-                                        height: parent.height
-                                        width: passwordCopyButton2.width
+                                        width: totpCopyButton.width
                                         spacing: Theme.paddingMedium
 
                                         Row {
 
-                                            spacing: 0
                                             width: parent.width
 
                                             Image {
 
-                                                id: passwordCopyButton2
+                                                id: totpCopyButton
                                                 source: "image://theme/icon-m-clipboard"
                                                 y: 0
 
@@ -863,117 +694,8 @@ Page {
 
                                                     onClicked: {
 
-                                                        Clipboard.text = fieldItemValue;
-                                                        detailsPageNotification.previewSummary = qsTr("Copied %1 to clipboard").arg(fieldItemTitle);
-                                                        detailsPageNotification.publish();
-
-                                                    }
-
-                                                }
-
-                                            }
-
-                                        }
-
-                                    }
-
-                                }
-
-                                Row {
-
-                                    width: parent.width
-                                    height: websiteField2.height + (Theme.paddingMedium * 2)
-                                    id: websiteRow2
-                                    visible: false
-
-                                    TextArea {
-
-                                        id: websiteField2
-                                        label: fieldItemTitle
-                                        readOnly: true
-                                        text: fieldItemValue
-                                        color: Theme.highlightColor
-                                        y: passwordCopyButton2.width / 8
-
-                                        onClicked: {
-
-                                            if (text.slice(0, 4) !== "http") {
-
-                                                // To avoid "Cannot open file. File was not found." error.
-                                                var needsHttp = "https://" + text;
-                                                Qt.openUrlExternally(needsHttp);
-
-                                            }
-
-                                            else Qt.openUrlExternally(text);
-
-                                        }
-
-                                    }
-
-                                }
-
-                                Row {
-
-                                    width: parent.width
-                                    id: notesRow
-                                    height: notesArea.height + (Theme.paddingMedium * 2)
-                                    spacing: 0
-                                    visible: false
-
-                                    Column {
-
-                                        height: parent.height
-                                        width: parent.width - notesCopyButton.width - notesArea.textLeftMargin - Theme.paddingMedium + (notesCopyButton.width / 8)
-                                        spacing: 0
-
-                                        Row {
-
-                                            width: parent.width
-                                            spacing: Theme.paddingMedium
-
-                                            TextArea {
-
-                                                id: notesArea
-                                                label: fieldItemTitle
-                                                readOnly: true
-                                                height: contentHeight
-                                                text: fieldItemValue
-                                                y: notesCopyButton.width / 8
-                                                //autoScrollEnabled: true
-                                                //wrapMode: Text.Wrap
-
-                                            }
-
-                                        }
-
-                                    }
-
-                                    Column {
-
-                                        height: parent.height
-                                        width: notesCopyButton.width
-                                        spacing: Theme.paddingMedium
-
-                                        Row {
-
-                                            spacing: 0
-                                            width: parent.width
-
-                                            Image {
-
-                                                id: notesCopyButton
-                                                source: "image://theme/icon-m-clipboard"
-                                                y: 0
-
-                                                MouseArea {
-
-                                                    anchors.fill: parent
-
-                                                    onClicked: {
-
-                                                        Clipboard.text = fieldItemValue;
-                                                        detailsPageNotification.previewSummary = qsTr("Copied %1 to clipboard").arg(fieldItemTitle);
+                                                        Clipboard.text = totpOutput;
+                                                        detailsPageNotification.previewSummary = qsTr("Copied one-time password to clipboard");
                                                         detailsPageNotification.publish();
 
                                                     }
@@ -992,6 +714,40 @@ Page {
 
                         }
 
+                        Row {
+
+                            width: parent.width
+                            id: websiteRow
+                            height: websiteField.height + (Theme.paddingMedium * 2)
+                            visible: false
+
+                            TextArea {
+
+                                id: websiteField
+                                label: "website" // fieldLabel was sometime 'website' and sometimes undefined.
+                                readOnly: true
+                                text: fieldValue
+                                color: Theme.highlightColor
+                                y: passwordCopyButton.width / 8
+
+                                onClicked: {
+
+                                    if (text.slice(0, 4) !== "http") {
+
+                                        // To avoid "Cannot open file. File was not found." error.
+                                        var needsHttp = "https://" + text;
+                                        Qt.openUrlExternally(needsHttp);
+
+                                    }
+
+                                    else Qt.openUrlExternally(text);
+
+                                }
+
+                            }
+
+                        }
+
                     }
 
                 }
@@ -1000,9 +756,94 @@ Page {
 
             Row {
 
+                id: notesHeaderRow
                 width: parent.width
-                id: paddingRow2
-                height: Theme.paddingMedium
+                visible: false
+
+                Column {
+
+                    height: notesHeader.height
+                    width: parent.width
+
+                    SectionHeader {
+
+                        id: notesHeader
+                        // id: notesSectionHeader
+                        text: "Notes"
+                        //visible: false
+                        topPadding: 0
+
+                    }
+
+                }
+
+            }
+
+            Row {
+
+                id: notesRow
+                width: parent.width
+                visible: false
+                height: notesArea.height + (Theme.paddingMedium * 2)
+
+                Column {
+
+                    height: parent.height
+                    width: parent.width - notesCopyButton.width - notesArea.textLeftMargin - Theme.paddingMedium + (notesCopyButton.width / 8)
+
+                    Row {
+
+                        width: parent.width
+                        spacing: Theme.paddingMedium
+
+                        TextArea {
+
+                            id: notesArea
+                            readOnly: true
+                            text: ""
+                            y: notesCopyButton.width / 8
+
+                        }
+
+                    }
+
+                }
+
+                Column {
+
+                    height: parent.height
+                    width: notesCopyButton.width
+                    spacing: Theme.paddingMedium
+
+                    Row {
+
+                        width: parent.width
+
+                        Image {
+
+                            id: notesCopyButton
+                            source: "image://theme/icon-m-clipboard"
+                            y: 0
+
+                            MouseArea {
+
+                                anchors.fill: parent
+
+                                onClicked: {
+
+                                    Clipboard.text = notesArea.text;
+                                    detailsPageNotification.previewSummary = qsTr("Copied notes to clipboard");
+                                    detailsPageNotification.publish();
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
 
             }
 
@@ -1017,6 +858,15 @@ Page {
         urgency: Notification.Low
         isTransient: true
         expireTimeout: 800
+
+    }
+
+    BusyIndicator {
+
+        id: loadingDataBusy
+        size: BusyIndicatorSize.Large
+        anchors.centerIn: parent
+        running: true
 
     }
 
