@@ -25,7 +25,7 @@ Page {
             updateCLI.write("y\n");
             updatingIndicator.running = true;
             updateDownloadTimer.start();
-            processStatus.previewSummary = qsTr("Downloading Update...");
+            processStatus.previewSummary = qsTr("Downloading update...");
             processStatus.publish();
 
         }
@@ -282,9 +282,9 @@ Page {
 
             TextSwitch {
 
+                id: showLockMenuItemSwitch
                 text: qsTr("Include 'Lock' menu on each screen")
                 description: qsTr("Alternatively, tap padlock on cover or swipe back to sign-in screen.")
-                id: showLockMenuItemSwitch
                 checked: settings.includeLockMenuItem
                 leftMargin: Theme.horizontalPageMargin
 
@@ -308,36 +308,6 @@ Page {
 
                     checked = !checked;
                     settings.skipVaultScreen = checked;
-/*
-                    if (justOneVault === false) {
-
-                        if (checked) { // need to assign first vault incase user doesn't interact with list
-
-                            defaultVaultIndex = 0;
-                            defaultVaultUUID = vaultUUID[0];
-                            defaultVaultTitle = vaultName[0];
-                            defaultVaultCombo.currentIndex = 0;
-                            encryptedUUID.deleteSecret();
-
-                            if (encryptedUUID.save("Default Vault UUID", vaultUUID[0]) === false) {
-
-                                processStatus.previewSummary = "Error saving default vault UUID. Please try again.";
-                                processStatus.publish();
-                                settings.skipVaultScreen = false;
-                                checked = false;
-
-                            }
-
-                        }
-
-                        else { // delete existing default UUID
-
-                            encryptedUUID.deleteSecret();
-
-                        }
-
-                    }
-*/
                     settings.sync();
 
                 }
@@ -351,7 +321,6 @@ Page {
                 width: parent.width
                 currentIndex: settings.whichItemsToLoadIndex
                 enabled: skipVaultScreenSwitch.checked
-                //x: Theme.horizontalPageMargin
 
                 menu: ContextMenu {
 
@@ -376,6 +345,23 @@ Page {
                         }
 
                     }
+
+                }
+
+            }
+
+            TextSwitch {
+
+                text: qsTr("Display one-time passwords on cover") // self explanitory
+                //description: "Display an item's one-time password on the home screen's app cover."
+                id: otpOnAppCover
+                checked: settings.otpOnCover
+                leftMargin: Theme.horizontalPageMargin
+
+                onCheckedChanged: {
+
+                    settings.otpOnCover = checked;
+                    settings.sync();
 
                 }
 
@@ -449,6 +435,7 @@ Page {
                             topPadding: Theme.paddingLarge
                             bottomPadding: Theme.paddingSmall
                             font.pixelSize: Theme.fontSizeExtraSmall
+                            linkColor: Theme.highlightColor
                             wrapMode: Text.Wrap
 
                             BackgroundItem {
@@ -531,6 +518,7 @@ Page {
                             topPadding: Theme.paddingLarge
                             bottomPadding: Theme.paddingSmall
                             font.pixelSize: Theme.fontSizeExtraSmall
+                            textFormat: Text.AutoText
                             wrapMode: Text.Wrap
 
                             BackgroundItem {
@@ -547,11 +535,11 @@ Page {
 
                             }
 
-                            Text {
+                            //Text {
 
-                                textFormat: Text.AutoText
 
-                            }
+
+                            //}
 
                             MouseArea {
 
@@ -585,7 +573,8 @@ Page {
                             topPadding: Theme.paddingLarge
                             font.pixelSize: Theme.fontSizeSmall
                             wrapMode: Text.Wrap
-                            text: qsTr("<p>Extract, verify and move updated tool to complete installation. More info @ <a href=\"https://support.1password.com/command-line-getting-started/#set-up-the-command-line-tool\">1Password Support</a></p>")
+                            text: qsTr("<p>Extract, verify and move updated tool to complete installation. More info @ <a href=\"https://developer.1password.com/docs/cli/get-started\">1Password Support</a></p>")
+                            linkColor: Theme.highlightColor
 
                             Text {
 
@@ -596,7 +585,7 @@ Page {
                             MouseArea {
 
                                 anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("https://support.1password.com/command-line-getting-started/#set-up-the-command-line-tool");
+                                onClicked: Qt.openUrlExternally("https://developer.1password.com/docs/cli/get-started");
 
                             }
 
@@ -625,8 +614,8 @@ Page {
 
                         if (text === qsTr("List CLI Accounts")) {
 
-                            updateCLI.start("op", ["signin", "--list"]);
-                            text = qsTr("Done");
+                            listAccounts.start("op", ["account", "list"]);
+                            text = qsTr("Hide Account List");
                             accountsLabelRow.visible = true;
 
                         }
@@ -693,251 +682,115 @@ Page {
                 id: paddingRow
                 width: parent.width
                 height: Theme.paddingLarge
-                visible: !accountsLabelRow.visible
+                //visible: !accountsLabelRow.visible
 
             }
+/* -- experiencing issues with account forget or signout --forget commands not working as expected and user still being able to sign in after these. will need to remove via terminal and/or account page on web.
+            Row {
 
-            SectionHeader {
+                id: signoutAndForgetLabelRow
+                width: parent.width
+                x: Theme.horizontalPageMargin
 
-                text: qsTr("About")
+                Label {
+
+                    id: signoutAndForgetLabel
+                    text: "Click below to revoke the app's ability to interface with the CLI. Please note current session must be active for command to take effect. Future use of the app will require first re-adding the 'quaycentsfos' shorthand with your account to the CLI.\n"
+                    wrapMode: Text.WordWrap
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    width: page.width - (Theme.horizontalPageMargin * 2)
+
+                }
 
             }
 
             Row {
 
                 width: parent.width
-                spacing: 0
+                //width: signoutAndForget.width
+                //height: signoutAndForget.height + (Theme.paddingMedium * 2)
+                //x: (page.width - signoutAndForget.width) * 0.5
 
-                Column {
+                ButtonLayout {
 
-                    width: parent.width
-                    spacing: 0
+                    Button {
 
-                    Row {
+                        text: qsTr("Signout & Forget");
+                        id: signoutAndForget
+                        y: Theme.paddingMedium
+                        preferredWidth: Theme.buttonWidthLarge
 
-                        width: appTitleLabel.width
-                        x: (parent.width - appTitleLabel.width) * 0.5
-                        spacing: 0
+                        BusyIndicator {
 
-                        Label {
-
-                            text: "QuayCentral"
-                            width: text.width
-                            height: text.height
-                            horizontalAlignment: Qt.AlignHCenter
-                            id: appTitleLabel
-                            font.pixelSize: Theme.fontSizeLarge
-                            // font.bold: true
-                            color: Theme.primaryColor
-                            bottomPadding: Theme.paddingMedium
+                            id: removingAccountIndicator
+                            size: BusyIndicatorSize.Medium
+                            anchors.centerIn: parent
+                            running: false
 
                         }
 
-                    }
+                        onClicked: {
 
-                    Separator {
+                            removingAccountIndicator.running = true;
+                            errorReadout = "";
+                            sessionExpiryTimer.stop();
+                            totpModel.clear();
+                            totpModel.set(0, {"active": false});
+                            mainTotpTimer.stop();
+                            // if user's session no longer active--e.g. settings page left open for over 30 mins, will first sign out and then use 'op account forget' command to ensure expected result.
+                            signOutProcess.start("op", ["signout", "--forget"]);
+                            signOutProcess.waitForFinished();
 
-                        id: titleSeparator
-                        width: appTitleLabel.width
-                        x: (page.width - this.width) * 0.5
-                        horizontalAlignment: Separator.Center
-                        color: Theme.highlightColor
+                            if (signOutProcess.exitStatus() === 0 && errorReadout === "") {
 
-                    }
+                                itemDetailsModel.clear();
+                                itemListModel.clear();
+                                vaultListModel.clear();
 
-                    Row {
+                                removingAccountIndicator.running = false;
+                                processStatus.expireTimeout = 2000;
+                                processStatus.previewSummary = "Signout using '--forget' flag was successful.";
+                                processStatus.publish();
+                                pageStack.clear();
+                                pageStack.push(Qt.resolvedUrl("pages/SignIn.qml"), null, PageStackAction.Immediate);
 
-                        width: parent.width * 0.64
-                        x: parent.width * 0.18
-                        height: aboutTextLabel.height
-                        spacing: 0
+                                /*
+                                signOutProcess.start("op", ["account", "forget", "quaycentsfos"]);
+                                signOutProcess.waitForFinished();
 
-                        Label {
+                                if (signOutProcess.exitStatus() === 0 && errorReadout === "") {
 
-                            topPadding: Theme.paddingLarge
-                            width: parent.width
-                            id: aboutTextLabel
-                            font.pixelSize: Theme.fontSizeExtraSmall
-                            color: Theme.primaryColor
-                            wrapMode: Text.Wrap
-                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\n\nVersion 0.5.1\nLicensed under GNU GPLv3\n\nApp icon by JSEHV @ GitHub. Thank you for the contribution!\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
-                            bottomPadding: Theme.paddingMedium
+                                    removingAccountIndicator.running = false;
+                                    processStatus.expireTimeout = 2000;
+                                    processStatus.previewSummary = "QuayCentral access to CLI has been revoked.";
+                                    processStatus.publish();
+                                    pageStack.clear();
+                                    pageStack.push(Qt.resolvedUrl("pages/SignIn.qml"), null, PageStackAction.Immediate);
 
-                        }
+                                }
 
-                    }
+                                else {
 
-                    Row {
+                                    removingAccountIndicator.running = false;
+                                    Clipboard.text = errorReadout;
+                                    processStatus.previewSummary = "Error when removing shorthand. Error output copied to clipboard.";
+                                    processStatus.publish();
 
-                        width: buyMeCoffeeLabel.paintedWidth
-                        x: (parent.width - this.width) * 0.5
-                        height: buyMeCoffeeLabel.height
-                        spacing: 0
+                                }
+                                * /
 
-                        Label {
+                            }
 
-                            topPadding: Theme.paddingLarge
-                            id: buyMeCoffeeLabel
-                            font.pixelSize: Theme.fontSizeTiny
-                            font.letterSpacing: 2
-                            color: Theme.highlightColor
-                            wrapMode: Text.Wrap
-                            text: qsTr("DONATE")
-                            bottomPadding: Theme.paddingMedium
+                            else {
 
-                        }
-
-                    }
-
-                    Row {
-
-                        id: linkToBMAC2Row
-                        width: parent.width * 0.6
-                        x: parent.width * 0.2
-                        spacing: 0
-                        height: linkToBMAC2.height + (Theme.paddingMedium * 2) //linkToBMAC.height
-
-                        Image {
-
-                            id: linkToBMAC2
-                            source: Theme.colorScheme == Theme.DarkOnLight ? "BMClogowithwordmark-black.png" : "BMClogowithwordmark-white.png"
-                            fillMode: Image.PreserveAspectFit
-                            width: parent.width
-                            y: Theme.paddingMedium // (linkToBMAC.height - this.paintedHeight) * 0.5
-
-                            MouseArea {
-
-                                anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("https://www.buymeacoffee.com/michaeljb");
+                                removingAccountIndicator.running = false;
+                                Clipboard.text = errorReadout;
+                                processStatus.previewSummary = "Error when signing out. Error output copied to clipboard.";
+                                processStatus.publish();
 
                             }
 
                         }
-
-                    }
-
-                    Row {
-
-                        width: sendFeedbackLabel.paintedWidth
-                        x: (parent.width - this.width) * 0.5
-                        height: sendFeedbackLabel.height
-                        spacing: 0
-
-                        Label {
-
-                            topPadding: Theme.paddingLarge
-                            id: sendFeedbackLabel
-                            font.pixelSize: Theme.fontSizeTiny
-                            font.letterSpacing: 2
-                            color: Theme.highlightColor
-                            wrapMode: Text.Wrap
-                            text: qsTr("FEEDBACK")
-                            bottomPadding: Theme.paddingMedium
-
-                        }
-
-                    }
-
-                    Row {
-
-                        spacing: 0
-                        height: linkToBMAC2Row.height
-                        width: emailIconSeparate.width + feedbackEmail.width
-                        x: (parent.width - this.width) * 0.5
-
-                        Image {
-
-                            id: emailIconSeparate
-                            source: "image://theme/icon-m-mail"
-                            fillMode: Image.PreserveAspectFit
-                            height: parent.height
-                            verticalAlignment: Image.AlignVCenter
-
-                            MouseArea {
-
-                                anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("mailto:qc@mjbdev.net?subject=QuayCentral Feedback");
-
-                            }
-
-                        }
-
-                        Label {
-
-                            id: feedbackEmail
-                            height: parent.height
-                            font.pixelSize: Theme.fontSizeLarge
-                            color: Theme.primaryColor
-                            text: "qc@mjbdev.net"
-                            font.bold: true
-                            topPadding: 0
-                            bottomPadding: this.paintedHeight * 0.1
-                            leftPadding: Theme.paddingSmall
-                            verticalAlignment: Text.AlignVCenter
-
-                            MouseArea {
-
-                                anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("mailto:qc@mjbdev.net?subject=QuayCentral Feedback");
-
-                            }
-
-                        }
-
-                    }
-
-                    Row {
-
-                        width: viewSourceCodeLabel.paintedWidth
-                        x: (parent.width - this.width) * 0.5
-                        height: viewSourceCodeLabel.height
-                        spacing: 0
-
-                        Label {
-
-                            topPadding: Theme.paddingLarge
-                            id: viewSourceCodeLabel
-                            font.pixelSize: Theme.fontSizeTiny
-                            font.letterSpacing: 2
-                            color: Theme.highlightColor
-                            wrapMode: Text.Wrap
-                            text: qsTr("SOURCE")
-                            bottomPadding: Theme.paddingMedium
-
-                        }
-
-                    }
-
-                    Row {
-
-                        width: linkToGitHub.paintedWidth
-                        x: (parent.width - this.width) * 0.5
-                        spacing: 0
-                        height: linkToBMAC2Row.height
-
-                        Image {
-
-                            id: linkToGitHub
-                            source: Theme.colorScheme == Theme.DarkOnLight ? "GitHub_Logo.png" : "GitHub_Logo_White.png"
-                            fillMode: Image.PreserveAspectFit
-                            height: parent.height
-
-                            MouseArea {
-
-                                anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("https://github.com/michaeljohnbarrett/harbour-quaycentral");
-
-                            }
-
-                        }
-
-                    }
-
-                    Row {
-
-                        id: bmacGapRow
-                        height: Theme.paddingLarge
-                        width: parent.width
 
                     }
 
@@ -945,6 +798,13 @@ Page {
 
             }
 
+            Row { // padding row
+
+                width: parent.width
+                height: Theme.paddingLarge
+
+            }
+*/
         }
 
     }
@@ -957,6 +817,30 @@ Page {
 
             cliVersion = readAllStandardOutput();
             cliVersion = cliVersion.trim();
+
+        }
+
+    }
+
+    Process {
+
+        id: listAccounts
+
+        onReadyReadStandardOutput: {
+
+            var listOfAccounts = readAllStandardOutput();
+            accountsLabel.text = "<pre>" + listOfAccounts + "</pre>";
+
+        }
+
+        onReadyReadStandardError: {
+
+            errorReadout = readAllStandardError();
+            errorReadout = errorReadout.trim();
+            Clipboard.text = errorReadout;
+            processStatus.previewSummary = qsTr("Error when listing accounts. Copied description to clipboard.");
+            processStatus.publish();
+            errorReadout = "";
 
         }
 
@@ -992,13 +876,13 @@ Page {
                 furtherActionRow.visible = true;
 
             }
-
+/*
             else if (standardOutput.indexOf("Accounts on this") !== -1) {
 
                 accountsLabel.text = "<pre>" + standardOutput + "</pre>";
 
             }
-
+*/
             else if (standardOutput.indexOf("is now available") !== -1) {
 
                 updateButton.enabled = false;
