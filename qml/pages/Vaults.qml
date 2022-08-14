@@ -26,8 +26,15 @@ Page {
 
             MenuItem {
 
+                text: qsTr("About")
+                onClicked: pageStack.push(Qt.resolvedUrl("About.qml"));
+
+            }
+
+            MenuItem {
+
                 text: qsTr("Settings")
-                onClicked: pageStack.push(Qt.resolvedUrl("Settings.qml"))
+                onClicked: pageStack.push(Qt.resolvedUrl("Settings.qml"));
 
             }
 
@@ -83,20 +90,22 @@ Page {
                         onClicked: {
 
                             gatheringBusy.running = true;
-                            itemsVault = uuid;
+                            //itemsVault = uuid;
 
                             if (uuid === "ALL_VAULTS") {
 
-                                itemsInAllVaults = true;
-                                mainProcess.start("op", ["list", "items", "--categories", categoryName, "--session", currentSession, "--cache"]);
+                                //itemsInAllVaults = true;
+
+                                mainProcess.start("op", ["item", "list", "--categories", categoryName, "--format", "json", "--session", currentSession, "--cache"]);
 
                             }
 
                             else {
 
-                                itemsInAllVaults = false;
-                                itemsVault = uuid;
-                                mainProcess.start("op", ["list", "items", "--categories", categoryName, "--vault", uuid, "--session", currentSession, "--cache"]);
+                                //itemsInAllVaults = false;
+                                //itemsVault = uuid;
+
+                                mainProcess.start("op", ["item", "list", "--categories", categoryName, "--vault", uuid, "--format", "json", "--session", currentSession, "--cache"]);
 
                             }
 
@@ -122,21 +131,15 @@ Page {
 
             sessionExpiryTimer.restart();
             itemListModel.clear();
+            itemSearchModel.clear();
             mainProcess.waitForFinished();
             var prelimOutput = readAllStandardOutput();
             itemList = JSON.parse(prelimOutput);
-            itemTitle = [];
-            itemTitleToUpperCase = [];
-            itemUUID = [];
-            itemKind = [];
 
             for (var i = 0; i < itemList.length; i++) {
 
-                itemTitle[i] = itemList[i].overview.title;
-                itemTitleToUpperCase[i] = itemList[i].overview.title.toUpperCase();
-                itemUUID[i] = itemList[i].uuid;
-                itemKind[i] = itemList[i].templateUuid;
-                itemListModel.append({uuid: itemUUID[i], title: itemTitle[i], templateUuid: itemKind[i]});
+                itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultID: itemList[i].vault.id, itemVaultName: itemList[i].vault.name});
+                itemSearchModel.append(itemListModel.get(i));
 
             }
 
@@ -185,3 +188,4 @@ Page {
     }
 
 }
+    
