@@ -18,9 +18,10 @@ SOURCES += src/harbour-quaycentral.cpp
 
 DISTFILES += qml/harbour-quaycentral.qml \
     qml/cover/CoverPage.qml \
+    qml/pages/About.qml \
     qml/pages/ItemDetails.qml \
     qml/pages/Items.qml \
-    qml/pages/OtherItemDetails.qml \
+    qml/pages/LargeType.qml \
     qml/pages/Settings.qml \
     qml/pages/SignIn.qml \
     qml/pages/Vaults.qml \
