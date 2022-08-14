@@ -13,5 +13,9 @@ Categories=Utility
 # a different app name in German locale (de).
 # Name[de]=harbour-quaycentral
 
+# Sailjail disabled as could not get app to work with CLI using any available permissions
+
 [X-Sailjail]
 Sandboxing=Disabled
+OrganizationName=org.mjebdev
+ApplicationName=QuayCentral
