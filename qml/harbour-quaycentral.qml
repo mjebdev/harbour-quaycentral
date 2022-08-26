@@ -5,8 +5,6 @@ import Nemo.Notifications 1.0
 import Nemo.Configuration 1.0
 import "pages"
 
-// version 0.6
-
 ApplicationWindow {
 
     id: appWindow
