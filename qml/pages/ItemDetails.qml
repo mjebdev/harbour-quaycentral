@@ -53,7 +53,12 @@ Page {
             sessionExpiryTimer.stop();
             loadingDataBusy.running = false;
 
-            if (errorReadout.indexOf("not currently signed in") !== -1 || errorReadout.indexOf("session expired") !== -1) lockItUp(true);
+            if (errorReadout.indexOf("not currently signed in") !== -1 || errorReadout.indexOf("session expired") !== -1) {
+
+                pageStack.completeAnimation(); // to avoid freezing app if user tries to load an item after access has expired.
+                lockItUp(true);
+
+            }
 
             else if (errorReadout.indexOf("network") !== -1) {
 
@@ -214,7 +219,7 @@ Page {
 
                         if (fieldID === "username") {
 
-                            usernameField.label = "username" // need to force this as output came up with odd and/or random labels sometimes e.g. imembernameeasi
+                            usernameField.label = qsTr("username") // need to force this as output came up with odd and/or random labels sometimes e.g. imembernameeasi
                             usernameField.text = fieldValue;
                             usernameRow.visible = true;
 
@@ -224,7 +229,7 @@ Page {
 
                             itemDetailsModel.set(0, {"itemPassword": fieldValue});
                             copyPasswordMenu.visible = true;
-                            itemDetailsPasswordField.label = "password" // see same reason for forcing username label above
+                            itemDetailsPasswordField.label = qsTr("password") // see same reason for forcing username label above
                             passwordRow.visible = true;
                             passwordLargeTypeMenu.visible = true;
 
@@ -447,7 +452,7 @@ Page {
                                             onClicked: {
 
                                                 Clipboard.text = usernameField.text;
-                                                detailsPageNotification.previewSummary = qsTr("Copied %1 to clipboard").arg(fieldLabel);
+                                                detailsPageNotification.previewSummary = qsTr("Copied %1 to clipboard").arg(usernameField.label);
                                                 detailsPageNotification.publish();
 
                                             }
@@ -560,7 +565,7 @@ Page {
                                             onClicked: {
 
                                                 Clipboard.text = fieldValue;
-                                                detailsPageNotification.previewSummary = qsTr("Copied %1 to clipboard").arg(fieldLabel);
+                                                detailsPageNotification.previewSummary = qsTr("Copied %1 to clipboard").arg(itemDetailsPasswordField.label);
                                                 detailsPageNotification.publish();
 
                                             }
@@ -724,7 +729,7 @@ Page {
                             TextArea {
 
                                 id: websiteField
-                                label: "website" // fieldLabel was sometime 'website' and sometimes undefined.
+                                label: qsTr("website") // fieldLabel was sometime 'website' and sometimes undefined.
                                 readOnly: true
                                 text: fieldValue
                                 color: Theme.highlightColor
@@ -769,7 +774,7 @@ Page {
 
                         id: notesHeader
                         // id: notesSectionHeader
-                        text: "Notes"
+                        text: qsTr("Notes")
                         //visible: false
                         topPadding: 0
 
