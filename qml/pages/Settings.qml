@@ -300,7 +300,7 @@ Page {
             TextSwitch {
 
                 id: skipVaultScreenSwitch
-                text: "Bypass Vaults page on sign-in"
+                text: qsTr("Bypass Vaults page on sign-in")
                 checked: settings.skipVaultScreen
                 automaticCheck: false
 
@@ -352,8 +352,8 @@ Page {
 
             TextSwitch {
 
-                text: qsTr("Display one-time passwords on cover") // self explanitory
-                //description: "Display an item's one-time password on the home screen's app cover."
+                text: qsTr("Display one-time password on cover")
+                description: qsTr("For items that include one, OTP will appear on the cover icon.")
                 id: otpOnAppCover
                 checked: settings.otpOnCover
                 leftMargin: Theme.horizontalPageMargin
