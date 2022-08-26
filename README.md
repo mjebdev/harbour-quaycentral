@@ -43,4 +43,4 @@ App icon by <a href="https://github.com/JSEHV">JSEHV</a>. Thanks for the contrib
 
 <h3>Tips</h3>
 
-<a href="https://ko-fi.com/michaeljb">Support me on Ko-fi</a>
+- <a href="https://ko-fi.com/michaeljb">Support me on Ko-fi</a>
