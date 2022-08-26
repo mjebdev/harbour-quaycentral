@@ -199,11 +199,9 @@ Page {
             else {
 
                 itemsPageNotification.previewSummary = "Unknown Error (copied to clipboard). Please sign back in.";
-                Clipboard.text = errorReadout;
-
                 itemsPageNotification.publish();
-                pageStack.clear();
-                pageStack.replace(Qt.resolvedUrl("SignIn.qml"));
+                Clipboard.text = errorReadout;
+                lockItUp(false);
 
             }
 
