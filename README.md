@@ -1,7 +1,7 @@
 # QuayCentral
 A read-only GUI for the 1Password command-line tool on Sailfish OS.
 
-Version 0.6
+Version 0.6.1
 
 QuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.
 
@@ -43,6 +43,4 @@ App icon by <a href="https://github.com/JSEHV">JSEHV</a>. Thanks for the contrib
 
 <h3>Tips</h3>
 
-<a href="https://ko-fi.com/michaeljb">Support me on Ko-fi</a><br>
-<a href="https://paypal.me/michaeljohnbarrett">PayPal</a><br>
-<a href="https://buymeacoffee.com/michaeljb">Buy me a coffee</a>
+<a href="https://ko-fi.com/michaeljb">Support me on Ko-fi</a>
