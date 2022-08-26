@@ -49,7 +49,7 @@ CoverBackground {
             color: Theme.highlightColor
             wrapMode: Text.Wrap
             opacity: 0.0
-            font.pixelSize: cover.size === Cover.Large ? Theme.fontSizeExtraLarge : Theme.fontSizeLarge
+            font.pixelSize: cover.size === Cover.Large ? Theme.fontSizeLarge : Theme.fontSizeMedium
             //font.bold: true
             //z: -1
 
@@ -97,7 +97,7 @@ CoverBackground {
                     id: totpLabel1
                     width: parent.width
                     //height: parent.height
-                    text: "<pre>" + totpPart1 + "</pre>"
+                    text: totpPart1
                     textFormat: Text.AutoText
                     font.pixelSize: Theme.fontSizeHuge
                     //font.bold: primaryColor
@@ -125,7 +125,7 @@ CoverBackground {
                     id: totpLabel2
                     width: parent.width
                     //height: parent.height
-                    text: "<pre>" + totpPart2 + "</pre>"
+                    text: totpPart2
                     textFormat: Text.AutoText
                     font.pixelSize: Theme.fontSizeHuge
                     //font.bold: primaryColor
@@ -136,7 +136,7 @@ CoverBackground {
                     //verticalAlignment: "AlignVCenter" // does not work for <pre> text
                     leftPadding: cover.size === Cover.Large ? Theme.paddingLarge : Theme.paddingMedium // the font.letterSpacing value offsets horizontal centering somewhat
                     rightPadding: 0
-                    topPadding: cover.size === Cover.Large ? 0 : Theme.paddingMedium
+                    topPadding: 0 // cover.size === Cover.Large ? 0 : Theme.paddingMedium
 
                 }
 
@@ -198,7 +198,7 @@ CoverBackground {
         onTriggered: {
 
             lowerLabel.opacity = 0.0
-            
+
         }
 
     }
