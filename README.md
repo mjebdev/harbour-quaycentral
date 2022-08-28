@@ -1,7 +1,7 @@
 # QuayCentral
 A read-only GUI for the 1Password command-line tool on Sailfish OS.
 
-Version 0.6.1
+Version 0.6.2
 
 QuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.
 
