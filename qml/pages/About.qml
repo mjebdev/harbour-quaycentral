@@ -92,7 +92,7 @@ Page {
                             font.pixelSize: Theme.fontSizeExtraSmall
                             color: Theme.primaryColor
                             wrapMode: Text.Wrap
-                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\n\nVersion 0.6.1\nLicensed under GNU GPLv3\n\nApp icon by JSEHV on GitHub--Thank you for the contribution!\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
+                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\n\nVersion 0.6.2\nLicensed under GNU GPLv3\n\nApp icon by JSEHV on GitHub--Thank you for the contribution!\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
                             bottomPadding: Theme.paddingLarge
 
                         }
