@@ -7,7 +7,7 @@ Page {
 
     id: page
     allowedOrientations: Orientation.PortraitMask
-    property string totpOutput
+    //property string totpOutput
 
     ListModel {
 
@@ -139,7 +139,8 @@ Page {
 
                 onClicked: {
 
-                    Clipboard.text = totpOutput;
+                    //Clipboard.text = totpOutput;
+                    Clipboard.text = totpModel.get(0).totp.trim();
                     detailsPageNotification.previewSummary = qsTr("Copied one-time password to clipboard");
                     detailsPageNotification.publish();
 
@@ -256,7 +257,7 @@ Page {
                                     // just leave as first value for now.
                                     totpModel.set(0, {"totp": fieldTotp, "totpPart1": fieldTotp.slice(0, 3), "totpPart2": fieldTotp.slice(3), "active": true});
                                     copyTotpMenu.visible = true;
-                                    totpOutput = fieldTotp; // to be replaced by output from process when timer expires.
+                                    //totpOutput = fieldTotp; // to be replaced by output from process when timer expires.
                                     mainTotpTimer.start();
                                     totpRow.visible = true;
                                     break;
@@ -699,7 +700,8 @@ Page {
 
                                                     onClicked: {
 
-                                                        Clipboard.text = totpOutput;
+                                                        //Clipboard.text = totpOutput;
+                                                        Clipboard.text = totpModel.get(0).totp.trim();
                                                         detailsPageNotification.previewSummary = qsTr("Copied one-time password to clipboard");
                                                         detailsPageNotification.publish();
 
