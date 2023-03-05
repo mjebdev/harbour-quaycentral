@@ -17,5 +17,5 @@ Categories=Utility
 
 [X-Sailjail]
 Sandboxing=Disabled
-OrganizationName=org.mjebdev
+OrganizationName=dev.mjeb
 ApplicationName=QuayCentral
