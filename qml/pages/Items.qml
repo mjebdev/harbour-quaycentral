@@ -15,8 +15,10 @@ Page {
 
         if (status === PageStatus.Active) {
 
-            mainTotpTimer.stop();
-            totpModel.set(0, {"active": false});
+            mainOtpTimer.stop();
+            otpModel.set(0, {"active": false});
+            otpDisplayedOnCover = false;
+            itemsPageObject = pageStack.currentPage;
 
         }
 
@@ -50,7 +52,7 @@ Page {
 
             Component.onCompleted: {
 
-                totpModel.set(0, {"active": false});
+                otpModel.set(0, {"active": false});
                 searchFieldMargin = this.textLeftMargin; // to get around errors with alias and direct identification of searchField not functioning as expected.
                 if (searchField.text === "") searchField.forceActiveFocus();
 
@@ -64,12 +66,11 @@ Page {
 
             EnterKey.onClicked: {
 
-                // needs to be at least one result to work with and not a full list / empty field.
                 if (itemSearchModel.count > 0 && text.length > 0) {
 
                     if (settings.enterKeyLoadsDetails || itemSearchModel.get(0).templateUuid !== "LOGIN") {
 
-                        itemDetailsModel.set(0, {"itemID": itemSearchModel.get(0).uuid, "itemTitle": itemSearchModel.get(0).title, "itemType": itemSearchModel.get(0).templateUuid, "itemVaultID": itemSearchModel.get(0).itemVaultID, "itemVaultName": itemSearchModel.get(0).itemVaultName});
+                        itemDetailsModel.set(0, {"itemId": itemSearchModel.get(0).uuid, "itemTitle": itemSearchModel.get(0).title, "itemType": itemSearchModel.get(0).templateUuid, "itemVaultId": itemSearchModel.get(0).itemVaultId, "itemVaultName": itemSearchModel.get(0).itemVaultName});
                         pageStack.push(Qt.resolvedUrl("ItemDetails.qml"));
 
                     }
@@ -77,8 +78,7 @@ Page {
                     else {
 
                         itemCopied = itemSearchModel.get(0).title;
-                        //allItemDetails = false;
-                        getPassword.start("op", ["item", "get", itemSearchModel.get(0).uuid, "--vault", itemSearchModel.get(0).itemVaultID, "--fields", "label=password", "--session", currentSession]);
+                        getPassword.start("op", ["item", "get", itemSearchModel.get(0).uuid, "--vault", itemSearchModel.get(0).itemVaultId, "--fields", "label=password", "--session", currentSession]);
 
                     }
 
@@ -129,14 +129,13 @@ Page {
                         if (settings.tapToCopy && templateUuid === "LOGIN") {
 
                             itemCopied = title;
-                            //allItemDetails = false;
-                            getPassword.start("op", ["item", "get", uuid, "--fields", "label=password", "--vault", itemVaultID, "--session", currentSession]);
+                            getPassword.start("op", ["item", "get", uuid, "--fields", "label=password", "--vault", itemVaultId, "--session", currentSession]);
 
                         }
 
                         else {
 
-                            itemDetailsModel.set(0, {"itemID": uuid, "itemTitle": title, "itemType": templateUuid, "itemVaultID": itemVaultID, "itemVaultName": itemVaultName});
+                            itemDetailsModel.set(0, {"itemId": uuid, "itemTitle": title, "itemType": templateUuid, "itemVaultId": itemVaultId, "itemVaultName": itemVaultName});
                             pageStack.push(Qt.resolvedUrl("ItemDetails.qml"));
 
                         }
@@ -147,7 +146,7 @@ Page {
 
                         if (settings.tapToCopy || templateUuid !== "LOGIN") {
 
-                            itemDetailsModel.set(0, {"itemID": uuid, "itemTitle": title, "itemType": templateUuid, "itemVaultID": itemVaultID, "itemVaultName": itemVaultName});
+                            itemDetailsModel.set(0, {"itemId": uuid, "itemTitle": title, "itemType": templateUuid, "itemVaultId": itemVaultId, "itemVaultName": itemVaultName});
                             pageStack.push(Qt.resolvedUrl("ItemDetails.qml"));
 
                         }
@@ -155,8 +154,7 @@ Page {
                         else {
 
                             itemCopied = title;
-                            //allItemDetails = false;
-                            getPassword.start("op", ["item", "get", uuid, "--fields", "label=password", "--vault", itemVaultID, "--session", currentSession]);
+                            getPassword.start("op", ["item", "get", uuid, "--fields", "label=password", "--vault", itemVaultId, "--session", currentSession]);
 
                         }
 
@@ -179,10 +177,10 @@ Page {
         onReadyReadStandardOutput: {
 
             sessionExpiryTimer.restart();
-            //itemDetailsModel.clear();  //  not needed?
-            //var prelimOutput = readAllStandardOutput();
-            //Clipboard.text = prelimOutput;
-            Clipboard.text = readAllStandardOutput();
+            var prelimOutput = readAllStandardOutput();
+            prelimOutput = " " + prelimOutput + " "; // need to avoid error: TypeError: Property 'trim' of object [password string w/ new line at end] is not a function.
+            prelimOutput = prelimOutput.trim();
+            Clipboard.text = prelimOutput;
             itemsPageNotification.previewSummary = qsTr("%1 password copied.").arg(itemCopied);
             itemsPageNotification.publish();
 
