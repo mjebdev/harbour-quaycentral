@@ -5,6 +5,86 @@
 <context>
     <name>harbour-quaycentral</name>
     <message>
+        <source>Logins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secure Notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Credit Cards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Identities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>API Credentials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bank Accounts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Databases</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Driver Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email Accounts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Memberships</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Outdoor Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passwords</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reward Programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Servers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Social Security Numbers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Software Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wireless Routers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network error when fetching One-Time Password. Please reload item when reconnected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown error fetching One-Time Password (copied to clipboard).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Locked</source>
         <translation type="unfinished"></translation>
     </message>
@@ -25,17 +105,29 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\n\nVersion 0.6.1\nLicensed under GNU GPLv3\n\nApp icon by JSEHV on GitHub--Thank you for the contribution!\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.</source>
+        <source>A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\n\nVersion 0.7\nLicensed under GNU GPLv3\n\nApp icon by JSEHV on GitHub--Thank you for the contribution!\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+
+<context>
+    <name>CoverPage</name>
     <message>
-        <source>Tips, Feedback & Source</source>
+        <source>OTP Copied</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 
 <context>
     <name>ItemDetails</name>
+    <message>
+        <source>Network-related error (copied). Please check connection.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown error (copied to clipboard). Please sign back in.</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Lock</source>
         <translation type="unfinished"></translation>
@@ -119,38 +211,85 @@
 </context>
 
 <context>
-    <name>OtherItemDetails</name>
-    <message>
-        <source>Lock</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copy One-Time Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-
-    <message>
-        <source>Copied one-time password to clipboard</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copy Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copied password to clipboard</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>one-time password</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-
-<context>
     <name>Settings</name>
     <message>
         <source>Downloading update...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Categories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secure Notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Credit Cards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Identities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>API Credentials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bank Accounts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Databases</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Driver Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email Accounts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Memberships</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Outdoor Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passwords</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reward Programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Servers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Social Security Numbers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Software Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wireless Routers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -162,11 +301,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Login Item Search</source>
+        <source>Item Listing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter key</source>
+        <source>Enter key in search</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -226,15 +365,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Navigation</source>
+        <source>Layout & Navigation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Include 'Lock' menu on each screen</source>
+        <source>Include Lock menu on each screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Alternatively, tap padlock on cover or swipe back to sign-in screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Favorite items on Vaults page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change will take effect on next sign-in.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -250,7 +397,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>For items that include one, OTP will appear on the cover icon.</source>
+        <source>For items that include one, OTP will appear on the app cover.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Lock button on cover with OTP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alternatively, tapping Close button will revert to items page without locking vault.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -286,6 +441,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Download complete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Error: QuayCentral is unable to process CLI response.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -296,7 +455,7 @@
     <message>
         <source>
 
-Download has taken longer than 45 seconds. Please check Downloads folder for completed ZIP file or check network &amp; relaunch app to try again, if download has failed.</source>
+Download has taken longer than one minute. Please check Downloads folder for completed ZIP file or check network &amp; relaunch app to try again, if download has failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -317,6 +476,14 @@ Download has taken longer than 45 seconds. Please check Downloads folder for com
     </message>
     <message>
         <source>Unable to communicate with CLI.\n\nPlease confirm that 1Password CLI has been installed in /usr/bin or /usr/local/bin and relaunch QuayCentral.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listing all items...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listing categorized items...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -348,11 +515,15 @@ Download has taken longer than 45 seconds. Please check Downloads folder for com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Listing items...</source>
+        <source>Listing favorite items...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Error occurred while accessing vault data.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error occurred while listing items.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -378,7 +549,31 @@ Please confirm that 1Password CLI has been installed in /usr/bin or /usr/local/b
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Home</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vault</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Vaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorites</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session Expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Error (copied to clipboard). Please sign back in.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 password copied</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
