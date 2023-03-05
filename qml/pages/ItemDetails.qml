@@ -7,7 +7,6 @@ Page {
 
     id: page
     allowedOrientations: Orientation.PortraitMask
-    //property string totpOutput
 
     ListModel {
 
@@ -15,7 +14,7 @@ Page {
 
         ListElement {
 
-            fieldID: ""; fieldType: ""; fieldLabel: ""; fieldValue: ""; fieldTotp: ""
+            fieldID: ""; fieldType: ""; fieldLabel: ""; fieldValue: ""; fieldOtp: ""
 
         }
 
@@ -29,17 +28,17 @@ Page {
 
             sessionExpiryTimer.restart();
             var prelimOutput = readAllStandardOutput();
-            itemDetails = JSON.parse(prelimOutput);
+            var itemDetails = JSON.parse(prelimOutput);
 
             for (var i = 0; i < itemDetails.fields.length; i++) {
 
-                if (itemDetails.fields[i].id !== "" && itemDetails.fields[i].value !== undefined) itemFieldsModel.append({"fieldID": itemDetails.fields[i].id, "fieldType": itemDetails.fields[i].type, "fieldLabel": itemDetails.fields[i].label, "fieldValue": itemDetails.fields[i].value, "fieldTotp": itemDetails.fields[i].totp !== undefined ? itemDetails.fields[i].totp : ""});
+                if (itemDetails.fields[i].id !== "" && itemDetails.fields[i].value !== undefined) itemFieldsModel.append({"fieldID": itemDetails.fields[i].id, "fieldType": itemDetails.fields[i].type, "fieldLabel": itemDetails.fields[i].label, "fieldValue": itemDetails.fields[i].value, "fieldOtp": itemDetails.fields[i].totp !== undefined ? itemDetails.fields[i].totp : ""});
 
             }
 
             if (itemDetails.urls !== undefined) {
 
-                for (var j = 0; j < itemDetails.urls.length; j++) itemFieldsModel.append({"fieldID": "URL", "fieldType": "URL", "fieldLabel": itemDetails.urls[j].label, "fieldValue": itemDetails.urls[j].href, "fieldTotp": ""});
+                for (var j = 0; j < itemDetails.urls.length; j++) itemFieldsModel.append({"fieldID": "URL", "fieldType": "URL", "fieldLabel": itemDetails.urls[j].label, "fieldValue": itemDetails.urls[j].href, "fieldOtp": ""});
 
             }
 
@@ -62,7 +61,7 @@ Page {
 
             else if (errorReadout.indexOf("network") !== -1) {
 
-                detailsPageNotification.previewSummary = "Network-related error (copied). Please check connection.";
+                detailsPageNotification.previewSummary = qsTr("Network-related error (copied). Please check connection.");
                 Clipboard.text = errorReadout;
                 detailsPageNotification.publish();
 
@@ -70,7 +69,7 @@ Page {
 
             else {
 
-                detailsPageNotification.previewSummary = "Unknown error (copied to clipboard). Please sign back in.";
+                detailsPageNotification.previewSummary = qsTr("Unknown error (copied to clipboard). Please sign back in.");
                 Clipboard.text = errorReadout;
                 detailsPageNotification.publish();
                 lockItUp(false);
@@ -96,9 +95,7 @@ Page {
 
         PullDownMenu {
 
-            //visible: settings.includeLockMenuItem
             visible: itemDetailsModel.get(0).itemType === "LOGIN" ? true : settings.includeLockMenuItem ? true : false
-
 
             MenuItem {
 
@@ -133,14 +130,13 @@ Page {
 
             MenuItem {
 
-                id: copyTotpMenu
+                id: copyOtpMenu
                 text: qsTr("Copy One-Time Password")
                 visible: false
 
                 onClicked: {
 
-                    //Clipboard.text = totpOutput;
-                    Clipboard.text = totpModel.get(0).totp.trim();
+                    Clipboard.text = otpModel.get(0).otp.trim();
                     detailsPageNotification.previewSummary = qsTr("Copied one-time password to clipboard");
                     detailsPageNotification.publish();
 
@@ -169,22 +165,13 @@ Page {
         delegate: Column {
 
             id: column
-            //spacing: 0
             width: page.width
             height: titleHeader.height + paddingRow.height + fieldItemsView.height + notesHeaderRow.height + notesRow.height
-/*
-            anchors {
 
-                top: parent
-                left: parent
-                right: parent
-
-            }
-*/
             Component.onCompleted: {
 
                 itemFieldsModel.clear();
-                loadItemData.start("op", ["item", "get", itemID, "--vault", itemVaultID, "--format", "json", "--session", currentSession, "--cache"]);
+                loadItemData.start("op", ["item", "get", itemId, "--vault", itemVaultId, "--format", "json", "--session", currentSession, "--cache"]);
 
             }
 
@@ -208,7 +195,7 @@ Page {
                 id: fieldItemsView
                 model: itemFieldsModel
                 width: parent.width
-                height: contentHeight //+ notesHeaderRow.height + notesRow.height
+                height: contentHeight
                 spacing: Theme.paddingMedium
                 interactive: false
 
@@ -254,12 +241,11 @@ Page {
 
                                 case "OTP":
 
-                                    // just leave as first value for now.
-                                    totpModel.set(0, {"totp": fieldTotp, "totpPart1": fieldTotp.slice(0, 3), "totpPart2": fieldTotp.slice(3), "active": true});
-                                    copyTotpMenu.visible = true;
-                                    //totpOutput = fieldTotp; // to be replaced by output from process when timer expires.
-                                    mainTotpTimer.start();
-                                    totpRow.visible = true;
+                                    otpModel.set(0, {"otp": fieldOtp, "otpPart1": fieldOtp.slice(0, 3), "otpPart2": fieldOtp.slice(3), "active": true});
+                                    copyOtpMenu.visible = true;
+                                    mainOtpTimer.start();
+                                    otpRow.visible = true;
+                                    if (settings.otpOnCover) otpDisplayedOnCover = true;
                                     break;
 
                                 case "CONCEALED":
@@ -370,7 +356,6 @@ Page {
 
                                 case ("MONTH_YEAR"):
 
-                                    //usernameField.text = fieldValue.toString();
                                     usernameField.text = fieldValue.slice(4) + "/" + fieldValue.slice(0, 4);
                                     usernameRow.visible = true;
                                     break;
@@ -386,7 +371,6 @@ Page {
 
                                     usernameField.text = fieldValue;
                                     usernameRow.visible = true;
-                                    // plain text field
 
                             }
 
@@ -437,7 +421,6 @@ Page {
 
                                 Row {
 
-                                    //spacing: 0
                                     width: parent.width
 
                                     Image {
@@ -550,7 +533,6 @@ Page {
 
                                 Row {
 
-                                    //spacing: 0
                                     width: parent.width
 
                                     Image {
@@ -583,21 +565,21 @@ Page {
 
                         Row {
 
-                            id: totpRow
+                            id: otpRow
                             width: parent.width
-                            height: totpListView.height
+                            height: otpListView.height
                             visible: false
 
                             onVisibleChanged: {
 
-                                if (visible) mainGetTotp.start("op", ["item", "get", itemDetailsModel.get(0).itemID, "--otp", "--vault", itemDetailsModel.get(0).itemVaultID, "--session", currentSession]);
+                                if (visible) mainGetOtp.start("op", ["item", "get", itemDetailsModel.get(0).itemId, "--otp", "--vault", itemDetailsModel.get(0).itemVaultId, "--session", currentSession]);
 
                             }
 
                             ListView {
 
-                                id: totpListView
-                                model: totpModel
+                                id: otpListView
+                                model: otpModel
                                 width: parent.width
                                 height: itemDetailsPasswordField.height + (Theme.paddingMedium * 2)
                                 interactive: false
@@ -619,9 +601,9 @@ Page {
 
                                             TextField {
 
-                                                id: totpTextField
+                                                id: otpTextField
                                                 font.letterSpacing: 6
-                                                text: totpPart1 + " " + totpPart2;
+                                                text: otpPart1 + " " + otpPart2;
                                                 color: primaryColor ? Theme.primaryColor : "grey"
                                                 readOnly: true
                                                 label: qsTr("one-time password")
@@ -630,15 +612,15 @@ Page {
 
                                                 rightItem: Label {
 
-                                                    id: totpTimerField
+                                                    id: otpTimerField
                                                     horizontalAlignment: Qt.AlignHCenter
-                                                    width: totpCopyButton.width * 0.75
+                                                    width: otpCopyButton.width * 0.75
                                                     color: primaryColor ? Theme.primaryColor : "grey"
                                                     text: secondsLeft
 
                                                     Rectangle {
 
-                                                        height: gatheringTotpBusy.height + (gatheringTotpBusy.y * 2)
+                                                        height: gatheringOtpBusy.height + (gatheringOtpBusy.y * 2)
                                                         color: "transparent"
                                                         opacity: 1.0
                                                         radius: 20
@@ -653,7 +635,7 @@ Page {
 
                                                         border {
 
-                                                            id: totpTimerBorder
+                                                            id: otpTimerBorder
                                                             width: 3
                                                             color: secondsLeft < 11 ? Theme.errorColor : Theme.highlightColor
 
@@ -663,7 +645,7 @@ Page {
 
                                                     BusyIndicator {
 
-                                                        id: gatheringTotpBusy
+                                                        id: gatheringOtpBusy
                                                         size: BusyIndicatorSize.Small
                                                         anchors.centerIn: parent
                                                         running: !primaryColor
@@ -681,7 +663,7 @@ Page {
                                     Column {
 
                                         height: parent.height
-                                        width: totpCopyButton.width
+                                        width: otpCopyButton.width
                                         spacing: Theme.paddingMedium
 
                                         Row {
@@ -690,7 +672,7 @@ Page {
 
                                             Image {
 
-                                                id: totpCopyButton
+                                                id: otpCopyButton
                                                 source: "image://theme/icon-m-clipboard"
                                                 y: 0
 
@@ -700,8 +682,7 @@ Page {
 
                                                     onClicked: {
 
-                                                        //Clipboard.text = totpOutput;
-                                                        Clipboard.text = totpModel.get(0).totp.trim();
+                                                        Clipboard.text = otpModel.get(0).otp.trim();
                                                         detailsPageNotification.previewSummary = qsTr("Copied one-time password to clipboard");
                                                         detailsPageNotification.publish();
 
@@ -731,7 +712,7 @@ Page {
                             TextArea {
 
                                 id: websiteField
-                                label: qsTr("website") // fieldLabel was sometime 'website' and sometimes undefined.
+                                label: qsTr("website") // fieldLabel was sometimes 'website' and sometimes undefined.
                                 readOnly: true
                                 text: fieldValue
                                 color: Theme.highlightColor
@@ -775,9 +756,7 @@ Page {
                     SectionHeader {
 
                         id: notesHeader
-                        // id: notesSectionHeader
                         text: qsTr("Notes")
-                        //visible: false
                         topPadding: 0
 
                     }
