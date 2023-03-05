@@ -1,7 +1,7 @@
 # QuayCentral
 A read-only GUI for the 1Password command-line tool on Sailfish OS.
 
-Version 0.6.2
+Version 0.7
 
 QuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.
 
@@ -13,7 +13,7 @@ App icon by <a href="https://github.com/JSEHV">JSEHV</a>. Thanks for the contrib
 
 - A 1Password.com account.
 - An active network connection.
-- Installation of version 2.x of the 1Password command-line tool in /usr/bin, usr/local/bin, or another directory in your $PATH. More info:<br>
+- Installation of version 2.6.1 or later of the 1Password command-line tool in /usr/bin, usr/local/bin, or another directory in your $PATH. More info:<br>
     https://developer.1password.com/docs/cli/get-started/
 - Addition of the shorthand "quaycentsfos" to your device's CLI. This avoids the need for QC to store your address for signing in (in most cases 'my' but not always). More info on adding the shorthand:<br>
     https://developer.1password.com/docs/cli/sign-in-manually/#set-a-custom-account-shorthand
@@ -22,7 +22,7 @@ App icon by <a href="https://github.com/JSEHV">JSEHV</a>. Thanks for the contrib
 <h3>Limitations & Issues</h3>
 
 - Lockout timer may not function if device is put to sleep etc. and so is not meant as a reliable replacement for manually locking vault(s) using one of the available methods.
-- Lockout timer only goes by the app's interaction with the CLI and isn't reset by any user interaction that doesn't access data, such as swiping back, going to Settings, etc. Also, user may wish to avoid leaving the app on a page with a TOTP, since the one-time password is obtained every 30 seconds using the CLI.
+- Lockout timer only goes by the app's interaction with the CLI and isn't reset by any user interaction that doesn't access data, such as swiping back, going to Settings, etc. Also, if part of an item, the one-time password is obtained every 30 seconds using the CLI but can be stopped from continuing by using the Close button on the app cover depending on the chosen options in Settings.
 - Item details page should list all data entries, however will not display section headers (besides Notes) and may still have some formatting issues in some cases.
 - No support for multiple accounts or for groups.
 - Items are not listed alphabetically so search method is necessary as opposed to scrolling through a list.
