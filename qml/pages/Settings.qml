@@ -36,25 +36,25 @@ Page {
 
         id: allItemsOrOneCategoryModel
 
-        ListElement {categoryName: ""; categoryDisplayName: "All Categories"}
-        ListElement {categoryName: "Login"; categoryDisplayName: "Logins"}
-        ListElement {categoryName: "Secure Note"; categoryDisplayName: "Secure Notes"}
-        ListElement {categoryName: "Credit Card"; categoryDisplayName: "Credit Cards"}
-        ListElement {categoryName: "Identity"; categoryDisplayName: "Identities"}
-        ListElement {categoryName: "Bank Account"; categoryDisplayName: "Bank Accounts"}
-        ListElement {categoryName: "Database"; categoryDisplayName: "Databases"}
-        ListElement {categoryName: "Driver License"; categoryDisplayName: "Driver Licenses"}
-        ListElement {categoryName: "Email Account"; categoryDisplayName: "Email Accounts"}
-        ListElement {categoryName: "Medical Record"; categoryDisplayName: "Medical Records"}
-        ListElement {categoryName: "Membership"; categoryDisplayName: "Memberships"}
-        ListElement {categoryName: "Outdoor License"; categoryDisplayName: "Outdoor Licenses"}
-        ListElement {categoryName: "Passport"; categoryDisplayName: "Passports"}
-        ListElement {categoryName: "Password"; categoryDisplayName: "Passwords"}
-        ListElement {categoryName: "Reward Program"; categoryDisplayName: "Reward Programs"}
-        ListElement {categoryName: "Server"; categoryDisplayName: "Servers"}
-        ListElement {categoryName: "Social Security Number"; categoryDisplayName: "Social Security Numbers"}
-        ListElement {categoryName: "Software License"; categoryDisplayName: "Software Licenses"}
-        ListElement {categoryName: "Wireless Router"; categoryDisplayName: "Wireless Routers"}
+        ListElement {categoryName: ""; categoryDisplayName: qsTr("All Categories")}
+        ListElement {categoryName: "Login"; categoryDisplayName: qsTr("Logins")}
+        ListElement {categoryName: "Secure Note"; categoryDisplayName: qsTr("Secure Notes")}
+        ListElement {categoryName: "Credit Card"; categoryDisplayName: qsTr("Credit Cards")}
+        ListElement {categoryName: "Identity"; categoryDisplayName: qsTr("Identities")}
+        ListElement {categoryName: "API Credential"; categoryDisplayName: qsTr("API Credentials")}
+        ListElement {categoryName: "Bank Account"; categoryDisplayName: qsTr("Bank Accounts")}
+        ListElement {categoryName: "Database"; categoryDisplayName: qsTr("Databases")}
+        ListElement {categoryName: "Driver License"; categoryDisplayName: qsTr("Driver Licenses")}
+        ListElement {categoryName: "Email Account"; categoryDisplayName: qsTr("Email Accounts")}
+        ListElement {categoryName: "Membership"; categoryDisplayName: qsTr("Memberships")}
+        ListElement {categoryName: "Outdoor License"; categoryDisplayName: qsTr("Outdoor Licenses")}
+        ListElement {categoryName: "Passport"; categoryDisplayName: qsTr("Passports")}
+        ListElement {categoryName: "Password"; categoryDisplayName: qsTr("Passwords")}
+        ListElement {categoryName: "Reward Program"; categoryDisplayName: qsTr("Reward Programs")}
+        ListElement {categoryName: "Server"; categoryDisplayName: qsTr("Servers")}
+        ListElement {categoryName: "Social Security Number"; categoryDisplayName: qsTr("Social Security Numbers")}
+        ListElement {categoryName: "Software License"; categoryDisplayName: qsTr("Software Licenses")}
+        ListElement {categoryName: "Wireless Router"; categoryDisplayName: qsTr("Wireless Routers")}
 
     }
 
@@ -90,13 +90,13 @@ Page {
 
             SectionHeader {
 
-                text: qsTr("Login Item Search")
+                text: qsTr("Item Listing")
 
             }
 
             ComboBox {
 
-                label: qsTr("Enter key")
+                label: qsTr("Enter key in search")
                 id: enterKeyCombo
                 width: parent.width
                 currentIndex: settings.enterKeyLoadsDetails ? 0 : 1
@@ -276,14 +276,14 @@ Page {
 
             SectionHeader {
 
-                text: qsTr("Navigation")
+                text: qsTr("Layout & Navigation")
 
             }
 
             TextSwitch {
 
                 id: showLockMenuItemSwitch
-                text: qsTr("Include 'Lock' menu on each screen")
+                text: qsTr("Include Lock menu on each screen")
                 description: qsTr("Alternatively, tap padlock on cover or swipe back to sign-in screen.")
                 checked: settings.includeLockMenuItem
                 leftMargin: Theme.horizontalPageMargin
@@ -299,14 +299,29 @@ Page {
 
             TextSwitch {
 
+                id: loadFavItemsSwitch
+                text: qsTr("Show Favorite items on Vaults page");
+                description: qsTr("Change will take effect on next sign-in.");
+                checked: settings.loadFavItems
+                leftMargin: Theme.horizontalPageMargin
+
+                onCheckedChanged: {
+
+                    settings.loadFavItems = checked;
+                    settings.sync();
+
+                }
+
+            }
+
+            TextSwitch {
+
                 id: skipVaultScreenSwitch
                 text: qsTr("Bypass Vaults page on sign-in")
                 checked: settings.skipVaultScreen
-                automaticCheck: false
 
-                onClicked: {
+                onCheckedChanged: {
 
-                    checked = !checked;
                     settings.skipVaultScreen = checked;
                     settings.sync();
 
@@ -350,10 +365,16 @@ Page {
 
             }
 
+            SectionHeader {
+
+                text: "Cover"
+
+            }
+
             TextSwitch {
 
                 text: qsTr("Display one-time password on cover")
-                description: qsTr("For items that include one, OTP will appear on the cover icon.")
+                description: qsTr("For items that include one, OTP will appear on the app cover.")
                 id: otpOnAppCover
                 checked: settings.otpOnCover
                 leftMargin: Theme.horizontalPageMargin
@@ -367,12 +388,30 @@ Page {
 
             }
 
+            TextSwitch {
+
+                text: qsTr("Show Lock button on cover with OTP")
+                description: qsTr("Alternatively, tapping Close button will revert to items page without locking vault.")
+                id: lockButtonOnCoverSwitch
+                enabled: otpOnAppCover.checked
+                checked: settings.lockButtonOnCover
+                leftMargin: Theme.horizontalPageMargin
+
+                onCheckedChanged: {
+
+                    settings.lockButtonOnCover = checked;
+                    settings.sync;
+
+                }
+
+            }
+
             SectionHeader {
 
                 text: qsTr("Command-Line Tool")
 
             }
-
+// looking to add option to install RPM from permanent latest-version link if on aarch64 (arm RPM does not install) on future version.
             Row {
 
                 width: updateButton.width
@@ -474,7 +513,7 @@ Page {
 
                     }
 
-                    Row { // just here incase download takes longer than 45 seconds and explanation required.
+                    Row { // just here incase download takes longer than one minute and explanation required.
 
                         id: updateDownloadStatusRow
                         visible: false
@@ -535,17 +574,11 @@ Page {
 
                             }
 
-                            //Text {
-
-
-
-                            //}
-
                             MouseArea {
 
                                 anchors.fill: parent
 
-                                onClicked: { // copy file path
+                                onClicked: {
 
                                     Clipboard.text = updateFilePath;
                                     processStatus.previewSummary = qsTr("Copied file path to clipboard");
@@ -614,7 +647,7 @@ Page {
 
                         if (text === qsTr("List CLI Accounts")) {
 
-                            listAccounts.start("op", ["account", "list"]);
+                            listAccounts.start("op", ["account", "list", "--format", "json"]);
                             text = qsTr("Hide Account List");
                             accountsLabelRow.visible = true;
 
@@ -649,7 +682,6 @@ Page {
                     leftPadding: Theme.horizontalPageMargin
                     rightPadding: Theme.horizontalPageMargin
                     topPadding: Theme.paddingLarge
-                    bottomPadding: Theme.paddingMedium
                     font.pixelSize: Theme.fontSizeExtraSmall
                     wrapMode: Text.Wrap
 
@@ -679,132 +711,11 @@ Page {
 
             Row {
 
-                id: paddingRow
-                width: parent.width
-                height: Theme.paddingLarge
-                //visible: !accountsLabelRow.visible
-
-            }
-/* -- experiencing issues with account forget or signout --forget commands not working as expected and user still being able to sign in after these. will need to remove via terminal and/or account page on web.
-            Row {
-
-                id: signoutAndForgetLabelRow
-                width: parent.width
-                x: Theme.horizontalPageMargin
-
-                Label {
-
-                    id: signoutAndForgetLabel
-                    text: "Click below to revoke the app's ability to interface with the CLI. Please note current session must be active for command to take effect. Future use of the app will require first re-adding the 'quaycentsfos' shorthand with your account to the CLI.\n"
-                    wrapMode: Text.WordWrap
-                    font.pixelSize: Theme.fontSizeExtraSmall
-                    width: page.width - (Theme.horizontalPageMargin * 2)
-
-                }
-
-            }
-
-            Row {
-
-                width: parent.width
-                //width: signoutAndForget.width
-                //height: signoutAndForget.height + (Theme.paddingMedium * 2)
-                //x: (page.width - signoutAndForget.width) * 0.5
-
-                ButtonLayout {
-
-                    Button {
-
-                        text: qsTr("Signout & Forget");
-                        id: signoutAndForget
-                        y: Theme.paddingMedium
-                        preferredWidth: Theme.buttonWidthLarge
-
-                        BusyIndicator {
-
-                            id: removingAccountIndicator
-                            size: BusyIndicatorSize.Medium
-                            anchors.centerIn: parent
-                            running: false
-
-                        }
-
-                        onClicked: {
-
-                            removingAccountIndicator.running = true;
-                            errorReadout = "";
-                            sessionExpiryTimer.stop();
-                            totpModel.clear();
-                            totpModel.set(0, {"active": false});
-                            mainTotpTimer.stop();
-                            // if user's session no longer active--e.g. settings page left open for over 30 mins, will first sign out and then use 'op account forget' command to ensure expected result.
-                            signOutProcess.start("op", ["signout", "--forget"]);
-                            signOutProcess.waitForFinished();
-
-                            if (signOutProcess.exitStatus() === 0 && errorReadout === "") {
-
-                                itemDetailsModel.clear();
-                                itemListModel.clear();
-                                vaultListModel.clear();
-
-                                removingAccountIndicator.running = false;
-                                processStatus.expireTimeout = 2000;
-                                processStatus.previewSummary = "Signout using '--forget' flag was successful.";
-                                processStatus.publish();
-                                pageStack.clear();
-                                pageStack.push(Qt.resolvedUrl("pages/SignIn.qml"), null, PageStackAction.Immediate);
-
-                                /*
-                                signOutProcess.start("op", ["account", "forget", "quaycentsfos"]);
-                                signOutProcess.waitForFinished();
-
-                                if (signOutProcess.exitStatus() === 0 && errorReadout === "") {
-
-                                    removingAccountIndicator.running = false;
-                                    processStatus.expireTimeout = 2000;
-                                    processStatus.previewSummary = "QuayCentral access to CLI has been revoked.";
-                                    processStatus.publish();
-                                    pageStack.clear();
-                                    pageStack.push(Qt.resolvedUrl("pages/SignIn.qml"), null, PageStackAction.Immediate);
-
-                                }
-
-                                else {
-
-                                    removingAccountIndicator.running = false;
-                                    Clipboard.text = errorReadout;
-                                    processStatus.previewSummary = "Error when removing shorthand. Error output copied to clipboard.";
-                                    processStatus.publish();
-
-                                }
-                                * /
-
-                            }
-
-                            else {
-
-                                removingAccountIndicator.running = false;
-                                Clipboard.text = errorReadout;
-                                processStatus.previewSummary = "Error when signing out. Error output copied to clipboard.";
-                                processStatus.publish();
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-            }
-
-            Row { // padding row
-
                 width: parent.width
                 height: Theme.paddingLarge
 
             }
-*/
+
         }
 
     }
@@ -828,8 +739,19 @@ Page {
 
         onReadyReadStandardOutput: {
 
-            var listOfAccounts = readAllStandardOutput();
-            accountsLabel.text = "<pre>" + listOfAccounts + "</pre>";
+            waitForFinished();
+            const listOfAccounts = readAllStandardOutput();
+            var parsedListOfAccounts = JSON.parse(listOfAccounts);
+            var accountsString = "";
+
+            for (var i = 0; i < parsedListOfAccounts.length; i++) {
+
+                accountsString = accountsString + "URL:\n" + parsedListOfAccounts[i].url + "\nEmail:\n" + parsedListOfAccounts[i].email + "\nShorthand:\n" + parsedListOfAccounts[i].shorthand;
+                if ((i + 1) < parsedListOfAccounts.length) accountsString = accountsString + "\n\n";
+
+            }
+
+            accountsLabel.text = "<pre>" + accountsString + "</pre>";
 
         }
 
@@ -876,13 +798,7 @@ Page {
                 furtherActionRow.visible = true;
 
             }
-/*
-            else if (standardOutput.indexOf("Accounts on this") !== -1) {
 
-                accountsLabel.text = "<pre>" + standardOutput + "</pre>";
-
-            }
-*/
             else if (standardOutput.indexOf("is now available") !== -1) {
 
                 updateButton.enabled = false;
@@ -919,7 +835,7 @@ Page {
             else {
 
                 Clipboard.text = errorReadout;
-                processStatus.previewSummary = qsTr("Error when updating. Copied description to clipboard.");
+                processStatus.previewSummary = qsTr("Error when updating. Description copied to clipboard.");
                 processStatus.publish();
 
             }
@@ -938,16 +854,16 @@ Page {
 
     }
 
-    Timer { // if update installer (so far just a few MBs) isn't done in 45 seconds, will notify user and let it continue in background.
+    Timer {
 
         id: updateDownloadTimer
-        interval: 45000
+        interval: 60000
 
-        onTriggered: { // notify that download should continue etc.
+        onTriggered: {
 
             updateButton.enabled = false;
             updatingIndicator.running = false;
-            updateDownloadStatusLabel.text = updateDownloadStatusLabel.text + qsTr("\n\nDownload has taken longer than 45 seconds. Please check Downloads folder for completed ZIP file or check network & relaunch app to try again, if download has failed.");
+            updateDownloadStatusLabel.text = updateDownloadStatusLabel.text + qsTr("\n\nDownload has taken longer than one minute. Please check Downloads folder for completed ZIP file or check network & relaunch app to try again, if download has failed.");
             updateDownloadStatusRow.visible = true;
             processStatus.previewSummary = qsTr("Downloading of update still in progress");
             processStatus.publish();
