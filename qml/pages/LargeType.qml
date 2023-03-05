@@ -16,8 +16,9 @@ Page {
 
         id: largeTypeGridView
         model: largeTypeModel
-        cellWidth: page.orientation === Orientation.Portrait ? width / 5 : Screen.height > 1920 ? width / 11 : width / 9
-        cellHeight: cellWidth * 1.1 // page.orientation === Orientation.Portrait ? Screen.height > 1920 ? (cellWidth / 6) * 7 : (cellWidth / 9) * 10 : height / 4
+        cellWidth: page.isPortrait ? Screen.width / 5 : Screen.height > 1920 ? Screen.height / 11 : Screen.height / 9
+        cellHeight: cellWidth * 1.1
+
         anchors.fill: parent
 
         delegate: GridItem {
@@ -50,7 +51,7 @@ Page {
                 height: parent.height
                 color: Theme.highlightColor
                 opacity: 0.1
-                visible: Math.abs(index % 2) == 1
+                visible: Math.abs(index % 2) == 0
 
             }
 
