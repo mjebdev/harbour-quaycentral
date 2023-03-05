@@ -29,12 +29,12 @@ ApplicationWindow {
         property bool enableTimer
         property bool includeLockMenuItem: true
         property bool loadAllItems: true
+        property bool loadFavItems
+        property bool lockButtonOnCover
 
     }
 
-    property var vaultList // used to parse the JSON output before filling vaultListModel, also for active vault
-    property var itemList // used to parse the JSON output before filling itemListModel
-    property var itemDetails // used to parse the JSON output before filling itemDetailsModel
+    property var itemsPageObject
     property int secondsCountdown
     property string chosenCategory
     property string errorReadout
@@ -45,15 +45,17 @@ ApplicationWindow {
     property bool expiredSession
     property bool appPastLaunch
     property bool justOneVault
-    property bool fetchingTotp
+    property bool fetchingOtp
+    property bool otpDisplayedOnCover
+    property bool anyFavItems
 
     ListModel {
 
-        id: totpModel
+        id: otpModel
 
         ListElement {
 
-            totp: ""; totpPart1: ""; totpPart2: ""; secondsLeft: 0; primaryColor: true; active: false;
+            otp: ""; otpPart1: ""; otpPart2: ""; secondsLeft: 0; primaryColor: true; active: false;
 
         }
 
@@ -75,24 +77,24 @@ ApplicationWindow {
 
         id: categoryListModel
 
-        ListElement {categoryName: "Login"; categoryDisplayName: "Logins"}
-        ListElement {categoryName: "Secure Note"; categoryDisplayName: "Secure Notes"}
-        ListElement {categoryName: "Credit Card"; categoryDisplayName: "Credit Cards"}
-        ListElement {categoryName: "Identity"; categoryDisplayName: "Identities"}
-        ListElement {categoryName: "Bank Account"; categoryDisplayName: "Bank Accounts"}
-        ListElement {categoryName: "Database"; categoryDisplayName: "Databases"}
-        ListElement {categoryName: "Driver License"; categoryDisplayName: "Driver Licenses"}
-        ListElement {categoryName: "Email Account"; categoryDisplayName: "Email Accounts"}
-        ListElement {categoryName: "Medical Record"; categoryDisplayName: "Medical Records"}
-        ListElement {categoryName: "Membership"; categoryDisplayName: "Memberships"}
-        ListElement {categoryName: "Outdoor License"; categoryDisplayName: "Outdoor Licenses"}
-        ListElement {categoryName: "Passport"; categoryDisplayName: "Passports"}
-        ListElement {categoryName: "Password"; categoryDisplayName: "Passwords"}
-        ListElement {categoryName: "Reward Program"; categoryDisplayName: "Reward Programs"}
-        ListElement {categoryName: "Server"; categoryDisplayName: "Servers"}
-        ListElement {categoryName: "Social Security Number"; categoryDisplayName: "Social Security Numbers"}
-        ListElement {categoryName: "Software License"; categoryDisplayName: "Software Licenses"}
-        ListElement {categoryName: "Wireless Router"; categoryDisplayName: "Wireless Routers"}
+        ListElement {categoryName: "Login"; categoryDisplayName: qsTr("Logins")}
+        ListElement {categoryName: "Secure Note"; categoryDisplayName: qsTr("Secure Notes")}
+        ListElement {categoryName: "Credit Card"; categoryDisplayName: qsTr("Credit Cards")}
+        ListElement {categoryName: "Identity"; categoryDisplayName: qsTr("Identities")}
+        ListElement {categoryName: "API Credential"; categoryDisplayName: qsTr("API Credentials")}
+        ListElement {categoryName: "Bank Account"; categoryDisplayName: qsTr("Bank Accounts")}
+        ListElement {categoryName: "Database"; categoryDisplayName: qsTr("Databases")}
+        ListElement {categoryName: "Driver License"; categoryDisplayName: qsTr("Driver Licenses")}
+        ListElement {categoryName: "Email Account"; categoryDisplayName: qsTr("Email Accounts")}
+        ListElement {categoryName: "Membership"; categoryDisplayName: qsTr("Memberships")}
+        ListElement {categoryName: "Outdoor License"; categoryDisplayName: qsTr("Outdoor Licenses")}
+        ListElement {categoryName: "Passport"; categoryDisplayName: qsTr("Passports")}
+        ListElement {categoryName: "Password"; categoryDisplayName: qsTr("Passwords")}
+        ListElement {categoryName: "Reward Program"; categoryDisplayName: qsTr("Reward Programs")}
+        ListElement {categoryName: "Server"; categoryDisplayName: qsTr("Servers")}
+        ListElement {categoryName: "Social Security Number"; categoryDisplayName: qsTr("Social Security Numbers")}
+        ListElement {categoryName: "Software License"; categoryDisplayName: qsTr("Software Licenses")}
+        ListElement {categoryName: "Wireless Router"; categoryDisplayName: qsTr("Wireless Routers")}
 
     }
 
@@ -114,7 +116,7 @@ ApplicationWindow {
 
         ListElement {
 
-            uuid: ""; title: ""; titleUpperCase: ""; templateUuid: ""; itemVaultID: ""; itemVaultName: ""
+            uuid: ""; title: ""; titleUpperCase: ""; templateUuid: ""; itemVaultId: ""; itemVaultName: ""
 
         }
 
@@ -126,7 +128,7 @@ ApplicationWindow {
 
         ListElement {
 
-            uuid: ""; title: ""; titleUpperCase: ""; templateUuid: ""; itemVaultID: ""; itemVaultName: ""
+            uuid: ""; title: ""; titleUpperCase: ""; templateUuid: ""; itemVaultId: ""; itemVaultName: ""
 
         }
 
@@ -154,7 +156,20 @@ ApplicationWindow {
 
         ListElement {
 
-            itemId: ""; itemType: ""; itemTitle: ""; itemPassword: ""; itemVaultID: ""; itemVaultName: "";
+            itemId: ""; itemType: ""; itemTitle: ""; itemPassword: ""; itemVaultId: ""; itemVaultName: "";
+
+        }
+
+    }
+
+    ListModel {
+
+        id: favItemsModel
+
+        ListElement {
+
+            itemId: ""; itemType: ""; itemTitle: ""; itemVaultId: ""; itemVaultName: "";
+
 
         }
 
@@ -162,15 +177,15 @@ ApplicationWindow {
 
     Process {
 
-        id: mainGetTotp
+        id: mainGetOtp
 
         onReadyReadStandardOutput: {
 
-            var totpOutput = readAllStandardOutput();
-            totpOutput = totpOutput.toString();
-            totpModel.set(0, {"totp": totpOutput, "totpPart1": totpOutput.slice(0, 3), "totpPart2": totpOutput.slice(3), "primaryColor": true});
+            var otpOutput = readAllStandardOutput();
+            otpOutput = otpOutput.toString();
+            otpModel.set(0, {"otp": otpOutput, "otpPart1": otpOutput.slice(0, 3), "otpPart2": otpOutput.slice(3), "primaryColor": true});
             sessionExpiryTimer.restart();
-            fetchingTotp = false;
+            fetchingOtp = false;
 
         }
 
@@ -182,7 +197,7 @@ ApplicationWindow {
 
             else if (errorReadout.indexOf("dial tcp") !== -1) {
 
-                notifySessionExpired.previewSummary = "Network error when fetching One-Time Password. Please reload item when reconnected.";
+                notifySessionExpired.previewSummary = qsTr("Network error when fetching One-Time Password. Please reload item when reconnected.");
                 notifySessionExpired.publish();
 
             }
@@ -190,7 +205,7 @@ ApplicationWindow {
             else {
 
                 Clipboard.text = errorReadout;
-                notifySessionExpired.previewSummary = "Unknown error fetching One-Time Password (copied to clipboard).";
+                notifySessionExpired.previewSummary = qsTr("Unknown error fetching One-Time Password (copied to clipboard).");
                 notifySessionExpired.publish();
 
             }
@@ -208,27 +223,27 @@ ApplicationWindow {
 
     Timer {
 
-        id: mainTotpTimer
+        id: mainOtpTimer
         interval: 500
         repeat: true
         triggeredOnStart: false
 
         onTriggered: {
 
-            var totpCurrentTime = new Date;
-            secondsCountdown = totpCurrentTime.getSeconds();
+            var otpCurrentTime = new Date;
+            secondsCountdown = otpCurrentTime.getSeconds();
             if (secondsCountdown > 29) secondsCountdown = secondsCountdown - 30;
             secondsCountdown = (secondsCountdown - 30) * -1;
 
-            if (secondsCountdown === 30 && fetchingTotp === false) {
+            if (secondsCountdown === 30 && fetchingOtp === false) {
 
-                fetchingTotp = true;
-                totpModel.set(0, {"secondsLeft": 30, "primaryColor": false});
-                mainGetTotp.start("op", ["item", "get", itemDetailsModel.get(0).itemID, "--otp", "--vault", itemDetailsModel.get(0).itemVaultID, "--session", currentSession]);
+                fetchingOtp = true;
+                otpModel.set(0, {"secondsLeft": 30, "primaryColor": false});
+                mainGetOtp.start("op", ["item", "get", itemDetailsModel.get(0).itemId, "--otp", "--vault", itemDetailsModel.get(0).itemVaultId, "--session", currentSession]);
 
             }
 
-            else totpModel.set(0, {"secondsLeft": secondsCountdown});
+            else otpModel.set(0, {"secondsLeft": secondsCountdown});
 
         }
 
@@ -261,9 +276,10 @@ ApplicationWindow {
 
         errorReadout = "";
         sessionExpiryTimer.stop();
-        totpModel.clear(); // check to see if clear reverts active property to false, probably should
-        totpModel.set(0, {"active": false});
-        mainTotpTimer.stop();
+        otpModel.clear(); // check to see if clear reverts active property to false, probably should
+        otpModel.set(0, {"active": false});
+        otpDisplayedOnCover = false;
+        mainOtpTimer.stop();
         signOutProcess.start("op", ["signout"]);
         signOutProcess.waitForFinished();
 
@@ -274,7 +290,14 @@ ApplicationWindow {
             vaultListModel.clear();
             pageStack.clear();
             pageStack.push(Qt.resolvedUrl("pages/SignIn.qml"), null, PageStackAction.Immediate);
-            if (expiredSession && settings.sessionExpiryNotify) notifySessionExpired.publish();
+
+            if (expiredSession && settings.sessionExpiryNotify) {
+
+                notifySessionExpired.previewSummary = qsTr("QuayCentral Locked");
+                notifySessionExpired.publish();
+
+            }
+
             return qsTr("Locked");
 
         }
