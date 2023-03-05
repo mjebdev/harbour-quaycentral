@@ -7,6 +7,7 @@ Page {
 
     id: page
     allowedOrientations: Orientation.PortraitMask
+    property string itemCopied
 
     SilicaListView {
 
@@ -40,10 +41,112 @@ Page {
 
         }
 
-        header: PageHeader {
+        header: Column {
 
-            id: vaultsPageHeader
-            title: qsTr("Vaults")
+            id: headerColumn
+            width: parent.width
+
+            PageHeader {
+
+                id: vaultsPageHeader
+                title: anyFavItems ? qsTr("Home") : justOneVault ? qsTr("Vault") : qsTr("Vaults")
+
+            }
+
+            SilicaListView {
+
+                model: favItemsModel
+                width: parent.width
+                visible: anyFavItems
+                height: contentHeight
+
+                header: SectionHeader {
+
+                    text: qsTr("Favorites")
+
+                }
+
+                delegate: BackgroundItem {
+
+                    Icon {
+
+                        anchors {
+
+                            left: parent.left
+                            leftMargin: Theme.horizontalPageMargin
+                            verticalCenter: parent.verticalCenter
+
+                        }
+
+                        id: favItemIcon
+                        source: "image://theme/icon-s-favorite"
+                        color: parent.highlighted ? Theme.highlightColor : Theme.primaryColor
+
+                    }
+
+                    Label {
+
+                        anchors {
+
+                            left: favItemIcon.right
+                            leftMargin: Theme.paddingMedium
+                            verticalCenter: parent.verticalCenter
+
+                        }
+
+                        text: itemTitle
+                        color: parent.highlighted ? Theme.highlightColor : Theme.primaryColor                        
+
+                    }
+
+                    onClicked: {
+
+                        if (settings.tapToCopy && itemType === "LOGIN") {
+
+                            gatheringBusy.running = true;
+                            itemCopied = itemTitle;
+                            getFavsItemPassword.start("op", ["item", "get", itemId, "--fields", "label=password", "--vault", itemVaultId, "--session", currentSession]);
+
+                        }
+
+                        else {
+
+                            itemDetailsModel.set(0, {"itemId": itemId, "itemTitle": itemTitle, "itemType": itemType, "itemVaultId": itemVaultId, "itemVaultName": itemVaultName});
+                            pageStack.push(Qt.resolvedUrl("ItemDetails.qml"));
+
+                        }
+
+                    }
+
+                    onPressAndHold: {
+
+                        if (settings.tapToCopy || itemType !== "LOGIN") {
+
+                            itemDetailsModel.set(0, {"itemId": itemId, "itemTitle": itemTitle, "itemType": itemType, "itemVaultId": itemVaultId, "itemVaultName": itemVaultName});
+                            pageStack.push(Qt.resolvedUrl("ItemDetails.qml"));
+
+                        }
+
+                        else {
+
+                            gatheringBusy.running = true;
+                            itemCopied = itemTitle;
+                            getFavsItemPassword.start("op", ["item", "get", itemId, "--fields", "label=password", "--vault", itemVaultId, "--session", currentSession]);
+
+                        }
+
+                    }
+
+                }
+
+                footer: SectionHeader {
+
+                    visible: anyFavItems
+                    text: justOneVault ? qsTr("Vault") : qsTr("Vaults")
+
+                }
+
+            }
 
         }
 
@@ -90,24 +193,8 @@ Page {
                         onClicked: {
 
                             gatheringBusy.running = true;
-                            //itemsVault = uuid;
-
-                            if (uuid === "ALL_VAULTS") {
-
-                                //itemsInAllVaults = true;
-
-                                mainProcess.start("op", ["item", "list", "--categories", categoryName, "--format", "json", "--session", currentSession, "--cache"]);
-
-                            }
-
-                            else {
-
-                                //itemsInAllVaults = false;
-                                //itemsVault = uuid;
-
-                                mainProcess.start("op", ["item", "list", "--categories", categoryName, "--vault", uuid, "--format", "json", "--session", currentSession, "--cache"]);
-
-                            }
+                            if (uuid === "ALL_VAULTS") mainProcess.start("op", ["item", "list", "--categories", categoryName, "--format", "json", "--session", currentSession, "--cache"]);
+                            else mainProcess.start("op", ["item", "list", "--categories", categoryName, "--vault", uuid, "--format", "json", "--session", currentSession, "--cache"]);
 
                         }
 
@@ -134,11 +221,11 @@ Page {
             itemSearchModel.clear();
             mainProcess.waitForFinished();
             var prelimOutput = readAllStandardOutput();
-            itemList = JSON.parse(prelimOutput);
+            var itemList = JSON.parse(prelimOutput);
 
             for (var i = 0; i < itemList.length; i++) {
 
-                itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultID: itemList[i].vault.id, itemVaultName: itemList[i].vault.name});
+                itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name});
                 itemSearchModel.append(itemListModel.get(i));
 
             }
@@ -156,7 +243,7 @@ Page {
             if (errorReadout.indexOf("not currently signed in") !== -1 || errorReadout.indexOf("session expired") !== -1) {
 
                 gatheringBusy.running = false;
-                notifySessionExpired.previewSummary = "Session Expired";
+                notifySessionExpired.previewSummary = qsTr("Session Expired");
                 notifySessionExpired.publish();
                 pageStack.clear();
                 pageStack.replace(Qt.resolvedUrl("SignIn.qml"));
@@ -166,11 +253,49 @@ Page {
             else {
 
                 gatheringBusy.running = false;
-                notifySessionExpired.previewSummary = "Unknown Error (copied to clipboard). Please sign back in.";
+                notifySessionExpired.previewSummary = qsTr("Unknown Error (copied to clipboard). Please sign back in.");
                 notifySessionExpired.publish();
                 Clipboard.text = errorReadout;
                 pageStack.clear();
                 pageStack.replace(Qt.resolvedUrl("SignIn.qml"));
+
+            }
+
+        }
+
+    }
+
+    Process {
+
+        id: getFavsItemPassword
+
+        onReadyReadStandardOutput: {
+
+            sessionExpiryTimer.restart();
+            var prelimOutput = readAllStandardOutput();
+            prelimOutput = " " + prelimOutput + " "; // need to avoid error: TypeError: Property 'trim' of object [password string w/ new line at end] is not a function.
+            prelimOutput = prelimOutput.trim();
+            Clipboard.text = prelimOutput;
+            vaultsPageNotification.previewSummary = qsTr("%1 password copied").arg(itemCopied);
+            vaultsPageNotification.publish();
+            gatheringBusy.running = false;
+
+        }
+
+        onReadyReadStandardError: {
+
+            errorReadout = readAllStandardError();
+            sessionExpiryTimer.stop();
+            gatheringBusy.running = false;
+
+            if (errorReadout.indexOf("not currently signed in") !== -1 || errorReadout.indexOf("session expired") !== -1) lockItUp(true);
+
+            else {
+
+                vaultsPageNotification.previewSummary = "Unknown Error (copied to clipboard). Please sign back in.";
+                vaultsPageNotification.publish();
+                Clipboard.text = errorReadout;
+                lockItUp(false);
 
             }
 
@@ -184,6 +309,14 @@ Page {
         size: BusyIndicatorSize.Large
         anchors.centerIn: parent
         running: false
+
+    }
+
+    Notification {
+
+        id: vaultsPageNotification
+        isTransient: true
+        expireTimeout: 1500
 
     }
 
