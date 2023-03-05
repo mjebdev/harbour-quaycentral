@@ -29,8 +29,8 @@ CoverBackground {
 
     ListView {
 
-        id: totpListView
-        model: totpModel
+        id: otpListView
+        model: otpModel
 
         anchors {
 
@@ -50,8 +50,6 @@ CoverBackground {
             wrapMode: Text.Wrap
             opacity: 0.0
             font.pixelSize: cover.size === Cover.Large ? Theme.fontSizeLarge : Theme.fontSizeMedium
-            //font.bold: true
-            //z: -1
 
             Behavior on opacity {
 
@@ -71,7 +69,7 @@ CoverBackground {
             height: cover.height - coverActionArea.height
             visible: active && settings.otpOnCover
 
-            onVisibleChanged: { // to allow for clearer otp in highlight color
+            onVisibleChanged: {
 
                 if (visible) coverBackgroundIcon.opacity = 0.05;
                 else coverBackgroundIcon.opacity = 0.15;
@@ -89,26 +87,22 @@ CoverBackground {
             Row {
 
                 width: cover.size === Cover.Large ? parent.width - (Theme.paddingLarge * 2) : parent.width - (Theme.paddingMedium * 2)
-                height: (parent.height - totpTimerProgressBarRow.height - topPaddingRow.height) / 2
+                height: (parent.height - otpTimerProgressBarRow.height - topPaddingRow.height) / 2
                 x: cover.size === Cover.Large ? Theme.paddingLarge : Theme.paddingMedium
 
                 Label {
 
-                    id: totpLabel1
+                    id: otpLabel1
                     width: parent.width
-                    //height: parent.height
-                    text: totpPart1
+                    text: otpPart1
                     textFormat: Text.AutoText
                     font.pixelSize: Theme.fontSizeHuge
-                    //font.bold: primaryColor
                     font.letterSpacing: cover.size === Cover.Large ? Theme.paddingLarge : Theme.paddingMedium
                     color: primaryColor ? Theme.highlightColor : Theme.primaryColor
                     horizontalAlignment: Text.AlignHCenter
                     opacity: primaryColor ? 1.0 : 0.2
-                    //verticalAlignment: "AlignVCenter" //  -- does not work with fixed width text / <pre>
                     leftPadding: cover.size === Cover.Large ? Theme.paddingLarge : Theme.paddingMedium
                     rightPadding: 0
-                    //bottomPadding: 0
 
                 }
 
@@ -117,26 +111,23 @@ CoverBackground {
             Row {
 
                 width: cover.size === Cover.Large ? parent.width - (Theme.paddingLarge * 2) : parent.width - (Theme.paddingMedium * 2)
-                height: (parent.height - totpTimerProgressBarRow.height - topPaddingRow.height) / 2
+                height: (parent.height - otpTimerProgressBarRow.height - topPaddingRow.height) / 2
                 x: cover.size === Cover.Large ? Theme.paddingLarge : Theme.paddingMedium
 
                 Label {
 
-                    id: totpLabel2
+                    id: otpLabel2
                     width: parent.width
-                    //height: parent.height
-                    text: totpPart2
+                    text: otpPart2
                     textFormat: Text.AutoText
                     font.pixelSize: Theme.fontSizeHuge
-                    //font.bold: primaryColor
                     font.letterSpacing: cover.size === Cover.Large ? Theme.paddingLarge : Theme.paddingMedium
                     color: primaryColor ? Theme.highlightColor : Theme.primaryColor
                     horizontalAlignment: Text.AlignHCenter
                     opacity: primaryColor ? 1.0 : 0.2
-                    //verticalAlignment: "AlignVCenter" // does not work for <pre> text
                     leftPadding: cover.size === Cover.Large ? Theme.paddingLarge : Theme.paddingMedium // the font.letterSpacing value offsets horizontal centering somewhat
                     rightPadding: 0
-                    topPadding: 0 // cover.size === Cover.Large ? 0 : Theme.paddingMedium
+                    topPadding: 0
 
                 }
 
@@ -144,19 +135,18 @@ CoverBackground {
 
             Row {
 
-                id: totpTimerProgressBarRow
+                id: otpTimerProgressBarRow
                 width: cover.size === Cover.Large ? parent.width - (Theme.paddingLarge * 2) : parent.width - (Theme.paddingMedium * 2)
-                height: cover.size === Cover.Large ? totpTimerProgressBar.height + (Theme.paddingLarge * 2) : totpTimerProgressBar.height + Theme.paddingMedium // putting a bit more space between bar and the lock button.
+                height: cover.size === Cover.Large ? otpTimerProgressBar.height + (Theme.paddingLarge * 2) : otpTimerProgressBar.height + Theme.paddingMedium // putting a bit more space between bar and the lock button.
                 x: cover.size === Cover.Large ? Theme.paddingLarge : Theme.paddingMedium
 
                 ProgressBar {
 
-                    id: totpTimerProgressBar
-                    anchors.top: totpLabel2.bottom
+                    id: otpTimerProgressBar
+                    anchors.top: otpLabel2.bottom
                     width: parent.width
                     minimumValue: 0
                     maximumValue: 30
-                    //visible: active
                     value: secondsLeft
                     leftMargin: cover.size === Cover.Large ? Theme.paddingLarge : Theme.paddingMedium
                     rightMargin: cover.size === Cover.Large ? Theme.paddingLarge : Theme.paddingMedium
@@ -172,6 +162,7 @@ CoverBackground {
     CoverActionList {
 
         id: coverActionList
+        enabled: !otpDisplayedOnCover
 
         CoverAction {
 
@@ -183,6 +174,63 @@ CoverBackground {
                 lowerLabel.text = lockItUp(false);
                 lowerLabel.opacity = 1.0;
                 lockedTextTimer.start();
+
+            }
+
+        }
+
+    }
+
+    CoverActionList {
+
+        id: otpCoverActionList
+        enabled: otpDisplayedOnCover
+
+        CoverAction {
+
+            id: backFromOtpPage
+            iconSource: settings.lockButtonOnCover ? "image://theme/icon-s-secure" : "image://theme/icon-cover-cancel"
+
+            onTriggered: {
+
+                if (settings.lockButtonOnCover) {
+
+                    otpModel.set(0, {"active": false});
+                    otpModel.clear();
+                    otpDisplayedOnCover = false;
+                    mainOtpTimer.stop();
+                    itemDetailsModel.clear();
+                    lowerLabel.text = lockItUp(false);
+                    lowerLabel.opacity = 1.0;
+                    lockedTextTimer.start();
+
+                }
+
+                else {
+
+                    otpModel.set(0, {"active": false});
+                    otpModel.clear();
+                    otpDisplayedOnCover = false;
+                    mainOtpTimer.stop();
+                    itemDetailsModel.clear();
+                    pageStack.pop(itemsPageObject, PageStackAction.Immediate);
+
+                }
+
+            }
+
+        }
+
+        CoverAction {
+
+            id: otpCopyButton
+            iconSource: "image://theme/icon-s-clipboard"
+
+            onTriggered: {
+
+                Clipboard.text = otpModel.get(0).otp.trim();
+                notifySessionExpired.previewSummary = qsTr("OTP Copied");
+                notifySessionExpired.publish();
 
             }
 
