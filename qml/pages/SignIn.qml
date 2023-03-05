@@ -13,11 +13,12 @@ Page {
 
         if (status === PageStatus.Active) {
 
-            if (appPastLaunch) { // this is a swipe back, vault(s) will be locked.
+            if (appPastLaunch) { // A swipe back, vault(s) will be locked.
 
                 signOutProcess.start("op", ["signout"]);
                 itemDetailsModel.clear();
                 itemListModel.clear();
+                favItemsModel.clear();
                 vaultListModel.clear();
                 currentSession = "000000000000000000000000000000000000000000000000000000000000000000000000";
                 currentSession = "";
@@ -29,7 +30,7 @@ Page {
 
             }
 
-            else { // this is the first view of signin screen following app launch
+            else { // First view of signin screen following app launch.
 
                 installationCheck.start("op", ["--version"]);
                 versionCheckTimer.start();
@@ -48,7 +49,6 @@ Page {
         Column {
 
             id: column
-            spacing: 0
             anchors.fill: parent
 
             Row {
@@ -56,7 +56,6 @@ Page {
                 id: titleRow
                 width: titleLabel.width
                 height: parent.height * 0.2
-                spacing: 0
                 x: (page.width - titleLabel.width) / 2
 
                 Label {
@@ -82,7 +81,7 @@ Page {
                 Label {
 
                     id: appVersionLabel
-                    text: "v0.6.2"
+                    text: "v0.7"
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.secondaryColor
                     width: parent.width
@@ -122,7 +121,6 @@ Page {
                 width: parent.width * 0.7
                 height: passwordField.height
                 x: parent.width * 0.15
-                spacing: 0
 
                 PasswordField {
 
@@ -189,7 +187,6 @@ Page {
 
                 width: loginButton.width
                 height: loginButton.height + (parent.height * 0.04) // for spacing between text field and button
-                spacing: 0
                 x: (page.width - loginButton.width) * 0.5
 
                 Image {
@@ -274,22 +271,72 @@ Page {
 
             if (haveSessionKey) {
 
-                itemListModel.clear();
-                itemSearchModel.clear();
-                processOne.waitForFinished();
-                var prelimOutput = readAllStandardOutput();
-                itemList = JSON.parse(prelimOutput);
+                if (settings.loadFavItems) {
 
-                for (var i = 0; i < itemList.length; i++) {
+                    favItemsModel.clear();
+                    processOne.waitForFinished();
+                    var favsOutput = readAllStandardOutput();
+                    var favsOutputParsed = JSON.parse(favsOutput);
 
-                    itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultID: itemList[i].vault.id, itemVaultName: itemList[i].vault.name});
-                    itemSearchModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultID: itemList[i].vault.id, itemVaultName: itemList[i].vault.name});
+                    if (favsOutputParsed.length > 0) {
+
+                        anyFavItems = true;
+                        for (var i = 0; i < favsOutputParsed.length; i++) favItemsModel.append({itemId: favsOutputParsed[i].id, itemTitle: favsOutputParsed[i].title, itemType: favsOutputParsed[i].category, itemVaultId: favsOutputParsed[i].vault.id, itemVaultName: favsOutputParsed[i].vault.name});
+
+                    }
+
+                    else anyFavItems = false;
+
+                    if (settings.skipVaultScreen) {
+
+                        skippingVaultScreen = true;
+
+                        if (settings.loadAllItems) {
+
+                            statusLabel.text = qsTr("Listing all items...");
+                            processThree.start("op", ["item", "list", "--format", "json", "--session", currentSession]);
+
+                        }
+
+                        else {
+
+                            statusLabel.text = qsTr("Listing categorized items...");
+                            processThree.start("op", ["item", "list", "--categories", settings.whichItemsToLoad, "--format", "json", "--session", currentSession]);
+
+                        }
+
+                    }
+
+                    else {
+
+                        loggingInBusy.running = false;
+                        statusLabel.text = "";
+                        pageStack.push(Qt.resolvedUrl("Vaults.qml"));
+
+                    }
 
                 }
 
-                loggingInBusy.running = false;
-                statusLabel.text = "";
-                pageStack.push([Qt.resolvedUrl("Vaults.qml"), Qt.resolvedUrl("Items.qml")]);
+                else {
+
+                    itemListModel.clear();
+                    itemSearchModel.clear();
+                    processOne.waitForFinished();
+                    var prelimOutput = readAllStandardOutput();
+                    var itemList = JSON.parse(prelimOutput);
+
+                    for (var i = 0; i < itemList.length; i++) {
+
+                        itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name});
+                        itemSearchModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name});
+
+                    }
+
+                    loggingInBusy.running = false;
+                    statusLabel.text = "";
+                    pageStack.push([Qt.resolvedUrl("Vaults.qml"), Qt.resolvedUrl("Items.qml")]);
+
+                }
 
             }
 
@@ -322,11 +369,8 @@ Page {
             else if (errorReadout.indexOf("o accounts configured") !== -1 || errorReadout.indexOf("o accounts found matching filter") !== -1) {
 
                 loggingInBusy.running = false;
-                //statusLabel.color = Theme.errorColor;
                 statusLabel.horizontalAlignment = "AlignLeft";
                 statusLabel.text = qsTr("QuayCentral shorthand has not been added to the 1Password command-line tool.\n\nPlease add the shorthand when adding your account to the CLI (\"--shorthand quaycentsfos\") and restart app.");
-                //titleLabel.color = "grey"
-                //appVersionLabel.color = "grey"
                 statusRow.height = statusLabel.height;
 
             }
@@ -380,8 +424,7 @@ Page {
 
             sessionExpiryTimer.restart();
             var prelimOutput = readAllStandardOutput();
-            vaultList = JSON.parse(prelimOutput);
-
+            var vaultList = JSON.parse(prelimOutput);
             vaultListModel.clear();
 
             if (vaultList.length === 1) justOneVault = true;
@@ -395,8 +438,6 @@ Page {
 
             for (var i = 0; i < vaultList.length; i++) {
 
-                //vaultName[i] = vaultList[i].name;
-                //vaultUUID[i] = vaultList[i].id;
                 vaultListModel.append({name: vaultList[i].name, uuid: vaultList[i].id,
                 categories: categoryListModel});
 
@@ -404,35 +445,43 @@ Page {
 
             statusLabel.text = qsTr("Vault listing complete.");
 
-            if (settings.skipVaultScreen) {
+            if (settings.loadFavItems) {
 
-                skippingVaultScreen = true;
-                statusLabel.text = qsTr("Listing items...");
-
-                // will not be able to single out vaults, just categories
-
-                //itemsInAllVaults = true; // no default vault value, it's all vaults
-
-                if (settings.loadAllItems) {
-
-                    processOne.start("op", ["item", "list", "--format", "json", "--session", currentSession]);
-
-                }
-
-                else {
-
-                    processOne.start("op", ["item", "list", "--categories", settings.whichItemsToLoad, "--format", "json", "--session", currentSession]);
-
-                }
+                statusLabel.text = qsTr("Listing favorite items...");
+                processOne.start("op", ["item", "list", "--favorite", "--format", "json", "--session", currentSession]);
 
             }
 
             else {
 
-                skippingVaultScreen = false;
-                loggingInBusy.running = false;
-                statusLabel.text = "";
-                pageStack.push(Qt.resolvedUrl("Vaults.qml"));
+                anyFavItems = false;
+
+                if (settings.skipVaultScreen) {
+
+                    skippingVaultScreen = true;
+
+                    if (settings.loadAllItems) {
+
+                        statusLabel.text = qsTr("Listing all items...");
+                        processOne.start("op", ["item", "list", "--format", "json", "--session", currentSession]);
+                    }
+
+                    else {
+
+                        statusLabel.text = qsTr("Listing categorized items...");
+                        processOne.start("op", ["item", "list", "--categories", settings.whichItemsToLoad, "--format", "json", "--session", currentSession]);
+
+                    }
+
+                }
+
+                else {
+
+                    loggingInBusy.running = false;
+                    statusLabel.text = "";
+                    pageStack.push(Qt.resolvedUrl("Vaults.qml"));
+
+                }
 
             }
 
@@ -443,6 +492,41 @@ Page {
             sessionExpiryTimer.stop();
             statusLabel.color = Theme.errorColor;
             statusLabel.text = qsTr("Error occurred while accessing vault data.");
+
+        }
+
+    }
+
+    Process {
+
+        id: processThree // for when user is both loading Favs and bypassing Vaults page.
+
+        onReadyReadStandardOutput: {
+
+            itemListModel.clear();
+            itemSearchModel.clear();
+            processThree.waitForFinished();
+            var prelimOutput = readAllStandardOutput();
+            var itemList = JSON.parse(prelimOutput);
+
+            for (var i = 0; i < itemList.length; i++) {
+
+                itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name});
+                itemSearchModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name});
+
+            }
+
+            loggingInBusy.running = false;
+            statusLabel.text = "";
+            pageStack.push([Qt.resolvedUrl("Vaults.qml"), Qt.resolvedUrl("Items.qml")]);
+
+        }
+
+        onReadyReadStandardError: {
+
+            sessionExpiryTimer.stop();
+            statusLabel.color = Theme.errorColor;
+            statusLabel.text = qsTr("Error occurred while listing items.");
 
         }
 
