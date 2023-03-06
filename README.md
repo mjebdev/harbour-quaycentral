@@ -22,7 +22,7 @@ App icon by <a href="https://github.com/JSEHV">JSEHV</a>. Thanks for the contrib
 <h3>Limitations & Issues</h3>
 
 - Lockout timer may not function if device is put to sleep etc. and so is not meant as a reliable replacement for manually locking vault(s) using one of the available methods.
-- Lockout timer only goes by the app's interaction with the CLI and isn't reset by any user interaction that doesn't access data, such as swiping back, going to Settings, etc. Also, if part of an item, the one-time password is obtained every 30 seconds using the CLI but can be stopped from continuing by using the Close button on the app cover depending on the chosen options in Settings.
+- Lockout timer only goes by the app's interaction with the CLI and isn't reset by any user interaction that doesn't access data, such as swiping back, going to Settings, etc. If part of an item, the one-time password is obtained every 30 seconds using the CLI but can be stopped from continuing by using the Close button on the app cover or just swiping back from the item details if inside the app.
 - Item details page should list all data entries, however will not display section headers (besides Notes) and may still have some formatting issues in some cases.
 - No support for multiple accounts or for groups.
 - Items are not listed alphabetically so search method is necessary as opposed to scrolling through a list.
