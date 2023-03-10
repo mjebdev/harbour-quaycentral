@@ -29,6 +29,29 @@ public:
 
     }
 
+    Q_INVOKABLE void startPipedCommand(const QString &program1, const QVariantList &arguments1, const QString &program2, const QVariantList &arguments2) {
+
+        QStringList args1;
+        QStringList args2;
+
+
+        for (int i = 0; i < arguments1.length(); i++) args1 << arguments1[i].toString();
+        for (int j = 0; j < arguments2.length(); j++) args2 << arguments2[j].toString();
+
+        QProcess process1;
+        QProcess process2;
+
+        process1.setStandardOutputProcess(&process2);
+
+        process1.start(program1, args1);
+        process1.waitForFinished();
+        process2.start(program2, args2);
+
+
+        //QProcess::start(program, args);
+
+    }
+
     Q_INVOKABLE QByteArray readAll() {
 
         return QProcess::readAll();
