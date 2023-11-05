@@ -14,7 +14,20 @@ Page {
 
     Component.onCompleted: {
 
-        versionCheck.start("op", ["--version"]);
+        if (!justOneVault && settings.skipVaultScreen) {
+
+            // determine current index of default vault combo by confirming its place in current list of vaults.
+            for (var i = 0; i < vaultListModel.count; i++) {
+
+                if (settings.defaultVaultUuid === vaultListModel.get(i).uuid) {
+
+                    defaultVaultCombo.currentIndex = i;
+
+                }
+
+            }
+
+        }
 
     }
 
@@ -22,11 +35,24 @@ Page {
 
         if (updateAvailable) {
 
-            updateCLI.write("y\n");
-            updatingIndicator.running = true;
-            updateDownloadTimer.start();
-            processStatus.previewSummary = qsTr("Downloading update...");
-            processStatus.publish();
+            if (runningOnAarch64) { // grab latest RPM from 1Password site. Option in settings for this as opposed to zip file to be moved manually?
+
+                updateCLI.write("n\n");
+                processStatus.previewSummary = qsTr("Downloading latest RPM...");
+                processStatus.publish();
+                Qt.openUrlExternally("https://downloads.1password.com/linux/rpm/stable/aarch64/1password-cli-latest.aarch64.rpm");
+
+            }
+
+            else {
+
+                updateCLI.write("y\n");
+                updatingIndicator.running = true;
+                updateDownloadTimer.start();
+                processStatus.previewSummary = qsTr("Downloading update in ZIP format...");
+                processStatus.publish();
+
+            }
 
         }
 
@@ -54,6 +80,7 @@ Page {
         ListElement {categoryName: "Server"; categoryDisplayName: qsTr("Servers")}
         ListElement {categoryName: "Social Security Number"; categoryDisplayName: qsTr("Social Security Numbers")}
         ListElement {categoryName: "Software License"; categoryDisplayName: qsTr("Software Licenses")}
+        ListElement {categoryName: "SSH Key"; categoryDisplayName: qsTr("SSH Keys")}
         ListElement {categoryName: "Wireless Router"; categoryDisplayName: qsTr("Wireless Routers")}
 
     }
@@ -96,7 +123,7 @@ Page {
 
             ComboBox {
 
-                label: qsTr("Enter key in search")
+                label: qsTr("Enter key")
                 id: enterKeyCombo
                 width: parent.width
                 currentIndex: settings.enterKeyLoadsDetails ? 0 : 1
@@ -299,31 +326,54 @@ Page {
 
             TextSwitch {
 
-                id: loadFavItemsSwitch
-                text: qsTr("Show Favorite items on Vaults page");
-                description: qsTr("Change will take effect on next sign-in.");
-                checked: settings.loadFavItems
-                leftMargin: Theme.horizontalPageMargin
+                id: skipVaultScreenSwitch
+                text: justOneVault ? qsTr("Bypass Vault page after sign-in") : qsTr("Bypass Vaults page after sign-in")
+                checked: settings.skipVaultScreen
 
                 onCheckedChanged: {
 
-                    settings.loadFavItems = checked;
+                    if (!checked && !justOneVault) {
+
+                        defaultVaultCombo.currentIndex = 0;
+                        settings.defaultVaultUuid = "ALL_VAULTS";
+
+                    }
+
+                    settings.skipVaultScreen = checked;
                     settings.sync();
 
                 }
 
             }
 
-            TextSwitch {
+            ComboBox {
 
-                id: skipVaultScreenSwitch
-                text: qsTr("Bypass Vaults page on sign-in")
-                checked: settings.skipVaultScreen
+                label: qsTr("Default vault")
+                id: defaultVaultCombo
+                width: parent.width
+                enabled: skipVaultScreenSwitch.checked
+                visible: !justOneVault
 
-                onCheckedChanged: {
+                menu: ContextMenu {
 
-                    settings.skipVaultScreen = checked;
-                    settings.sync();
+                    Repeater {
+
+                        model: vaultListModel
+
+                        MenuItem {
+
+                            text: name
+
+                            onClicked: {
+
+                                settings.defaultVaultUuid = uuid;
+                                settings.sync();
+
+                            }
+
+                        }
+
+                    }
 
                 }
 
@@ -367,7 +417,7 @@ Page {
 
             SectionHeader {
 
-                text: "Cover"
+                text: qsTr("Cover")
 
             }
 
@@ -401,6 +451,97 @@ Page {
 
                     settings.lockButtonOnCover = checked;
                     settings.sync;
+
+                }
+
+            }
+
+            SectionHeader {
+
+                text: qsTr("Vaults Page")
+
+            }
+
+            TextSwitch {
+
+                id: loadFavItemsSwitch
+                text: qsTr("Show Favorite items on Vaults page");
+                description: qsTr("Change takes effect after next sign-in.");
+                checked: settings.loadFavItems
+                leftMargin: Theme.horizontalPageMargin
+
+                onCheckedChanged: {
+
+                    settings.loadFavItems = checked;
+                    settings.sync();
+
+                }
+
+            }
+
+            TextSwitch {
+
+                id: specifyVaultsPageCategoriesSwitch
+                text: qsTr("List only selected categories");
+                checked: settings.limitedCatsVaultsPage
+                automaticCheck: false
+
+                onClicked: {
+
+                    checked = !checked;
+
+                    if (checked) {
+
+                        settings.limitedCatsVaultsPage = true;
+                        settings.sync();
+                        pageStack.push("SelectCategories.qml");
+
+                    }
+
+                    else {
+
+                        categoryListModel.set(1, {"includeOnVaultsPage": true});
+                        categoryListModel.set(2, {"includeOnVaultsPage": true});
+                        categoryListModel.set(3, {"includeOnVaultsPage": true});
+                        categoryListModel.set(4, {"includeOnVaultsPage": true});
+                        categoryListModel.set(5, {"includeOnVaultsPage": true});
+                        categoryListModel.set(6, {"includeOnVaultsPage": true});
+                        categoryListModel.set(7, {"includeOnVaultsPage": true});
+                        categoryListModel.set(8, {"includeOnVaultsPage": true});
+                        categoryListModel.set(9, {"includeOnVaultsPage": true});
+                        categoryListModel.set(10, {"includeOnVaultsPage": true});
+                        categoryListModel.set(11, {"includeOnVaultsPage": true});
+                        categoryListModel.set(12, {"includeOnVaultsPage": true});
+                        categoryListModel.set(13, {"includeOnVaultsPage": true});
+                        categoryListModel.set(14, {"includeOnVaultsPage": true});
+                        categoryListModel.set(15, {"includeOnVaultsPage": true});
+                        categoryListModel.set(16, {"includeOnVaultsPage": true});
+                        categoryListModel.set(17, {"includeOnVaultsPage": true});
+                        categoryListModel.set(18, {"includeOnVaultsPage": true});
+                        categoryListModel.set(19, {"includeOnVaultsPage": true});
+                        settings.vaultPageDisplayApiCredential = true;
+                        settings.vaultPageDisplayBankAccount = true;
+                        settings.vaultPageDisplayCreditCard = true;
+                        settings.vaultPageDisplayDatabase = true;
+                        settings.vaultPageDisplayDocument = true;
+                        settings.vaultPageDisplayDriverLicense = true;
+                        settings.vaultPageDisplayEmailAccount = true;
+                        settings.vaultPageDisplayIdentity = true;
+                        settings.vaultPageDisplayMembership = true;
+                        settings.vaultPageDisplayOutdoorLicense = true;
+                        settings.vaultPageDisplayPassport = true;
+                        settings.vaultPageDisplayPassword = true;
+                        settings.vaultPageDisplayRewardProgram = true;
+                        settings.vaultPageDisplaySecureNote = true;
+                        settings.vaultPageDisplayServer = true;
+                        settings.vaultPageDisplaySocialSecurityNumber = true;
+                        settings.vaultPageDisplaySoftwareLicense = true;
+                        settings.vaultPageDisplaySshKey = true;
+                        settings.vaultPageDisplayWirelessRouter = true;
+                        settings.limitedCatsVaultsPage = false;
+                        settings.sync();
+
+                    }
 
                 }
 
@@ -715,19 +856,6 @@ Page {
                 height: Theme.paddingLarge
 
             }
-
-        }
-
-    }
-
-    Process {
-
-        id: versionCheck
-
-        onReadyReadStandardOutput: {
-
-            cliVersion = readAllStandardOutput();
-            cliVersion = cliVersion.trim();
 
         }
 
