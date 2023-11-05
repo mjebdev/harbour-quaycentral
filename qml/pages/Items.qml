@@ -10,6 +10,7 @@ Page {
     allowedOrientations: Orientation.PortraitMask
     property string itemCopied
     property int searchFieldMargin
+    property bool localListingFin: appWindow.itemListingFin
 
     onStatusChanged: {
 
@@ -108,13 +109,51 @@ Page {
                 BackgroundItem {
 
                     id: delegate
+                    visible: templateUuid !== "DOCUMENT"
+
+                    Icon {
+
+                        id: itemIcon
+                        source: iconUrl
+                        visible: iconEmoji === ""
+
+                        anchors {
+
+                            left: parent.left
+                            leftMargin: searchFieldMargin - this.width - Theme.paddingMedium
+                            verticalCenter: parent.verticalCenter
+
+                        }
+
+                    }
+                    
+                    Label {
+                        
+                        id: itemEmojiIcon
+                        padding: 0
+                        visible: iconEmoji !== ""
+                        text: iconEmoji
+                        font.pixelSize: Theme.fontSizeExtraLarge
+                        color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
+                        width: Theme.iconSizeMedium
+                        horizontalAlignment: "AlignHCenter"
+
+                        anchors {
+                            
+                            left: parent.left
+                            leftMargin: searchFieldMargin - this.width - Theme.paddingMedium
+                            verticalCenter: parent.verticalCenter
+                            
+                        }
+
+                    }
 
                     Label {
 
                         anchors {
 
-                            left: parent.left
-                            leftMargin: searchFieldMargin
+                            left: itemIcon.visible ? itemIcon.right : itemEmojiIcon.right
+                            leftMargin: Theme.paddingMedium
                             verticalCenter: parent.verticalCenter
 
                         }
@@ -222,7 +261,7 @@ Page {
         id: loadingItemBusy
         size: BusyIndicatorSize.Large
         anchors.centerIn: parent
-        running: false
+        running: !localListingFin
 
     }
 
