@@ -19,10 +19,13 @@ SOURCES += src/harbour-quaycentral.cpp
 DISTFILES += qml/harbour-quaycentral.qml \
     qml/cover/CoverPage.qml \
     qml/pages/About.qml \
+    qml/pages/Documents.qml \
     qml/pages/ItemDetails.qml \
     qml/pages/Items.qml \
     qml/pages/LargeType.qml \
+    qml/pages/SelectCategories.qml \
     qml/pages/Settings.qml \
+    qml/pages/Setup.qml \
     qml/pages/SignIn.qml \
     qml/pages/Vaults.qml \
     rpm/harbour-quaycentral.changes.in \
@@ -45,7 +48,7 @@ QT += core
 # following TRANSLATIONS line. And also do not forget to
 # modify the localized app name in the the .desktop file.
 
-# intending to add translations, none as of yet.
+# keeping 'harbour-quaycentral.ts' up to date should anyone wish to translate
 # TRANSLATIONS += translations/harbour-quaycentral-de.ts
 
 HEADERS += src/process.h
