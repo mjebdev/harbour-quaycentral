@@ -1,6 +1,7 @@
 #ifndef PROCESS_H
 #define PROCESS_H
 
+// 'Running an external program, system command, or shell script from QML'
 // Source: http://www.xargs.com/qml/process.html
 // Copyright © 2015 John Temples
 
@@ -8,6 +9,9 @@
 #include <QProcess>
 #include <QVariant>
 #include <QString>
+#include <QStandardPaths>
+#include <QFile>
+#include <QDebug>
 
 class Process : public QProcess {
 
@@ -15,7 +19,15 @@ class Process : public QProcess {
 
 public:
 
+    QString downloadsFolder = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+
     Process(QObject *parent = 0) : QProcess(parent) { }
+
+    Q_INVOKABLE QString getDownloadsPath() {
+
+        return downloadsFolder;
+
+    }
 
     Q_INVOKABLE void start(const QString &program, const QVariantList &arguments) {
 
@@ -26,29 +38,6 @@ public:
         args << arguments[i].toString();
 
         QProcess::start(program, args);
-
-    }
-
-    Q_INVOKABLE void startPipedCommand(const QString &program1, const QVariantList &arguments1, const QString &program2, const QVariantList &arguments2) {
-
-        QStringList args1;
-        QStringList args2;
-
-
-        for (int i = 0; i < arguments1.length(); i++) args1 << arguments1[i].toString();
-        for (int j = 0; j < arguments2.length(); j++) args2 << arguments2[j].toString();
-
-        QProcess process1;
-        QProcess process2;
-
-        process1.setStandardOutputProcess(&process2);
-
-        process1.start(program1, args1);
-        process1.waitForFinished();
-        process2.start(program2, args2);
-
-
-        //QProcess::start(program, args);
 
     }
 
