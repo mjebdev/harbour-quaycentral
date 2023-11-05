@@ -5,6 +5,9 @@ Page {
 
     id: page
     allowedOrientations: Orientation.All
+    readonly property int landscapeCount: Screen.height > 1920 ? 11 : 9
+    readonly property int cellWidthCalc: page.isPortrait ? Screen.width / 5 : Screen.height / landscapeCount
+    readonly property int cellHeightCalc: cellWidthCalc * 1.1
 
     onStatusChanged: {
 
@@ -16,10 +19,20 @@ Page {
 
         id: largeTypeGridView
         model: largeTypeModel
-        cellWidth: page.isPortrait ? Screen.width / 5 : Screen.height > 1920 ? Screen.height / 11 : Screen.height / 9
-        cellHeight: cellWidth * 1.1
+        cellWidth: cellWidthCalc
+        cellHeight: cellHeightCalc
+        width: parent.width
 
-        anchors.fill: parent
+        header: Item {
+
+            width: parent.width
+            height: page.isPortrait ? Screen.height < (cellHeightCalc * Math.ceil(largeTypeModel.count / 5)) ? 0 : (Screen.height - (cellHeightCalc * Math.ceil(largeTypeModel.count / 5))) / 2 : Screen.width < (cellHeightCalc * Math.ceil(largeTypeModel.count / landscapeCount)) ? 0 : (Screen.width - (cellHeightCalc * Math.ceil(largeTypeModel.count / landscapeCount))) / 2
+
+        }
+
+        x: page.isPortrait ? largeTypeModel.count < 5 ? (Screen.width - (cellWidthCalc * largeTypeModel.count)) / 2 : 0 : largeTypeModel.count < landscapeCount ? (Screen.height - (cellWidthCalc * largeTypeModel.count)) / 2 : 0
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
 
         delegate: GridItem {
 
@@ -50,8 +63,7 @@ Page {
                 width: parent.width
                 height: parent.height
                 color: Theme.highlightColor
-                opacity: 0.1
-                visible: Math.abs(index % 2) == 0
+                opacity: Math.abs(index % 2) == 0 ? 0.07 : 0.12
 
             }
 
