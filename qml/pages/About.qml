@@ -1,10 +1,17 @@
 import QtQuick 2.6
 import Sailfish.Silica 1.0
+import Process 1.0
 
 Page {
 
     id: page
     allowedOrientations: Orientation.PortraitMask
+
+    Component.onCompleted: {
+
+        versionCheck.start("op", ["--version"]);
+
+    }
 
     SilicaFlickable {
 
@@ -33,7 +40,7 @@ Page {
 
                     Row {
 
-                        width: parent.width * 0.25
+                        width: parent.width * 0.2
                         x: (parent.width - this.width) / 2
 
                         Image {
@@ -61,7 +68,7 @@ Page {
                             id: appTitleLabel
                             font.pixelSize: Theme.fontSizeLarge
                             font.bold: true
-                            color: Theme.primaryColor
+                            color: Theme.highlightColor
                             topPadding: Theme.paddingLarge
                             bottomPadding: Theme.paddingLarge
 
@@ -75,7 +82,7 @@ Page {
                         width: appTitleLabel.width
                         x: (page.width - this.width) * 0.5
                         horizontalAlignment: Separator.Center
-                        color: Theme.highlightColor
+                        color: Theme.primaryColor
 
                     }
 
@@ -87,13 +94,13 @@ Page {
 
                         Label {
 
-                            topPadding: Theme.paddingLarge
-                            width: parent.width
                             id: aboutTextLabel
+                            width: parent.width
                             font.pixelSize: Theme.fontSizeExtraSmall
-                            color: Theme.primaryColor
+                            color: Theme.highlightColor
                             wrapMode: Text.Wrap
-                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\n\nVersion 0.7\nLicensed under GNU GPLv3\n\nApp icon by JSEHV on GitHub--Thank you for the contribution!\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
+                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\n\nVersion 0.8\nLicensed under GNU GPLv3\n\nApp icon by JSEHV on GitHub--Thank you for the contribution!\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
+                            topPadding: Theme.paddingLarge * 2
                             bottomPadding: Theme.paddingLarge
 
                         }
@@ -103,7 +110,7 @@ Page {
                     Row {
 
                         width: parent.width
-                        height: Theme.paddingMedium
+                        height: Theme.paddingLarge
 
                     }
 
@@ -136,7 +143,7 @@ Page {
                     Row {
 
                         width: parent.width
-                        height: Theme.paddingMedium
+                        height: Theme.paddingLarge
 
                     }
 
@@ -177,6 +184,19 @@ Page {
                 }
 
             }
+
+        }
+
+    }
+
+    Process {
+
+        id: versionCheck
+
+        onReadyReadStandardOutput: {
+
+            cliVersion = readAllStandardOutput();
+            cliVersion = cliVersion.trim();
 
         }
 
