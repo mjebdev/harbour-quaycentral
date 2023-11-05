@@ -9,6 +9,42 @@ Page {
     allowedOrientations: Orientation.PortraitMask
     property string itemCopied
 
+    Component.onCompleted: {
+
+        categoryListModel.set(1, {"includeOnVaultsPage": settings.vaultPageDisplayApiCredential});
+        categoryListModel.set(2, {"includeOnVaultsPage": settings.vaultPageDisplayBankAccount});
+        categoryListModel.set(3, {"includeOnVaultsPage": settings.vaultPageDisplayCreditCard});
+        categoryListModel.set(4, {"includeOnVaultsPage": settings.vaultPageDisplayDatabase});
+        categoryListModel.set(5, {"includeOnVaultsPage": settings.vaultPageDisplayDocument});
+        categoryListModel.set(6, {"includeOnVaultsPage": settings.vaultPageDisplayDriverLicense});
+        categoryListModel.set(7, {"includeOnVaultsPage": settings.vaultPageDisplayEmailAccount});
+        categoryListModel.set(8, {"includeOnVaultsPage": settings.vaultPageDisplayIdentity});
+        categoryListModel.set(9, {"includeOnVaultsPage": settings.vaultPageDisplayMembership});
+        categoryListModel.set(10, {"includeOnVaultsPage": settings.vaultPageDisplayOutdoorLicense});
+        categoryListModel.set(11, {"includeOnVaultsPage": settings.vaultPageDisplayPassport});
+        categoryListModel.set(12, {"includeOnVaultsPage": settings.vaultPageDisplayPassword});
+        categoryListModel.set(13, {"includeOnVaultsPage": settings.vaultPageDisplayRewardProgram});
+        categoryListModel.set(14, {"includeOnVaultsPage": settings.vaultPageDisplaySecureNote});
+        categoryListModel.set(15, {"includeOnVaultsPage": settings.vaultPageDisplayServer});
+        categoryListModel.set(16, {"includeOnVaultsPage": settings.vaultPageDisplaySocialSecurityNumber});
+        categoryListModel.set(17, {"includeOnVaultsPage": settings.vaultPageDisplaySoftwareLicense});
+        categoryListModel.set(18, {"includeOnVaultsPage": settings.vaultPageDisplaySshKey});
+        categoryListModel.set(19, {"includeOnVaultsPage": settings.vaultPageDisplayWirelessRouter});
+
+    }
+
+    onStatusChanged: {
+
+        if (status === PageStatus.Active) {
+
+            itemListModel.clear();
+            itemSearchModel.clear();
+            appWindow.itemListingFin = false;
+
+        }
+
+    }
+
     SilicaListView {
 
         id: vaultListView
@@ -49,7 +85,7 @@ Page {
             PageHeader {
 
                 id: vaultsPageHeader
-                title: anyFavItems ? qsTr("Home") : justOneVault ? qsTr("Vault") : qsTr("Vaults")
+                title: justOneVault ? qsTr("Vault") : qsTr("Vaults")
 
             }
 
@@ -62,7 +98,7 @@ Page {
 
                 header: SectionHeader {
 
-                    text: qsTr("Favorites")
+                    text: qsTr("Favorite Items")
 
                 }
 
@@ -139,13 +175,6 @@ Page {
 
                 }
 
-                footer: SectionHeader {
-
-                    visible: anyFavItems
-                    text: justOneVault ? qsTr("Vault") : qsTr("Vaults")
-
-                }
-
             }
 
         }
@@ -175,6 +204,7 @@ Page {
                     delegate: BackgroundItem {
 
                         width: parent.width
+                        visible: includeOnVaultsPage
 
                         Label {
 
@@ -192,9 +222,36 @@ Page {
 
                         onClicked: {
 
-                            gatheringBusy.running = true;
-                            if (uuid === "ALL_VAULTS") mainProcess.start("op", ["item", "list", "--categories", categoryName, "--format", "json", "--session", currentSession, "--cache"]);
-                            else mainProcess.start("op", ["item", "list", "--categories", categoryName, "--vault", uuid, "--format", "json", "--session", currentSession, "--cache"]);
+                            if (categoryName === "Document") {
+
+                                if (uuid === "ALL_VAULTS") {
+
+                                    docsInAllVaults = true;
+                                    itemCategoryListingType = "Document";
+                                    mainGetItems.start("op", ["document", "list", "--format", "json", "--session", currentSession]);
+
+                                }
+
+                                else {
+
+                                    docsInAllVaults = false;
+                                    itemCategoryListingType = "Document";
+                                    mainGetItems.start("op", ["document", "list", "--vault", uuid, "--format", "json", "--session", currentSession]);
+
+                                }
+
+                                pageStack.push(Qt.resolvedUrl("Documents.qml"));
+
+                            }
+
+                            else {
+
+                                itemCategoryListingType = categoryName;
+                                if (uuid === "ALL_VAULTS") mainGetItems.start("op", ["item", "list", "--categories", categoryName, "--format", "json", "--session", currentSession]);
+                                else mainGetItems.start("op", ["item", "list", "--categories", categoryName, "--vault", uuid, "--format", "json", "--session", currentSession]);
+                                pageStack.push(Qt.resolvedUrl("Items.qml"));
+
+                            }
 
                         }
 
@@ -207,61 +264,6 @@ Page {
         }
 
         VerticalScrollDecorator { }
-
-    }
-
-    Process {
-
-        id: mainProcess
-
-        onReadyReadStandardOutput: {
-
-            sessionExpiryTimer.restart();
-            itemListModel.clear();
-            itemSearchModel.clear();
-            mainProcess.waitForFinished();
-            var prelimOutput = readAllStandardOutput();
-            var itemList = JSON.parse(prelimOutput);
-
-            for (var i = 0; i < itemList.length; i++) {
-
-                itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name});
-                itemSearchModel.append(itemListModel.get(i));
-
-            }
-
-            gatheringBusy.running = false;
-            pageStack.push(Qt.resolvedUrl("Items.qml"));
-
-        }
-
-        onReadyReadStandardError: {
-
-            sessionExpiryTimer.stop();
-            errorReadout = readAllStandardError();
-
-            if (errorReadout.indexOf("not currently signed in") !== -1 || errorReadout.indexOf("session expired") !== -1) {
-
-                gatheringBusy.running = false;
-                notifySessionExpired.previewSummary = qsTr("Session Expired");
-                notifySessionExpired.publish();
-                pageStack.clear();
-                pageStack.replace(Qt.resolvedUrl("SignIn.qml"));
-
-            }
-
-            else {
-
-                gatheringBusy.running = false;
-                notifySessionExpired.previewSummary = qsTr("Unknown Error (copied to clipboard). Please sign back in.");
-                notifySessionExpired.publish();
-                Clipboard.text = errorReadout;
-                pageStack.clear();
-                pageStack.replace(Qt.resolvedUrl("SignIn.qml"));
-
-            }
-
-        }
 
     }
 
@@ -292,7 +294,7 @@ Page {
 
             else {
 
-                vaultsPageNotification.previewSummary = "Unknown Error (copied to clipboard). Please sign back in.";
+                vaultsPageNotification.previewSummary = qsTr("Unknown Error (copied to clipboard). Please sign back in.");
                 vaultsPageNotification.publish();
                 Clipboard.text = errorReadout;
                 lockItUp(false);
