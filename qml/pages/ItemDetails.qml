@@ -14,7 +14,7 @@ Page {
 
         ListElement {
 
-            fieldID: ""; fieldType: ""; fieldLabel: ""; fieldValue: ""; fieldOtp: ""
+            fieldId: ""; fieldType: ""; fieldLabel: ""; fieldValue: ""; fieldOtp: ""
 
         }
 
@@ -32,13 +32,13 @@ Page {
 
             for (var i = 0; i < itemDetails.fields.length; i++) {
 
-                if (itemDetails.fields[i].id !== "" && itemDetails.fields[i].value !== undefined) itemFieldsModel.append({"fieldID": itemDetails.fields[i].id, "fieldType": itemDetails.fields[i].type, "fieldLabel": itemDetails.fields[i].label, "fieldValue": itemDetails.fields[i].value, "fieldOtp": itemDetails.fields[i].totp !== undefined ? itemDetails.fields[i].totp : ""});
+                if (itemDetails.fields[i].id !== "" && itemDetails.fields[i].value !== undefined) itemFieldsModel.append({"fieldId": itemDetails.fields[i].id, "fieldType": itemDetails.fields[i].type, "fieldLabel": itemDetails.fields[i].label, "fieldValue": itemDetails.fields[i].value, "fieldOtp": itemDetails.fields[i].totp !== undefined ? itemDetails.fields[i].totp : ""});
 
             }
 
             if (itemDetails.urls !== undefined) {
 
-                for (var j = 0; j < itemDetails.urls.length; j++) itemFieldsModel.append({"fieldID": "URL", "fieldType": "URL", "fieldLabel": itemDetails.urls[j].label, "fieldValue": itemDetails.urls[j].href, "fieldOtp": ""});
+                for (var j = 0; j < itemDetails.urls.length; j++) itemFieldsModel.append({"fieldId": "URL", "fieldType": "URL", "fieldLabel": itemDetails.urls[j].label, "fieldValue": itemDetails.urls[j].href, "fieldOtp": ""});
 
             }
 
@@ -171,9 +171,11 @@ Page {
             Component.onCompleted: {
 
                 itemFieldsModel.clear();
-                loadItemData.start("op", ["item", "get", itemId, "--vault", itemVaultId, "--format", "json", "--session", currentSession, "--cache"]);
+                loadItemData.start("op", ["item", "get", itemId, "--vault", itemVaultId, "--format", "json", "--session", currentSession]);
 
             }
+
+            // put busy indicator here and link to whether itemId is still blank?
 
             PageHeader {
 
@@ -205,7 +207,7 @@ Page {
 
                     Component.onCompleted: {
 
-                        if (fieldID === "username") {
+                        if (fieldId === "username") {
 
                             usernameField.label = qsTr("username") // need to force this as output came up with odd and/or random labels sometimes e.g. imembernameeasi
                             usernameField.text = fieldValue;
@@ -213,7 +215,7 @@ Page {
 
                         }
 
-                        else if (fieldID === "password") {
+                        else if (fieldId === "password") {
 
                             itemDetailsModel.set(0, {"itemPassword": fieldValue});
                             copyPasswordMenu.visible = true;
@@ -223,7 +225,7 @@ Page {
 
                         }
 
-                        else if (fieldID === "notesPlain") {
+                        else if (fieldId === "notesPlain") {
 
                             if (fieldValue !== "") {
 
