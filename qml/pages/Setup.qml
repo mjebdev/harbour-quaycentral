@@ -130,6 +130,7 @@ Page {
                 wrapMode: Text.WordWrap
                 bottomPadding: Theme.paddingLarge
                 textFormat: Text.RichText
+                onLinkActivated: Qt.openUrlExternally(link)
 
             }
 
