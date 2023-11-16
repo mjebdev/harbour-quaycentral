@@ -39,6 +39,7 @@ Page {
                 statusLabel.text = "";
                 statusLabel.color = Theme.primaryColor;
                 statusLabel.horizontalAlignment = "AlignHCenter";
+                checkingShorthand = false; // starting over
                 appPastLaunch = true;
                 // Need to check for userland architecture (as opposed to kernel architecture which will show as aarch64 even on Xperia X and XA2)
                 // Many thanks to olf and nephros on Sailfish OS Forum for this guidance:
@@ -263,6 +264,8 @@ Page {
                             statusLabel.horizontalAlignment = "AlignHCenter";
                             statusRow.height = column.height * 0.12;
                             setupButtonLayout.visible = false;
+                            titleLabel.color = Theme.highlightColor;
+                            appVersionLabel.color = Theme.secondaryColor;
                             appPastLaunch = false;
                             pageStack.push(Qt.resolvedUrl("Setup.qml"));
 
@@ -290,11 +293,11 @@ Page {
             cliVersion = readAllStandardOutput();
             cliVersion = cliVersion.trim();
 
-            checkingShorthand = true;
-            architectureCheck.start("op", ["account", "list", "--format", "json"]);
-
             titleLabel.color = Theme.highlightColor; // incase coming back from setup page etc.
             appVersionLabel.color = Theme.secondaryColor;
+
+            checkingShorthand = true;
+            architectureCheck.start("op", ["account", "list", "--format", "json"]);
 
         }
 
