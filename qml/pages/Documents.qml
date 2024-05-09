@@ -20,6 +20,7 @@ Page {
 
             downloadingDocBusy.running = false;
             itemListView.enabled = true;
+            downloadFin = false; // to allow for subsequent downloads to work also--bug fixed.
 
         }
 
@@ -32,6 +33,7 @@ Page {
             // If still on this page, will refresh the list. If user has already swiped back, it's not necessary as list will be reloaded if they come back.
             if (docsInAllVaults) localRefreshDocsList.start("op", ["document", "list", "--format", "json", "--session", currentSession]);
             else localRefreshDocsList.start("op", ["document", "list", "--vault",  itemListModel.get(0).itemVaultId, "--format", "json", "--session", currentSession]);
+            uploadFin = false;
 
         }
 
@@ -412,7 +414,8 @@ Page {
 
                                 downloadingDocBusy.running = true;
                                 documentDownloading = title;
-                                mainGetDocument.start("op", ["document", "get", uuid, "--output", downloadsPath + "/" + title, "--session", currentSession]);
+                                if (settings.downloadToDocs) mainGetDocument.start("op", ["document", "get", uuid, "--output", StandardPaths.documents + "/" + title, "--session", currentSession]);
+                                else mainGetDocument.start("op", ["document", "get", uuid, "--output", StandardPaths.download + "/" + title, "--session", currentSession]);
                                 itemListView.enabled = false;
                                 
                             }
