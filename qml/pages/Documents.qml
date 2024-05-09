@@ -12,7 +12,6 @@ Page {
     property int searchFieldMargin
     property bool localDownloadFin: appWindow.downloadFin
     property bool localUploadFin: appWindow.uploadFin
-    property bool localListingFin: appWindow.itemListingFin
 
     onLocalDownloadFinChanged: {
 
@@ -463,13 +462,6 @@ Page {
         urgency: Notification.Low
         isTransient: true
         expireTimeout: 1500
-
-    }
-
-    PageBusyIndicator {
-
-        id: gettingDocListBusy
-        running: !localListingFin
 
     }
 
