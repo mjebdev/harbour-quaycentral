@@ -10,7 +10,7 @@ Page {
     allowedOrientations: Orientation.PortraitMask
     property string itemCopied
     property int searchFieldMargin
-    property bool localListingFin: appWindow.itemListingFin
+    property bool allItemDetails
 
     onStatusChanged: {
 
@@ -67,19 +67,24 @@ Page {
 
             EnterKey.onClicked: {
 
+                loadingItemBusy.running = true;
+
                 if (itemSearchModel.count > 0 && text.length > 0) {
 
                     if (settings.enterKeyLoadsDetails || itemSearchModel.get(0).templateUuid !== "LOGIN") {
 
-                        itemDetailsModel.set(0, {"itemId": itemSearchModel.get(0).uuid, "itemTitle": itemSearchModel.get(0).title, "itemType": itemSearchModel.get(0).templateUuid, "itemVaultId": itemSearchModel.get(0).itemVaultId, "itemVaultName": itemSearchModel.get(0).itemVaultName});
-                        pageStack.push(Qt.resolvedUrl("ItemDetails.qml"));
+                        allItemDetails = true;
+                        itemDetailsModel.clear();
+                        itemDetailsModel.set(0, {"itemId": uuid, "itemTitle": title, "itemType": templateUuid, "itemVaultId": itemVaultId, "itemVaultName": itemVaultName, "itemFields": [{"fieldId": "", "fieldType": "", "fieldLabel": "", "fieldValue": "", "fieldOtp": ""}]});
+                        getPassword.start("op", ["item", "get", uuid, "--vault", itemVaultId, "--format", "json", "--session", currentSession]);
 
                     }
 
                     else {
 
-                        itemCopied = itemSearchModel.get(0).title;
-                        getPassword.start("op", ["item", "get", itemSearchModel.get(0).uuid, "--vault", itemSearchModel.get(0).itemVaultId, "--fields", "label=password", "--session", currentSession]);
+                        allItemDetails = false;
+                        itemCopied = title;
+                        getPassword.start("op", ["item", "get", uuid, "--fields", "label=password", "--vault", itemVaultId, "--session", currentSession]);
 
                     }
 
@@ -165,8 +170,11 @@ Page {
 
                     onClicked: {
 
+                        loadingItemBusy.running = true;
+
                         if (settings.tapToCopy && templateUuid === "LOGIN") {
 
+                            allItemDetails = false;
                             itemCopied = title;
                             getPassword.start("op", ["item", "get", uuid, "--fields", "label=password", "--vault", itemVaultId, "--session", currentSession]);
 
@@ -174,8 +182,10 @@ Page {
 
                         else {
 
-                            itemDetailsModel.set(0, {"itemId": uuid, "itemTitle": title, "itemType": templateUuid, "itemVaultId": itemVaultId, "itemVaultName": itemVaultName});
-                            pageStack.push(Qt.resolvedUrl("ItemDetails.qml"));
+                            allItemDetails = true;
+                            itemDetailsModel.clear();
+                            itemDetailsModel.set(0, {"itemId": uuid, "itemTitle": title, "itemType": templateUuid, "itemVaultId": itemVaultId, "itemVaultName": itemVaultName, "itemFields": [{"fieldId": "", "fieldType": "", "fieldLabel": "", "fieldValue": "", "fieldOtp": ""}]});
+                            getPassword.start("op", ["item", "get", uuid, "--vault", itemVaultId, "--format", "json", "--session", currentSession]);
 
                         }
 
@@ -183,15 +193,20 @@ Page {
 
                     onPressAndHold: {
 
+                        loadingItemBusy.running = true;
+
                         if (settings.tapToCopy || templateUuid !== "LOGIN") {
 
-                            itemDetailsModel.set(0, {"itemId": uuid, "itemTitle": title, "itemType": templateUuid, "itemVaultId": itemVaultId, "itemVaultName": itemVaultName});
-                            pageStack.push(Qt.resolvedUrl("ItemDetails.qml"));
+                            allItemDetails = true;
+                            itemDetailsModel.clear();
+                            itemDetailsModel.set(0, {"itemId": uuid, "itemTitle": title, "itemType": templateUuid, "itemVaultId": itemVaultId, "itemVaultName": itemVaultName, "itemFields": [{"fieldId": "", "fieldType": "", "fieldLabel": "", "fieldValue": "", "fieldOtp": ""}]});
+                            getPassword.start("op", ["item", "get", uuid, "--vault", itemVaultId, "--format", "json", "--session", currentSession]);
 
                         }
 
                         else {
 
+                            allItemDetails = false;
                             itemCopied = title;
                             getPassword.start("op", ["item", "get", uuid, "--fields", "label=password", "--vault", itemVaultId, "--session", currentSession]);
 
@@ -217,11 +232,37 @@ Page {
 
             sessionExpiryTimer.restart();
             var prelimOutput = readAllStandardOutput();
-            prelimOutput = " " + prelimOutput + " "; // need to avoid error: TypeError: Property 'trim' of object [password string w/ new line at end] is not a function.
-            prelimOutput = prelimOutput.trim();
-            Clipboard.text = prelimOutput;
-            itemsPageNotification.previewSummary = qsTr("%1 password copied.").arg(itemCopied);
-            itemsPageNotification.publish();
+
+            if (allItemDetails) {
+
+                var itemDetails = JSON.parse(prelimOutput);
+                itemDetailsModel.get(0).itemFields.clear();
+
+                for (var i = 0; i < itemDetails.fields.length; i++) {
+
+                    if (itemDetails.fields[i].id !== "" && itemDetails.fields[i].value !== undefined) itemDetailsModel.get(0).itemFields.append({"fieldId": itemDetails.fields[i].id, "fieldType": itemDetails.fields[i].type, "fieldLabel": itemDetails.fields[i].label, "fieldValue": itemDetails.fields[i].value, "fieldOtp": itemDetails.fields[i].totp !== undefined ? itemDetails.fields[i].totp : ""});
+
+                }
+
+                if (itemDetails.urls !== undefined) {
+
+                    for (var j = 0; j < itemDetails.urls.length; j++) itemDetailsModel.get(0).itemFields.append({"fieldId": "URL", "fieldType": "URL", "fieldLabel": itemDetails.urls[j].label, "fieldValue": itemDetails.urls[j].href, "fieldOtp": ""});
+
+                }
+
+                pageStack.push(Qt.resolvedUrl("ItemDetails.qml"));
+
+            }
+
+            else {
+
+                Clipboard.text = prelimOutput;
+                itemsPageNotification.previewSummary = qsTr("%1 password copied.").arg(itemCopied);
+                itemsPageNotification.publish();
+
+            }
+
+            loadingItemBusy.running = false;
 
         }
 
@@ -261,7 +302,7 @@ Page {
         id: loadingItemBusy
         size: BusyIndicatorSize.Large
         anchors.centerIn: parent
-        running: !localListingFin
+        running: false
 
     }
 
