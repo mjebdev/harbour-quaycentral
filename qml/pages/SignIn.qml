@@ -26,6 +26,7 @@ Page {
                 currentSession = "";
                 getToSetupPage.visible = false;
                 skippingVaultScreen = false; // this needs to be switched back to false in order to allow signin, will later be set to Settings value.
+                titleLabel.opacity = 1.0;
                 statusLabel.text = "";
                 passwordField.visible = true;
                 passwordField.opacity = 1.0;
@@ -91,7 +92,7 @@ Page {
                 Label {
 
                     id: appVersionLabel
-                    text: "v0.8"
+                    text: "v0.9"
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.secondaryColor
                     width: parent.width
@@ -121,7 +122,6 @@ Page {
                     verticalAlignment: Text.AlignTop
                     leftPadding: Theme.horizontalPageMargin
                     rightPadding: Theme.horizontalPageMargin
-                    //readOnly: true
                     wrapMode: Text.WordWrap
                     textFormat: Text.RichText
                     onLinkActivated: Qt.openUrlExternally(link)
@@ -264,7 +264,7 @@ Page {
                             statusLabel.horizontalAlignment = "AlignHCenter";
                             statusRow.height = column.height * 0.12;
                             setupButtonLayout.visible = false;
-                            titleLabel.color = Theme.highlightColor;
+                            titleLabel.opacity = 1.0;
                             appVersionLabel.color = Theme.secondaryColor;
                             appPastLaunch = false;
                             pageStack.push(Qt.resolvedUrl("Setup.qml"));
@@ -292,10 +292,8 @@ Page {
             versionCheckTimer.stop();
             cliVersion = readAllStandardOutput();
             cliVersion = cliVersion.trim();
-
-            titleLabel.color = Theme.highlightColor; // incase coming back from setup page etc.
+            titleLabel.opacity = 1.0;
             appVersionLabel.color = Theme.secondaryColor;
-
             checkingShorthand = true;
             architectureCheck.start("op", ["account", "list", "--format", "json"]);
 
@@ -335,7 +333,7 @@ Page {
 
                     if (matchFound) {
 
-                        titleLabel.color = Theme.highlightColor; // incase coming back from setup page etc.
+                        titleLabel.opacity = 1.0; // incase coming back from setup page etc.
                         appVersionLabel.color = Theme.secondaryColor;
                         passwordField.visible = true;
                         passwordField.opacity = 1.0;
@@ -707,13 +705,7 @@ Page {
 
                         }
 
-
-
                     }
-
-
-
-
 
                     loggingInBusy.running = false;
                     statusLabel.text = "";
@@ -790,7 +782,7 @@ Page {
                 loggingInBusy.running = false;
                 statusLabel.color = Theme.errorColor;
                 statusLabel.text = qsTr("Error: ") + errorReadout.slice(28);
-                titleLabel.color = "grey"
+                titleLabel.opacity = 0.5;
                 appVersionLabel.color = "grey"
                 statusRow.height = statusLabel.height;
 
@@ -1025,7 +1017,7 @@ Page {
 
         onTriggered: {
 
-            titleLabel.color = "grey";
+            titleLabel.opacity = 0.5;
             appVersionLabel.color = "grey";
             statusLabel.horizontalAlignment = "AlignLeft";
             statusLabel.color = Theme.highlightColor;
