@@ -7,78 +7,9 @@ Page {
 
     id: page
     allowedOrientations: Orientation.PortraitMask
-
-    ListModel {
-
-        id: itemFieldsModel
-
-        ListElement {
-
-            fieldId: ""; fieldType: ""; fieldLabel: ""; fieldValue: ""; fieldOtp: ""
-
-        }
-
-    }
-
-    Process {
-
-        id: loadItemData
-
-        onReadyReadStandardOutput: {
-
-            sessionExpiryTimer.restart();
-            var prelimOutput = readAllStandardOutput();
-            var itemDetails = JSON.parse(prelimOutput);
-
-            for (var i = 0; i < itemDetails.fields.length; i++) {
-
-                if (itemDetails.fields[i].id !== "" && itemDetails.fields[i].value !== undefined) itemFieldsModel.append({"fieldId": itemDetails.fields[i].id, "fieldType": itemDetails.fields[i].type, "fieldLabel": itemDetails.fields[i].label, "fieldValue": itemDetails.fields[i].value, "fieldOtp": itemDetails.fields[i].totp !== undefined ? itemDetails.fields[i].totp : ""});
-
-            }
-
-            if (itemDetails.urls !== undefined) {
-
-                for (var j = 0; j < itemDetails.urls.length; j++) itemFieldsModel.append({"fieldId": "URL", "fieldType": "URL", "fieldLabel": itemDetails.urls[j].label, "fieldValue": itemDetails.urls[j].href, "fieldOtp": ""});
-
-            }
-
-            loadingDataBusy.running = false;
-
-        }
-
-        onReadyReadStandardError: {
-
-            errorReadout = readAllStandardError();
-            sessionExpiryTimer.stop();
-            loadingDataBusy.running = false;
-
-            if (errorReadout.indexOf("not currently signed in") !== -1 || errorReadout.indexOf("session expired") !== -1) {
-
-                pageStack.completeAnimation(); // to avoid freezing app if user tries to load an item after access has expired.
-                lockItUp(true);
-
-            }
-
-            else if (errorReadout.indexOf("network") !== -1) {
-
-                detailsPageNotification.previewSummary = qsTr("Network-related error (copied). Please check connection.");
-                Clipboard.text = errorReadout;
-                detailsPageNotification.publish();
-
-            }
-
-            else {
-
-                detailsPageNotification.previewSummary = qsTr("Unknown error (copied to clipboard). Please sign back in.");
-                Clipboard.text = errorReadout;
-                detailsPageNotification.publish();
-                lockItUp(false);
-
-            }
-
-        }
-
-    }
+    property string localVarOtp: appWindow.varOtp
+    property bool localVarOtpPrimaryColor: appWindow.varOtpPrimaryColor
+    property int localVarOtpSecondsLeft: appWindow.varOtpSecondsLeft
 
     SilicaListView {
 
@@ -136,7 +67,7 @@ Page {
 
                 onClicked: {
 
-                    Clipboard.text = otpModel.get(0).otp.trim();
+                    Clipboard.text = localVarOtp.trim();
                     detailsPageNotification.previewSummary = qsTr("Copied one-time password to clipboard");
                     detailsPageNotification.publish();
 
@@ -168,15 +99,6 @@ Page {
             width: page.width
             height: titleHeader.height + paddingRow.height + fieldItemsView.height + notesHeaderRow.height + notesRow.height
 
-            Component.onCompleted: {
-
-                itemFieldsModel.clear();
-                loadItemData.start("op", ["item", "get", itemId, "--vault", itemVaultId, "--format", "json", "--session", currentSession]);
-
-            }
-
-            // put busy indicator here and link to whether itemId is still blank?
-
             PageHeader {
 
                 id: titleHeader
@@ -195,7 +117,7 @@ Page {
             ListView {
 
                 id: fieldItemsView
-                model: itemFieldsModel
+                model: itemFields
                 width: parent.width
                 height: contentHeight
                 spacing: Theme.paddingMedium
@@ -209,7 +131,7 @@ Page {
 
                         if (fieldId === "username") {
 
-                            usernameField.label = qsTr("username") // need to force this as output came up with odd and/or random labels sometimes e.g. imembernameeasi
+                            usernameField.label = qsTr("username") // need to force this as output came up with odd and/or random labels
                             usernameField.text = fieldValue;
                             usernameRow.visible = true;
 
@@ -243,7 +165,8 @@ Page {
 
                                 case "OTP":
 
-                                    otpModel.set(0, {"otp": fieldOtp, "otpPart1": fieldOtp.slice(0, 3), "otpPart2": fieldOtp.slice(3), "active": true});
+                                    varOtp = fieldOtp;
+                                    varOtpActive = true;
                                     copyOtpMenu.visible = true;
                                     mainOtpTimer.start();
                                     otpRow.visible = true;
@@ -605,8 +528,8 @@ Page {
 
                                                 id: otpTextField
                                                 font.letterSpacing: 6
-                                                text: otpPart1 + " " + otpPart2;
-                                                color: primaryColor ? Theme.primaryColor : "grey"
+                                                text: localVarOtp.slice(0, 3) + " " + localVarOtp.slice(3);
+                                                color: localVarOtpPrimaryColor ? Theme.primaryColor : "grey"
                                                 readOnly: true
                                                 label: qsTr("one-time password")
                                                 y: passwordCopyButton.width / 8
@@ -617,8 +540,8 @@ Page {
                                                     id: otpTimerField
                                                     horizontalAlignment: Qt.AlignHCenter
                                                     width: otpCopyButton.width * 0.75
-                                                    color: primaryColor ? Theme.primaryColor : "grey"
-                                                    text: secondsLeft
+                                                    color: localVarOtpPrimaryColor ? Theme.primaryColor : "grey"
+                                                    text: localVarOtpSecondsLeft
 
                                                     Rectangle {
 
@@ -639,7 +562,7 @@ Page {
 
                                                             id: otpTimerBorder
                                                             width: 3
-                                                            color: secondsLeft < 11 ? Theme.errorColor : Theme.highlightColor
+                                                            color: localVarOtpSecondsLeft < 11 ? Theme.errorColor : Theme.highlightColor
 
                                                         }
 
@@ -650,7 +573,7 @@ Page {
                                                         id: gatheringOtpBusy
                                                         size: BusyIndicatorSize.Small
                                                         anchors.centerIn: parent
-                                                        running: !primaryColor
+                                                        running: !localVarOtpPrimaryColor
 
                                                     }
 
@@ -684,7 +607,7 @@ Page {
 
                                                     onClicked: {
 
-                                                        Clipboard.text = otpModel.get(0).otp.trim();
+                                                        Clipboard.text = localVarOtp.trim(); // otpModel.get(0).otp.trim();
                                                         detailsPageNotification.previewSummary = qsTr("Copied one-time password to clipboard");
                                                         detailsPageNotification.publish();
 
@@ -854,7 +777,7 @@ Page {
         id: loadingDataBusy
         size: BusyIndicatorSize.Large
         anchors.centerIn: parent
-        running: true
+        running: false
 
     }
 
