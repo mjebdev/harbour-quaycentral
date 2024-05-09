@@ -7,7 +7,7 @@ Page {
     allowedOrientations: Orientation.All
     readonly property int landscapeCount: Screen.height > 1920 ? 11 : 9
     readonly property int cellWidthCalc: page.isPortrait ? Screen.width / 5 : Screen.height / landscapeCount
-    readonly property int cellHeightCalc: cellWidthCalc * 1.1
+    readonly property int cellHeightCalc: cellWidthCalc + Theme.paddingLarge + Theme.paddingSmall
 
     onStatusChanged: {
 
@@ -42,16 +42,40 @@ Page {
             Label {
 
                 id: characterLargeType
+                anchors.top: parent.top
+                width: parent.width
+                height: width
                 text: "<pre>" + character + "</pre>"
                 horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
                 font.pixelSize: Theme.fontSizeHuge
-                textFormat: Text.AutoText
-                width: parent.width
-                bottomPadding: 0
+                maximumLineCount: 1
 
                 Component.onCompleted: {
 
-                    this.topPadding = (parent.height - this.contentHeight) / 2;
+                    if (/\d/.test(text)) color = Theme.highlightColor; // Thanks to user jackocnr on Stack Overflow -- https://stackoverflow.com/questions/8935632/check-if-character-is-number
+
+                }
+
+            }
+
+            Label {
+
+                id: characterNumber
+                text: index + 1
+                font.pixelSize: Theme.fontSizeTiny
+                color: Theme.secondaryColor
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+                height: Theme.paddingLarge + Theme.paddingSmall
+                anchors.bottom: parent.bottom
+
+                Rectangle {
+
+                    anchors.fill: parent
+                    z: -100
+                    color: Theme.overlayBackgroundColor
 
                 }
 
