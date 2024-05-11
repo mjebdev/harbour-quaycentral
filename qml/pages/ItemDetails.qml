@@ -169,7 +169,6 @@ Page {
                                     varOtpActive = true;
                                     copyOtpMenu.visible = true;
                                     mainOtpTimer.start();
-                                    otpRow.visible = true;
                                     if (settings.otpOnCover) otpDisplayedOnCover = true;
                                     break;
 
@@ -491,93 +490,69 @@ Page {
                         Row {
 
                             id: otpRow
+                            visible: fieldOtp !== ""
                             width: parent.width
-                            height: otpListView.height
-                            visible: false
+                            height: itemDetailsPasswordField.height + (Theme.paddingMedium * 2)
 
-                            onVisibleChanged: {
+                            Column {
 
-                                if (visible) mainGetOtp.start("op", ["item", "get", itemDetailsModel.get(0).itemId, "--otp", "--vault", itemDetailsModel.get(0).itemVaultId, "--session", currentSession]);
+                                height: parent.height
+                                width: parent.width - passwordCopyButton.width - itemDetailsPasswordField.textLeftMargin - Theme.paddingMedium + (passwordCopyButton.width / 8)
 
-                            }
-
-                            ListView {
-
-                                id: otpListView
-                                model: otpModel
-                                width: parent.width
-                                height: itemDetailsPasswordField.height + (Theme.paddingMedium * 2)
-                                interactive: false
-
-                                delegate: Row {
+                                Row {
 
                                     width: parent.width
-                                    height: itemDetailsPasswordField.height + (Theme.paddingMedium * 2)
+                                    spacing: Theme.paddingMedium
 
-                                    Column {
+                                    TextField {
 
-                                        height: parent.height
-                                        width: parent.width - passwordCopyButton.width - itemDetailsPasswordField.textLeftMargin - Theme.paddingMedium + (passwordCopyButton.width / 8)
+                                        id: otpTextField
+                                        font.letterSpacing: 6
+                                        text: localVarOtp.slice(0, 3) + " " + localVarOtp.slice(3);
+                                        color: localVarOtpPrimaryColor ? Theme.primaryColor : "grey"
+                                        readOnly: true
+                                        label: qsTr("one-time password")
+                                        y: passwordCopyButton.width / 8
+                                        width: parent.width - Theme.paddingMedium
 
-                                        Row {
+                                        rightItem: Label {
 
-                                            width: parent.width
-                                            spacing: Theme.paddingMedium
+                                            id: otpTimerField
+                                            horizontalAlignment: Qt.AlignHCenter
+                                            width: otpCopyButton.width * 0.75
+                                            color: localVarOtpPrimaryColor ? Theme.primaryColor : "grey"
+                                            text: localVarOtpSecondsLeft
 
-                                            TextField {
+                                            Rectangle {
 
-                                                id: otpTextField
-                                                font.letterSpacing: 6
-                                                text: localVarOtp.slice(0, 3) + " " + localVarOtp.slice(3);
-                                                color: localVarOtpPrimaryColor ? Theme.primaryColor : "grey"
-                                                readOnly: true
-                                                label: qsTr("one-time password")
-                                                y: passwordCopyButton.width / 8
-                                                width: parent.width - Theme.paddingMedium
+                                                height: gatheringOtpBusy.height + (gatheringOtpBusy.y * 2)
+                                                color: "transparent"
+                                                opacity: 1.0
+                                                radius: 20
 
-                                                rightItem: Label {
+                                                anchors {
 
-                                                    id: otpTimerField
-                                                    horizontalAlignment: Qt.AlignHCenter
-                                                    width: otpCopyButton.width * 0.75
-                                                    color: localVarOtpPrimaryColor ? Theme.primaryColor : "grey"
-                                                    text: localVarOtpSecondsLeft
-
-                                                    Rectangle {
-
-                                                        height: gatheringOtpBusy.height + (gatheringOtpBusy.y * 2)
-                                                        color: "transparent"
-                                                        opacity: 1.0
-                                                        radius: 20
-
-                                                        anchors {
-
-                                                            top: parent.top
-                                                            left: parent.left
-                                                            right: parent.right
-
-                                                        }
-
-                                                        border {
-
-                                                            id: otpTimerBorder
-                                                            width: 3
-                                                            color: localVarOtpSecondsLeft < 11 ? Theme.errorColor : Theme.highlightColor
-
-                                                        }
-
-                                                    }
-
-                                                    BusyIndicator {
-
-                                                        id: gatheringOtpBusy
-                                                        size: BusyIndicatorSize.Small
-                                                        anchors.centerIn: parent
-                                                        running: !localVarOtpPrimaryColor
-
-                                                    }
+                                                    top: parent.top
+                                                    left: parent.left
+                                                    right: parent.right
 
                                                 }
+
+                                                border {
+
+                                                    width: 3
+                                                    color: localVarOtpSecondsLeft < 11 ? Theme.errorColor : Theme.highlightColor
+
+                                                }
+
+                                            }
+
+                                            BusyIndicator {
+
+                                                id: gatheringOtpBusy
+                                                size: BusyIndicatorSize.Small
+                                                anchors.centerIn: parent
+                                                running: !localVarOtpPrimaryColor
 
                                             }
 
@@ -585,35 +560,35 @@ Page {
 
                                     }
 
-                                    Column {
+                                }
 
-                                        height: parent.height
-                                        width: otpCopyButton.width
-                                        spacing: Theme.paddingMedium
+                            }
 
-                                        Row {
+                            Column {
 
-                                            width: parent.width
+                                height: parent.height
+                                width: otpCopyButton.width
+                                spacing: Theme.paddingMedium
 
-                                            Image {
+                                Row {
 
-                                                id: otpCopyButton
-                                                source: "image://theme/icon-m-clipboard"
-                                                y: 0
+                                    width: parent.width
 
-                                                MouseArea {
+                                    Image {
 
-                                                    anchors.fill: parent
+                                        id: otpCopyButton
+                                        source: "image://theme/icon-m-clipboard"
+                                        y: 0
 
-                                                    onClicked: {
+                                        MouseArea {
 
-                                                        Clipboard.text = localVarOtp.trim(); // otpModel.get(0).otp.trim();
-                                                        detailsPageNotification.previewSummary = qsTr("Copied one-time password to clipboard");
-                                                        detailsPageNotification.publish();
+                                            anchors.fill: parent
 
-                                                    }
+                                            onClicked: {
 
-                                                }
+                                                Clipboard.text = localVarOtp.trim(); // otpModel.get(0).otp.trim();
+                                                detailsPageNotification.previewSummary = qsTr("Copied one-time password to clipboard");
+                                                detailsPageNotification.publish();
 
                                             }
 
