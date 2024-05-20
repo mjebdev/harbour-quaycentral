@@ -309,7 +309,7 @@ Page {
                                             font.pixelSize: Theme.fontSizeExtraSmall
                                             color: Theme.secondaryColor
                                             rightPadding: Theme.paddingSmall
-                                            text: qsTr("Additional info:")
+                                            text: qsTr("Info:")
 
                                         }
 
@@ -413,8 +413,11 @@ Page {
 
                                 downloadingDocBusy.running = true;
                                 documentDownloading = title;
-                                if (settings.downloadToDocs) mainGetDocument.start("op", ["document", "get", uuid, "--output", StandardPaths.documents + "/" + title, "--session", currentSession]);
-                                else mainGetDocument.start("op", ["document", "get", uuid, "--output", StandardPaths.download + "/" + title, "--session", currentSession]);
+                                var fileString = "";
+                                if (settings.downloadToDocs) fileString = StandardPaths.documents + "/" + title;
+                                else fileString = StandardPaths.download + "/" + title;
+                                if (settings.forceOverwriteDocs) mainGetDocument.start("op", ["document", "get", uuid, "--output", fileString, "--force", "--session", currentSession]);
+                                else mainGetDocument.start("op", ["document", "get", uuid, "--output", fileString, "--session", currentSession]);
                                 itemListView.enabled = false;
                                 
                             }
