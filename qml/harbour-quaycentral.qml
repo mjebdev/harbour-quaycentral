@@ -33,6 +33,10 @@ ApplicationWindow {
         property bool loadFavItems
         property bool lockButtonOnCover
         property bool limitedCatsVaultsPage
+        property bool downloadToDocs: true
+        property bool autoDownloadRpmAarch64: true
+        property bool forceOverwriteDocs
+        property bool showItemIconsInList: true
 
         property bool vaultPageDisplayApiCredential: true
         property bool vaultPageDisplayBankAccount: true
@@ -64,7 +68,6 @@ ApplicationWindow {
     property string cliVersion
     property string currentSession
     property string categoriesSelected
-    property string downloadsPath: mainGetDocument.getDownloadsPath();
     property string documentDownloading
     property string documentUploading
     property string itemCategoryListingType
@@ -80,17 +83,14 @@ ApplicationWindow {
     property bool uploadFin
     property bool itemListingFin
 
-    ListModel {
+    // Testing w/ OTP variables instead of a ListModel
 
-        id: otpModel
-
-        ListElement {
-
-            otp: ""; otpPart1: ""; otpPart2: ""; secondsLeft: 0; primaryColor: true; active: false;
-
-        }
-
-    }
+    property string varOtp
+    //property string varOtpPart1
+    //property string varOtpPart2
+    property int varOtpSecondsLeft
+    property bool varOtpPrimaryColor: true
+    property bool varOtpActive
 
     ListModel {
 
@@ -137,7 +137,7 @@ ApplicationWindow {
 
         ListElement {
 
-            name: qsTr("Loading..."); uuid: ""
+            name: ""; uuid: ""
 
         }
 
@@ -150,18 +150,6 @@ ApplicationWindow {
         ListElement {
 
             uuid: ""; title: ""; titleUpperCase: ""; templateUuid: ""; itemVaultId: ""; itemVaultName: ""; iconUrl: "image://theme/icon-m-keys"; iconEmoji: ""; docCreatedAt: ""; docUpdatedAt: ""; docAdditionalInfo: ""
-
-        }
-
-    }
-
-    ListModel {
-
-        id: docsListModel
-
-        ListElement {
-
-            uuid: ""; title: ""; titleUpperCase: ""; templateUuid: ""; itemVaultId: ""; itemVaultName: ""
 
         }
 
@@ -201,7 +189,17 @@ ApplicationWindow {
 
         ListElement {
 
-            itemId: ""; itemType: ""; itemTitle: ""; itemPassword: ""; itemVaultId: ""; itemVaultName: ""; docCreatedAt: ""; docUpdatedAt: ""; docAdditionalInfo: ""
+            itemId: ""; itemType: ""; itemTitle: ""; itemPassword: ""; itemVaultId: ""; itemVaultName: ""; docCreatedAt: ""; docUpdatedAt: ""; docAdditionalInfo: "";
+
+            itemFields: [ ListElement {
+
+                fieldId: "";
+                fieldType: "";
+                fieldLabel: "";
+                fieldValue: "";
+                fieldOtp: ""
+
+            }]
 
         }
 
@@ -273,188 +271,78 @@ ApplicationWindow {
 
         id: mainGetDocument
 
-        onFinished: {
+        onReadyReadStandardOutput: {
 
+            var prelimOutput = "";
+            prelimOutput = readAllStandardOutput();
+
+            if (prelimOutput.indexOf("Aborting") !== 0) {
+
+                notifySessionExpired.previewSummary = qsTr("Download of '%1' cancelled.").arg(documentDownloading);
+
+            }
+
+            else if (prelimOutput == documentDownloading) {
+
+                notifySessionExpired.previewSummary = qsTr("Download of '%1' is complete.").arg(documentDownloading);
+
+            }
+
+            else {
+
+                Clipboard.text = prelimOutput;
+                notifySessionExpired.previewSummary = qsTr("QuayCentral is unable to process CLI response. Copied to clipboard.");
+
+            }
+
+            sessionExpiryTimer.restart();
+            notifySessionExpired.publish();
             downloadFin = true;
+
+        }
+
+        onReadyReadStandardError: {
+
+            errorReadout = readAllStandardError();
+            sessionExpiryTimer.stop();
+
+            if (errorReadout.indexOf("not currently signed in") !== -1 || errorReadout.indexOf("session expired") !== -1) { // (was - else if - prior to commenting out above)
+
+                notifySessionExpired.previewSummary = qsTr("Session Expired");
+                notifySessionExpired.publish();
+                pageStack.clear();
+                pageStack.replace(Qt.resolvedUrl("SignIn.qml"));
+
+            }
+
+            else if (errorReadout.indexOf("cannot prompt for confirmation") !== 1) { // User has chosen to not force CLI to overwrite so process ends without download being saved.
+
+                sessionExpiryTimer.restart();
+                notifySessionExpired.previewSummary = qsTr("File with the name '%1' already exists. Will not overwrite.").arg(documentDownloading);
+                notifySessionExpired.publish();
+                downloadFin = true;
+
+            }
+
+            else {
+
+                Clipboard.text = errorReadout;
+                notifySessionExpired.previewSummary = qsTr("Unknown error when downloading '%1' from server. Error copied to clipboard.").arg(documentDownloading);
+                notifySessionExpired.publish();
+                downloadFin = true;
+
+            }
+
+        }
+
+        onFinished: { // Can be the case that process will finish without output but completed download.
 
             if (mainGetDocument.exitStatus() === 0 && errorReadout === "") {
 
                 sessionExpiryTimer.restart();
                 notifySessionExpired.previewSummary = qsTr("Download of '%1' is complete.").arg(documentDownloading);
                 notifySessionExpired.publish();
-
-            }
-
-            else {
-
-                errorReadout = readAllStandardError();
-                sessionExpiryTimer.stop();
-
-                if (errorReadout.indexOf("specified file is not empty") !== -1) {
-
-                    notifySessionExpired.previewSummary = qsTr("File with the name '%1' already exists. CLI will not overwrite.").arg(documentDownloading);
-                    notifySessionExpired.publish();
-
-                }
-
-                else if (errorReadout.indexOf("not currently signed in") !== -1 || errorReadout.indexOf("session expired") !== -1) {
-
-                    notifySessionExpired.previewSummary = qsTr("Session Expired");
-                    notifySessionExpired.publish();
-                    pageStack.clear();
-                    pageStack.replace(Qt.resolvedUrl("SignIn.qml"));
-
-                }
-
-                else {
-
-                    Clipboard.text = errorReadout;
-                    notifySessionExpired.previewSummary = qsTr("Unknown error when downloading '%1' from server. Error copied to clipboard.").arg(documentDownloading);
-                    notifySessionExpired.publish();
-
-                }
-
-            }
-
-        }
-
-    }
-
-    Process {
-
-        id: mainGetItems
-
-        onReadyReadStandardOutput: {
-
-            sessionExpiryTimer.restart();
-            //itemListModel.clear();
-            itemSearchModel.clear();
-            mainGetItems.waitForFinished();
-            var prelimOutput = readAllStandardOutput();
-            var itemList = JSON.parse(prelimOutput);
-
-            // if all of same kind, need to add code to determine what kind of listing, or if it's multiple categories etc.
-
-            for (var i = 0; i < itemList.length; i++) {
-
-                if (itemList[i].category == null) {
-
-                    var createdDate = new Date(itemList[i].created_at);
-                    var updatedDate = new Date(itemList[i].created_at);
-
-                    if (itemList[i]["overview.ainfo"] !== null) itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-file-document-dark", iconEmoji: "", docCreatedAt: createdDate.toLocaleString(Locale.ShortFormat), docUpdatedAt: updatedDate.toLocaleString(Locale.ShortFormat), docAdditionalInfo: itemList[i]["overview.ainfo"]});
-                    else itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-file-document-dark", iconEmoji: "", docCreatedAt: createdDate.toLocaleString(Locale.ShortFormat), docUpdatedAt: updatedDate.toLocaleString(Locale.ShortFormat)});
-                    itemSearchModel.append(itemListModel.get(i));
-
-                }
-
-                else {
-
-                    switch (itemList[i].category) {
-
-                    case "API_CREDENTIAL": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-keys", iconEmoji: ""});
-                        break;
-
-                    case "BANK_ACCOUNT": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "", iconEmoji: "🏦"});
-                        break;
-
-                    case "CREDIT_CARD": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "", iconEmoji: "💳"});
-                        break;
-
-                    case "CUSTOM": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-keys", iconEmoji: ""}); // Bitcoin emoji not showing up on SFOS.
-                        break;
-
-                    case "DATABASE": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "", iconEmoji: "🗃️"});
-                        break;
-
-                    case "DRIVER_LICENSE": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "", iconEmoji: "🚘"});
-                        break;
-
-                    case "EMAIL_ACCOUNT": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-mail", iconEmoji: ""});
-                        break;
-                    // ID among others to be included in default (contact card icon)
-                    //case "IDENTITY": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-keys", iconEmoji: ""});
-                        //break;
-
-                    case "LOGIN": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-keys", iconEmoji: ""});
-                        break;
-
-                    case "MEDICAL_RECORD": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "", iconEmoji: "⚕️"});
-                        break;
-
-                    //case "MEMBERSHIP": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-keys", iconEmoji: ""});
-                        //break;
-
-                    case "OUTDOOR_LICENSE": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "", iconEmoji: "🏕️"});
-                        break;
-
-                    case "PASSPORT": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "", iconEmoji: "🛂"});
-                        break;
-
-                    case "PASSWORD": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-keys", iconEmoji: ""});
-                        break;
-
-                    case "REWARD_PROGRAM": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "", iconEmoji: "🎁"});
-                        break;
-
-                    case "SECURE_NOTE": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-note", iconEmoji: ""});
-                        break;
-
-                    case "SERVER": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "", iconEmoji: "🖧"});
-                        break;
-
-                    //case "SOCIAL_SECURITY_NUMBER": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-keys", iconEmoji: ""});
-                        //break;
-
-                    case "SOFTWARE_LICENSE": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "", iconEmoji: "💾"});
-                        break;
-
-                    case "SSH_KEY": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-keys", iconEmoji: ""});
-                        break;
-
-                    case "WIRELESS_ROUTER": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-wlan", iconEmoji: ""});
-                        break;
-
-                    default: // A catch-all for Identity, Membership and Social Security Number, as these will all have the same ID-card icon.
-                        itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://icon-m-file-vcard", iconEmoji: ""});
-
-                    }
-
-                    itemSearchModel.append(itemListModel.get(i));
-
-                }
-
-            }
-
-
-
-            itemListingFin = true;
-
-        }
-
-        onReadyReadStandardError: {
-
-            sessionExpiryTimer.stop();
-            errorReadout = readAllStandardError();
-
-            if (errorReadout.indexOf("not currently signed in") !== -1 || errorReadout.indexOf("session expired") !== -1) {
-
-                notifySessionExpired.previewSummary = qsTr("Session Expired");
-                notifySessionExpired.publish();
-                pageStack.completeAnimation();
-                pageStack.clear();
-                pageStack.replace(Qt.resolvedUrl("pages/SignIn.qml"));
-
-            }
-
-            else {
-
-                notifySessionExpired.previewSummary = qsTr("Unknown Error (copied to clipboard). Please sign back in.");
-                notifySessionExpired.publish();
-                Clipboard.text = errorReadout;
-                pageStack.completeAnimation();
-                pageStack.clear();
-                pageStack.replace(Qt.resolvedUrl("pages/SignIn.qml"));
+                downloadFin = true;
 
             }
 
@@ -470,7 +358,8 @@ ApplicationWindow {
 
             var otpOutput = readAllStandardOutput();
             otpOutput = otpOutput.toString();
-            otpModel.set(0, {"otp": otpOutput, "otpPart1": otpOutput.slice(0, 3), "otpPart2": otpOutput.slice(3), "primaryColor": true});
+            varOtp = otpOutput;
+            varOtpPrimaryColor = true;
             sessionExpiryTimer.restart();
             fetchingOtp = false;
 
@@ -525,12 +414,13 @@ ApplicationWindow {
             if (secondsCountdown === 30 && fetchingOtp === false) {
 
                 fetchingOtp = true;
-                otpModel.set(0, {"secondsLeft": 30, "primaryColor": false});
+                varOtpSecondsLeft = 30;
+                varOtpPrimaryColor = false;
                 mainGetOtp.start("op", ["item", "get", itemDetailsModel.get(0).itemId, "--otp", "--vault", itemDetailsModel.get(0).itemVaultId, "--session", currentSession]);
 
             }
 
-            else otpModel.set(0, {"secondsLeft": secondsCountdown});
+            else varOtpSecondsLeft = secondsCountdown;
 
         }
 
@@ -543,7 +433,7 @@ ApplicationWindow {
 
         onTriggered: {
 
-            if (settings.enableTimer) lockItUp(true); // session did expire so notification will publish if enabled
+            if (settings.enableTimer) lockItUp(true); // session expired so notification will publish if enabled
 
         }
 
@@ -563,8 +453,7 @@ ApplicationWindow {
 
         errorReadout = "";
         sessionExpiryTimer.stop();
-        otpModel.clear(); // check to see if clear reverts active property to false, probably should
-        otpModel.set(0, {"active": false});
+        varOtpActive = false;
         otpDisplayedOnCover = false;
         mainOtpTimer.stop();
         signOutProcess.start("op", ["signout"]);
