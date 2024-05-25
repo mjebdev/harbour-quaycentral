@@ -19,11 +19,7 @@ Page {
             // determine current index of default vault combo by confirming its place in current list of vaults.
             for (var i = 0; i < vaultListModel.count; i++) {
 
-                if (settings.defaultVaultUuid === vaultListModel.get(i).uuid) {
-
-                    defaultVaultCombo.currentIndex = i;
-
-                }
+                if (settings.defaultVaultUuid === vaultListModel.get(i).uuid) defaultVaultCombo.currentIndex = i;
 
             }
 
@@ -35,12 +31,26 @@ Page {
 
         if (updateAvailable) {
 
-            if (runningOnAarch64) { // grab latest RPM from 1Password site. Option in settings for this as opposed to zip file to be moved manually?
+            if (runningOnAarch64) {
 
-                updateCLI.write("n\n");
-                processStatus.previewSummary = qsTr("Downloading latest RPM...");
-                processStatus.publish();
-                Qt.openUrlExternally("https://downloads.1password.com/linux/rpm/stable/aarch64/1password-cli-latest.aarch64.rpm");
+                if (settings.autoDownloadRpmAarch64) { // grab latest RPM from 1Password site.
+
+                    updateCLI.write("n\n");
+                    processStatus.previewSummary = qsTr("Downloading latest RPM...");
+                    processStatus.publish();
+                    Qt.openUrlExternally("https://downloads.1password.com/linux/rpm/stable/aarch64/1password-cli-latest.aarch64.rpm");
+
+                }
+
+                else {
+
+                    updateCLI.write("y\n");
+                    updatingIndicator.running = true;
+                    updateDownloadTimer.start();
+                    processStatus.previewSummary = qsTr("Downloading update ZIP file...");
+                    processStatus.publish();
+
+                }
 
             }
 
@@ -49,7 +59,7 @@ Page {
                 updateCLI.write("y\n");
                 updatingIndicator.running = true;
                 updateDownloadTimer.start();
-                processStatus.previewSummary = qsTr("Downloading update in ZIP format...");
+                processStatus.previewSummary = qsTr("Downloading update ZIP file...");
                 processStatus.publish();
 
             }
@@ -87,6 +97,7 @@ Page {
 
     SilicaFlickable {
 
+        id: settingsFlickable
         anchors.fill: parent
         contentHeight: column.height
 
@@ -117,7 +128,7 @@ Page {
 
             SectionHeader {
 
-                text: qsTr("Item Listing")
+                text: qsTr("Item Options")
 
             }
 
@@ -164,7 +175,7 @@ Page {
             ComboBox {
 
                 label: qsTr("Tapping item")
-                description: currentIndex === 1 ? qsTr("Long press will load item details") : qsTr("Long press will copy password")
+                description: currentIndex === 1 ? qsTr("Long press will load item details.") : qsTr("Long press will copy password.")
                 id: tappingCombo
                 width: parent.width
                 currentIndex: settings.tapToCopy ? 1 : 0
@@ -197,6 +208,79 @@ Page {
                         }
 
                     }
+
+                }
+
+            }
+
+            TextSwitch {
+
+                text: qsTr("Display item icons in listings")
+                description: qsTr("Emoji used for some categories may appear irregular if using custom OS font.")
+                checked: settings.showItemIconsInList
+                leftMargin: Theme.horizontalPageMargin
+
+                onCheckedChanged: {
+
+                    settings.showItemIconsInList = checked;
+                    settings.sync();
+
+                }
+
+            }
+
+            ComboBox {
+
+                label: qsTr("Download documents to ")
+                id: docsDownloadCombo
+                width: parent.width
+                currentIndex: settings.downloadToDocs ? 1 : 0
+                leftMargin: Theme.horizontalPageMargin
+
+                menu: ContextMenu {
+
+                    MenuItem {
+
+                        text: qsTr("Downloads")
+
+                        onClicked: {
+
+                            settings.downloadToDocs = false;
+                            settings.sync();
+
+                        }
+
+                    }
+
+                    MenuItem {
+
+                        text: qsTr("Documents")
+
+                        onClicked: {
+
+                            settings.downloadToDocs = true;
+                            settings.sync();
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+            TextSwitch { // Necessary, as prompt will not work with QProcess -- [ERROR] 2024/05/18 19:44:10 cannot prompt for confirmation. Use the '-f' or '--force' flag to skip confirmation
+
+                text: qsTr("Force overwrite of existing documents")
+                description: qsTr("Only applies to identically named downloads. For uploads, multiple items will be created.")
+                id: forceOverwriteSwitch
+                checked: settings.forceOverwriteDocs
+                leftMargin: Theme.horizontalPageMargin
+
+                onCheckedChanged: {
+
+                    settings.forceOverwriteDocs = checked;
+                    settings.sync();
 
                 }
 
@@ -483,6 +567,7 @@ Page {
 
                 id: specifyVaultsPageCategoriesSwitch
                 text: qsTr("List only selected categories");
+                description: checked ? qsTr("Toggle switch to edit selected categories.") : null
                 checked: settings.limitedCatsVaultsPage
                 automaticCheck: false
 
@@ -552,7 +637,25 @@ Page {
                 text: qsTr("Command-Line Tool")
 
             }
-// looking to add option to install RPM from permanent latest-version link if on aarch64 (arm RPM does not install) on future version.
+
+            TextSwitch {
+
+                id: autoDownloadRpmSwitch
+                visible: runningOnAarch64
+                text: qsTr("Download RPM instead of ZIP");
+                description: qsTr("If an update is available (below), installer will be downloaded using URL of latest stable RPM at 1Password Developer.");
+                checked: settings.autoDownloadRpmAarch64
+                leftMargin: Theme.horizontalPageMargin
+
+                onCheckedChanged: {
+
+                    settings.autoDownloadRpmAarch64 = checked;
+                    settings.sync();
+
+                }
+
+            }
+
             Row {
 
                 width: updateButton.width
@@ -747,7 +850,8 @@ Page {
                             topPadding: Theme.paddingLarge
                             font.pixelSize: Theme.fontSizeSmall
                             wrapMode: Text.Wrap
-                            text: qsTr("<p>Extract, verify and move updated tool to complete installation. More info @ <a href=\"https://developer.1password.com/docs/cli/get-started\">1Password Support</a></p>")
+                            horizontalAlignment: Text.AlignHCenter
+                            text: qsTr("<p>Guide to completing installation @ <a href=\"https://developer.1password.com/docs/cli/get-started\">1Password Developer</a>.</p>")
                             linkColor: Theme.highlightColor
 
                             Text {
@@ -846,6 +950,12 @@ Page {
 
                     }
 
+                    onTextChanged: {
+
+                        if (text !== "") settingsFlickable.scrollToBottom();
+
+                    }
+
                 }
 
             }
@@ -880,6 +990,8 @@ Page {
             }
 
             accountsLabel.text = "<pre>" + accountsString + "</pre>";
+            // way to wait for accountsLabel to finish displaying text? below method doesn't go all the way to bottom of screen..
+            //settingsFlickable.scrollToBottom(); -- testing using onTextChanged in accountsLabel instead..
 
         }
 
@@ -928,6 +1040,17 @@ Page {
             }
 
             else if (standardOutput.indexOf("is now available") !== -1) {
+
+                updateButton.enabled = false;
+                updateAvailable = true;
+                releaseNotesURL = standardOutput.slice(standardOutput.indexOf("<") + 1, standardOutput.indexOf(">"));
+                updateResponseLabel.text = "<pre>" + standardOutput.slice(0, standardOutput.indexOf("<")) + "<a href=\"" + releaseNotesURL + "\">" + releaseNotesURL + "</a></pre>";
+                updateLabelsRow.visible = true;
+                updateInitialResponseRow.visible = true;
+
+            }
+
+            else if (standardOutput.indexOf("You can download the update here") !== -1) {
 
                 updateButton.enabled = false;
                 updateAvailable = true;
@@ -991,7 +1114,7 @@ Page {
 
             updateButton.enabled = false;
             updatingIndicator.running = false;
-            updateDownloadStatusLabel.text = updateDownloadStatusLabel.text + qsTr("\n\nDownload has taken longer than one minute. Please check Downloads folder for completed ZIP file or check network & relaunch app to try again, if download has failed.");
+            updateDownloadStatusLabel.text = updateDownloadStatusLabel.text + qsTr("\n\nDownload has taken longer than one minute. Please check Downloads folder for completed ZIP file, or check network & relaunch app to try again if download has failed.");
             updateDownloadStatusRow.visible = true;
             processStatus.previewSummary = qsTr("Downloading of update still in progress");
             processStatus.publish();
