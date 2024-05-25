@@ -103,6 +103,7 @@ Page {
 
                 id: titleHeader
                 title: itemTitle
+                wrapMode: Text.Wrap
 
             }
 
@@ -586,7 +587,7 @@ Page {
 
                                             onClicked: {
 
-                                                Clipboard.text = localVarOtp.trim(); // otpModel.get(0).otp.trim();
+                                                Clipboard.text = localVarOtp.trim();
                                                 detailsPageNotification.previewSummary = qsTr("Copied one-time password to clipboard");
                                                 detailsPageNotification.publish();
 
