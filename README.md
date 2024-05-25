@@ -1,7 +1,7 @@
 # QuayCentral
 A read-only GUI for the 1Password command-line tool on Sailfish OS.
 
-Version 0.8
+Version 0.9
 
 QuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.
 
@@ -23,15 +23,13 @@ App icon by <a href="https://github.com/JSEHV">JSEHV</a>. Thanks for the contrib
 
 - Lockout timer may not function if device is put to sleep etc. and so is not meant as a reliable replacement for manually locking vault(s) using one of the available methods.
 - Lockout timer only goes by the app's interaction with the CLI and isn't reset by any user interaction that doesn't access data, such as swiping back, going to Settings, etc. If part of an item, the one-time password is obtained every 30 seconds using the CLI but can be stopped from continuing by using the Close button on the app cover or just swiping back from the item details if inside the app.
-- Process will hang if downloading a document and there's already an existing file with the same name in the Downloads folder (CLI is asking whether to replace, no function in QC to handle this as of now).
 - One-time password will sometimes disappear from Cover and the Item page in the app after loading, reason as yet unknown. Will fix as soon as cause is identified.
 - No support for multiple accounts or for groups.
-- No support for creating new items or editing items as of now. Hope to add option to create an item in the future but technical issues (likely to do with permissions involving CLI) preventing this so far.
+- No support for creating new items or editing items as of now. Uploading and downloading of documents is supported but otherwise app is read-only. Hope to add option to create an item in the future but technical issues (likely to do with permissions involving CLI) preventing this so far.
 
 <h3>Minor Limitations & Issues</h3>
 
 - Documents won't show up in list of items when all categories are loaded, to get to them user must go to the Documents section from the Vault(s) page.
-- When searching for an item in a list, following the loading of the page completing, search field will need to be edited (adding or removing one character) to refresh the list or search results will not appear.
 - Item details page should list all data entries, however will not display section headers (besides Notes) and may still have some formatting issues in some cases.
 - Items are not listed alphabetically so search method is necessary as opposed to scrolling through a list.
 - Clipboard and zoom icons on item details page may be somewhat misaligned if text size is enlarged on a device's display settings.
