@@ -16,8 +16,8 @@ Page {
 
         if (status === PageStatus.Active) {
 
+            itemDetailsModel.clear();
             mainOtpTimer.stop();
-            otpModel.set(0, {"active": false});
             otpDisplayedOnCover = false;
             itemsPageObject = pageStack.currentPage;
 
@@ -53,8 +53,16 @@ Page {
 
             Component.onCompleted: {
 
-                otpModel.set(0, {"active": false});
-                searchFieldMargin = this.textLeftMargin; // to get around errors with alias and direct identification of searchField not functioning as expected.
+                otpDisplayedOnCover = false;
+                searchFieldMargin = this.textLeftMargin;
+
+                if (searchFieldMargin > Theme.paddingLarge) { // OS version 4.5 or earlier - rendered differently.
+
+                    if (settings.showItemIconsInList) searchFieldMargin = searchFieldMargin - Theme.iconSizeMedium - Theme.paddingMedium;
+
+                }
+
+                else if (!settings.showItemIconsInList) searchFieldMargin = searchFieldMargin + Theme.iconSizeMedium + Theme.paddingMedium;
                 if (searchField.text === "") searchField.forceActiveFocus();
 
             }
@@ -120,12 +128,12 @@ Page {
 
                         id: itemIcon
                         source: iconUrl
-                        visible: iconEmoji === ""
+                        visible: iconEmoji === "" && settings.showItemIconsInList
 
                         anchors {
 
                             left: parent.left
-                            leftMargin: searchFieldMargin - this.width - Theme.paddingMedium
+                            leftMargin: searchFieldMargin
                             verticalCenter: parent.verticalCenter
 
                         }
@@ -136,7 +144,7 @@ Page {
                         
                         id: itemEmojiIcon
                         padding: 0
-                        visible: iconEmoji !== ""
+                        visible: iconEmoji !== "" && settings.showItemIconsInList
                         text: iconEmoji
                         font.pixelSize: Theme.fontSizeExtraLarge
                         color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
@@ -146,7 +154,7 @@ Page {
                         anchors {
                             
                             left: parent.left
-                            leftMargin: searchFieldMargin - this.width - Theme.paddingMedium
+                            leftMargin: searchFieldMargin
                             verticalCenter: parent.verticalCenter
                             
                         }
@@ -157,12 +165,14 @@ Page {
 
                         anchors {
 
-                            left: itemIcon.visible ? itemIcon.right : itemEmojiIcon.right
-                            leftMargin: Theme.paddingMedium
+                            left: settings.showItemIconsInList ? itemIcon.visible ? itemIcon.right : itemEmojiIcon.right : parent.left
+                            leftMargin: settings.showItemIconsInList ? Theme.paddingMedium : searchFieldMargin
                             verticalCenter: parent.verticalCenter
 
                         }
 
+                        width: page.width - this.x - (Theme.paddingMedium * 2)
+                        truncationMode: TruncationMode.Fade
                         text: title
                         color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
 
