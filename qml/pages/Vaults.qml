@@ -38,9 +38,10 @@ Page {
 
         if (status === PageStatus.Active) {
 
+            otpDisplayedOnCover = false;
             itemListModel.clear();
             itemSearchModel.clear();
-            //appWindow.itemListingFin = false;
+            appWindow.itemListingFin = false;
 
         }
 
