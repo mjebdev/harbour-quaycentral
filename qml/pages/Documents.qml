@@ -132,12 +132,19 @@ Page {
 
             id: searchField
             width: parent.width
-            placeholderText: qsTr("Search items")
+            placeholderText: qsTr("Search documents")
 
             Component.onCompleted: {
 
-                otpModel.set(0, {"active": false});
-                searchFieldMargin = this.textLeftMargin; // to get around errors with alias and direct identification of searchField not functioning as expected.
+                searchFieldMargin = this.textLeftMargin;
+
+                if (searchFieldMargin > Theme.paddingLarge) { // OS version 4.5 or earlier - rendered differently.
+
+                    if (settings.showItemIconsInList) searchFieldMargin = searchFieldMargin - Theme.iconSizeMedium - Theme.paddingMedium;
+
+                }
+
+                else if (!settings.showItemIconsInList) searchFieldMargin = searchFieldMargin + Theme.iconSizeMedium + Theme.paddingMedium;
                 if (searchField.text === "") searchField.forceActiveFocus();
 
             }
@@ -150,28 +157,7 @@ Page {
 
             EnterKey.onClicked: {
 
-                if (itemSearchModel.count > 0 && text.length > 0) {
-
-                    if (settings.enterKeyLoadsDetails || itemSearchModel.get(0).templateUuid !== "LOGIN") {
-
-                        itemDetailsModel.set(0, {"itemId": itemSearchModel.get(0).uuid, "itemTitle": itemSearchModel.get(0).title, "itemType": itemSearchModel.get(0).templateUuid, "itemVaultId": itemSearchModel.get(0).itemVaultId, "itemVaultName": itemSearchModel.get(0).itemVaultName});
-                        pageStack.push(Qt.resolvedUrl("ItemDetails.qml"));
-
-                    }
-
-                    else {
-
-                        itemCopied = itemSearchModel.get(0).title;
-                        getPassword.start("op", ["item", "get", itemSearchModel.get(0).uuid, "--vault", itemSearchModel.get(0).itemVaultId, "--fields", "label=password", "--session", currentSession]);
-
-                    }
-
-                    searchField.focus = false;
-                    searchField.text = "";
-
-                }
-
-                else if (text === "") searchField.focus = false;
+                searchField.focus = false;
 
             }
 
@@ -197,11 +183,12 @@ Page {
 
                         id: docIcon
                         source: "image://theme/icon-m-file-document-dark"
+                        visible: settings.showItemIconsInList
 
                         anchors {
 
                             left: parent.left
-                            leftMargin: searchFieldMargin - this.width - Theme.paddingMedium
+                            leftMargin: searchFieldMargin // - this.width - Theme.paddingMedium
                             verticalCenter: parent.verticalCenter
 
                         }
@@ -214,12 +201,14 @@ Page {
 
                         anchors {
 
-                            left: docIcon.right
-                            leftMargin: Theme.paddingMedium
+                            left: settings.showItemIconsInList ? docIcon.right : parent.left
+                            leftMargin: settings.showItemIconsInList ? Theme.paddingMedium : searchFieldMargin
                             verticalCenter: parent.verticalCenter
 
                         }
 
+                        width: page.width - this.x - (Theme.paddingMedium * 2)
+                        truncationMode: TruncationMode.Fade
                         text: title
                         color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
 
