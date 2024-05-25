@@ -5,6 +5,18 @@ CoverBackground {
 
     id: cover
     allowResize: true
+    property string localVarOtp: appWindow.varOtp
+    property int localVarOtpSecondsLeft: appWindow.varOtpSecondsLeft
+    property bool localVarOtpPrimaryColor: appWindow.varOtpPrimaryColor
+    property bool localVarOtpActive: appWindow.varOtpActive
+    property bool localOtpDisplayedOnCover: appWindow.otpDisplayedOnCover
+
+    onLocalVarOtpChanged: {
+
+        otpLabel1.text = localVarOtp.slice(0, 3);
+        otpLabel2.text = localVarOtp.slice(3);
+
+    }
 
     Image {
 
@@ -30,7 +42,6 @@ CoverBackground {
     ListView {
 
         id: otpListView
-        model: otpModel
 
         anchors {
 
@@ -63,11 +74,11 @@ CoverBackground {
 
         }
 
-        delegate: Column {
+        Column {
 
             width: parent.width
             height: cover.height - coverActionArea.height
-            visible: active && settings.otpOnCover
+            visible: localOtpDisplayedOnCover && settings.otpOnCover
 
             onVisibleChanged: {
 
@@ -94,13 +105,12 @@ CoverBackground {
 
                     id: otpLabel1
                     width: parent.width
-                    text: otpPart1
                     textFormat: Text.AutoText
                     font.pixelSize: Theme.fontSizeHuge
                     font.letterSpacing: cover.size === Cover.Large ? Theme.paddingLarge : Theme.paddingMedium
-                    color: primaryColor ? Theme.highlightColor : Theme.primaryColor
+                    color: localVarOtpPrimaryColor ? Theme.highlightColor : Theme.primaryColor
                     horizontalAlignment: Text.AlignHCenter
-                    opacity: primaryColor ? 1.0 : 0.2
+                    opacity: localVarOtpPrimaryColor ? 1.0 : 0.2
                     leftPadding: cover.size === Cover.Large ? Theme.paddingLarge : Theme.paddingMedium
                     rightPadding: 0
 
@@ -118,13 +128,12 @@ CoverBackground {
 
                     id: otpLabel2
                     width: parent.width
-                    text: otpPart2
                     textFormat: Text.AutoText
                     font.pixelSize: Theme.fontSizeHuge
                     font.letterSpacing: cover.size === Cover.Large ? Theme.paddingLarge : Theme.paddingMedium
-                    color: primaryColor ? Theme.highlightColor : Theme.primaryColor
+                    color: localVarOtpPrimaryColor ? Theme.highlightColor : Theme.primaryColor
                     horizontalAlignment: Text.AlignHCenter
-                    opacity: primaryColor ? 1.0 : 0.2
+                    opacity: localVarOtpPrimaryColor ? 1.0 : 0.2
                     leftPadding: cover.size === Cover.Large ? Theme.paddingLarge : Theme.paddingMedium // the font.letterSpacing value offsets horizontal centering somewhat
                     rightPadding: 0
                     topPadding: 0
@@ -147,7 +156,7 @@ CoverBackground {
                     width: parent.width
                     minimumValue: 0
                     maximumValue: 30
-                    value: secondsLeft
+                    value: localVarOtpSecondsLeft
                     leftMargin: cover.size === Cover.Large ? Theme.paddingLarge : Theme.paddingMedium
                     rightMargin: cover.size === Cover.Large ? Theme.paddingLarge : Theme.paddingMedium
 
@@ -162,7 +171,7 @@ CoverBackground {
     CoverActionList {
 
         id: coverActionList
-        enabled: !otpDisplayedOnCover
+        enabled: !localOtpDisplayedOnCover
 
         CoverAction {
 
@@ -184,7 +193,7 @@ CoverBackground {
     CoverActionList {
 
         id: otpCoverActionList
-        enabled: otpDisplayedOnCover
+        enabled: localOtpDisplayedOnCover
 
         CoverAction {
 
@@ -195,8 +204,7 @@ CoverBackground {
 
                 if (settings.lockButtonOnCover) {
 
-                    otpModel.set(0, {"active": false});
-                    otpModel.clear();
+                    varOtpActive = false;
                     otpDisplayedOnCover = false;
                     mainOtpTimer.stop();
                     itemDetailsModel.clear();
@@ -208,8 +216,7 @@ CoverBackground {
 
                 else {
 
-                    otpModel.set(0, {"active": false});
-                    otpModel.clear();
+                    varOtpActive = false;
                     otpDisplayedOnCover = false;
                     mainOtpTimer.stop();
                     itemDetailsModel.clear();
@@ -228,7 +235,7 @@ CoverBackground {
 
             onTriggered: {
 
-                Clipboard.text = otpModel.get(0).otp.trim();
+                Clipboard.text = localVarOtp.trim();
                 notifySessionExpired.previewSummary = qsTr("OTP Copied");
                 notifySessionExpired.publish();
 
