@@ -27,7 +27,7 @@ App icon by <a href="https://github.com/JSEHV">JSEHV</a>. Thanks for the contrib
 - No support for multiple accounts or for groups.
 - No support for creating new items or editing items as of now. Uploading and downloading of documents is supported but otherwise app is read-only. Hope to add option to create an item in the future but technical issues (likely to do with permissions involving CLI) preventing this so far.
 
-<h3>Minor Limitations & Issues</h3>
+<h3>Minor Limitations</h3>
 
 - Documents won't show up in list of items when all categories are loaded, to get to them user must go to the Documents section from the Vault(s) page.
 - Item details page should list all data entries, however will not display section headers (besides Notes) and may still have some formatting issues in some cases.
