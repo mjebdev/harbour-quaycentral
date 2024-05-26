@@ -7,11 +7,9 @@
 
 #include <QObject>
 #include <QProcess>
+#include <QProcessEnvironment>
 #include <QVariant>
 #include <QString>
-#include <QStandardPaths>
-#include <QFile>
-#include <QDebug>
 
 class Process : public QProcess {
 
@@ -19,24 +17,12 @@ class Process : public QProcess {
 
 public:
 
-    QString downloadsFolder = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
-
     Process(QObject *parent = 0) : QProcess(parent) { }
-
-    Q_INVOKABLE QString getDownloadsPath() {
-
-        return downloadsFolder;
-
-    }
 
     Q_INVOKABLE void start(const QString &program, const QVariantList &arguments) {
 
         QStringList args;
-
-        for (int i = 0; i < arguments.length(); i++)
-
-        args << arguments[i].toString();
-
+        for (int i = 0; i < arguments.length(); i++) args << arguments[i].toString();
         QProcess::start(program, args);
 
     }
