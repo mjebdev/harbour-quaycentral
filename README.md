@@ -17,7 +17,7 @@ App icon by <a href="https://github.com/JSEHV">JSEHV</a>. Thanks for the contrib
     https://developer.1password.com/docs/cli/get-started/
 - Addition of the shorthand "quaycentsfos" to your device's CLI. This avoids the need for QC to store your address for signing in (in most cases 'my' but not always). It can be done from the app or independtly using Terminal. More info on adding the shorthand:<br>
     https://developer.1password.com/docs/cli/sign-in-manually/#set-a-custom-account-shorthand
-- Built for SFOS 4.5, has not been tested on previous versions.
+- Tested on SFOS 4.5 & 4.6.
 
 <h3>Limitations & Issues</h3>
 
