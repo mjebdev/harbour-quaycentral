@@ -85,10 +85,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Loading...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Upload successful - Document '%1' added to %2 vault. Refreshing Documents list...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -101,19 +97,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Download of '%1' canceled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Download of '%1' is complete.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>File with the name '%1' already exists. CLI will not overwrite.</source>
+        <source>QuayCentral is unable to process CLI response. Copied to clipboard.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File with the name '%1' already exists. Will not overwrite.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unknown error when downloading '%1' from server. Error copied to clipboard.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unknown Error (copied to clipboard). Please sign back in.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -145,7 +145,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\n\nVersion 0.8\nLicensed under GNU GPLv3\n\nApp icon by JSEHV on GitHub--Thank you for the contribution!\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.</source>
+        <source>A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\nmjeb.dev\n\nVersion 0.9\nLicensed under GNU GPLv3\n\nApp icon by JSEHV on GitHub--Thank you for this contribution.\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -189,21 +189,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Additional info:</source>
+        <source>Info:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 
 <context>
     <name>ItemDetails</name>
-    <message>
-        <source>Network-related error (copied). Please check connection.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unknown error (copied to clipboard). Please sign back in.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Lock</source>
         <translation type="unfinished"></translation>
@@ -385,7 +377,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Downloading update in ZIP format...</source>
+        <source>Downloading update ZIP file...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -477,7 +469,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Item Listing</source>
+        <source>Item Options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -510,6 +502,34 @@
     </message>
     <message>
         <source>copies password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display item icons in listings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Emoji used for some categories may appear irregular if using custom OS font.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download documents to </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Documents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Force overwrite of existing documents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only applies to identically named downloads. For uploads, multiple items will be created.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -577,7 +597,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>For items that include one, OTP will appear on the app cover.</source>
+        <source>For items that include one, OTP will appear on app cover.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -605,7 +625,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Toggle switch to edit selected categories.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Command-Line Tool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download RPM instead of ZIP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If an update is available (below), installer will be downloaded using URL of latest stable RPM at 1Password Developer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -621,7 +653,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;p&gt;Extract, verify and move updated tool to complete installation. More info @ &lt;a href=&quot;https://developer.1password.com/docs/cli/get-started&quot;&gt;1Password Support&lt;/a&gt;&lt;/p&gt;</source>
+        <source>&lt;p&gt;Guide to completing installation @ &lt;a href=&quot;https://developer.1password.com/docs/cli/get-started&quot;&gt;1Password Developer&lt;/a&gt;&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -641,7 +673,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error: QuayCentral is unable to process CLI response.</source>
+        <source>QuayCentral is unable to process CLI response. Copied to clipboard.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -803,10 +835,6 @@ Download has taken longer than one minute. Please check Downloads folder for com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>QuayCentral shorthand has not been added to the 1Password command-line tool.\n\nClick 'Setup' below to add, or manually add via Terminal [op account add --shorthand quaycentsfos]. Instructions @ &lt;a href='https://developer.1password.com/docs/cli/sign-in-manually/#set-a-custom-account-shorthand'&gt;1Password Developer&lt;/a&gt;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Connection to server timed out. Please check device's network connection.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -840,64 +868,6 @@ Download has taken longer than one minute. Please check Downloads folder for com
     </message>
     <message>
         <source>CLI not found on this device.\n\nPlease confirm that 1Password CLI has been installed and relaunch app. Instructions to install are at &lt;a href='https://developer.1password.com/docs/cli/get-started'&gt;1Password Developer&lt;/a&gt;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to communicate with CLI.\n\nPlease confirm that 1Password CLI has been installed in /usr/bin or /usr/local/bin and relaunch QuayCentral.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Listing all items...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Listing categorized items...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unlocked, listing vaults...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Incorrect password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>QuayCentral shorthand has not been added to the 1Password command-line tool.\n\nPlease add the shorthand when adding your account to the CLI (\"--shorthand quaycentsfos\") and restart app.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connection to server timed out. Please check device's network connection.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Network connection error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Vault listing complete.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Listing favorite items...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error occurred while accessing vault data.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error occurred while listing items.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No response from CLI.
-
-Please confirm that 1Password CLI has been installed in /usr/bin or /usr/local/bin and relaunch QuayCentral.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
