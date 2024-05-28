@@ -275,10 +275,9 @@ ApplicationWindow {
 
             var prelimOutput = "";
             prelimOutput = readAllStandardOutput();
-
             if (prelimOutput.indexOf("Aborting") !== 0) {
 
-                notifySessionExpired.previewSummary = qsTr("Download of '%1' cancelled.").arg(documentDownloading);
+                notifySessionExpired.previewSummary = qsTr("Download of '%1' canceled.").arg(documentDownloading);
 
             }
 
