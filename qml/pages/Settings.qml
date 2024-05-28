@@ -508,7 +508,7 @@ Page {
             TextSwitch {
 
                 text: qsTr("Display one-time password on cover")
-                description: qsTr("For items that include one, OTP will appear on the app cover.")
+                description: qsTr("For items that include one, OTP will appear on app cover.")
                 id: otpOnAppCover
                 checked: settings.otpOnCover
                 leftMargin: Theme.horizontalPageMargin
@@ -1064,7 +1064,7 @@ Page {
             else {
 
                 Clipboard.text = standardOutput;
-                updateResponseLabel.text = qsTr("Error: QuayCentral is unable to process CLI response.");
+                updateResponseLabel.text = qsTr("QuayCentral is unable to process CLI response. Copied to clipboard.");
 
             }
 
