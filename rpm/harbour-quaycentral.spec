@@ -9,7 +9,7 @@ Name:       harbour-quaycentral
 # << macros
 
 Summary:    QuayCentral
-Version:    0.9
+Version:    0.9.1
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE
