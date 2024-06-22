@@ -83,16 +83,16 @@ Page {
 
                         allItemDetails = true;
                         itemDetailsModel.clear();
-                        itemDetailsModel.set(0, {"itemId": uuid, "itemTitle": title, "itemType": templateUuid, "itemVaultId": itemVaultId, "itemVaultName": itemVaultName, "itemFields": [{"fieldId": "", "fieldType": "", "fieldLabel": "", "fieldValue": "", "fieldOtp": ""}]});
-                        getPassword.start("op", ["item", "get", uuid, "--vault", itemVaultId, "--format", "json", "--session", currentSession]);
+                        itemDetailsModel.set(0, {"itemId": itemSearchModel.get(0).uuid, "itemTitle": itemSearchModel.get(0).title, "itemType": itemSearchModel.get(0).templateUuid, "itemVaultId": itemSearchModel.get(0).itemVaultId, "itemVaultName": itemSearchModel.get(0).itemVaultName, "itemFields": [{"fieldId": "", "fieldType": "", "fieldLabel": "", "fieldValue": "", "fieldOtp": ""}]});
+                        getPassword.start("op", ["item", "get", itemSearchModel.get(0).uuid, "--vault", itemSearchModel.get(0).itemVaultId, "--format", "json", "--session", currentSession]);
 
                     }
 
                     else {
 
                         allItemDetails = false;
-                        itemCopied = title;
-                        getPassword.start("op", ["item", "get", uuid, "--fields", "label=password", "--vault", itemVaultId, "--session", currentSession]);
+                        itemCopied = itemSearchModel.get(0).title;
+                        getPassword.start("op", ["item", "get", itemSearchModel.get(0).uuid, "--fields", "label=password", "--vault", itemSearchModel.get(0).itemVaultId, "--session", currentSession]);
 
                     }
 
