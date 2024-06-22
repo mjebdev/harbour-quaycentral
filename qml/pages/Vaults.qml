@@ -133,7 +133,7 @@ Page {
                         }
 
                         text: itemTitle
-                        color: parent.highlighted ? Theme.highlightColor : Theme.primaryColor                        
+                        color: parent.highlighted ? Theme.highlightColor : Theme.primaryColor
 
                     }
 
