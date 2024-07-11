@@ -5,8 +5,6 @@ Version 0.9.1
 
 QuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.
 
-Licensed under GNU GPLv3.
-
 App icon by <a href="https://github.com/JSEHV">JSEHV</a>. Thanks for the contribution!
 
 <h3>Requirements</h3>
