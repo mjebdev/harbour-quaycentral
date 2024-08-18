@@ -1,7 +1,7 @@
 # QuayCentral
 A read-only GUI for the 1Password command-line tool on Sailfish OS.
 
-Version 0.9.1
+Version 0.9.2
 
 QuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.
 
@@ -11,7 +11,7 @@ App icon by <a href="https://github.com/JSEHV">JSEHV</a>. Thanks for the contrib
 
 - A 1Password.com account.
 - An active network connection.
-- Installation of version 2.6.1 or later of the 1Password command-line tool in /usr/bin, /usr/local/bin, or another directory in your $PATH. More info:<br>
+- Installation of version 2.20.0 or later of the 1Password command-line tool in /usr/bin, /usr/local/bin, or another directory in your $PATH. More info:<br>
     https://developer.1password.com/docs/cli/get-started/
 - Addition of the shorthand "quaycentsfos" to your device's CLI. This avoids the need for QC to store your address for signing in (in most cases 'my' but not always). It can be done from the app or independtly using Terminal. More info on adding the shorthand:<br>
     https://developer.1password.com/docs/cli/sign-in-manually/#set-a-custom-account-shorthand
