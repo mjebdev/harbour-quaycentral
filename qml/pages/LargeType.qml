@@ -53,7 +53,14 @@ Page {
 
                 Component.onCompleted: {
 
-                    if (/\d/.test(text)) color = Theme.highlightColor; // Thanks to user jackocnr on Stack Overflow -- https://stackoverflow.com/questions/8935632/check-if-character-is-number
+                    if (!/^[a-zA-Z]+$/.test(text)) { // if not a letter - so as not to have to go through this for all characters in the password.
+
+                        if (/\d/.test(text)) color = Theme.highlightColor; // Thanks to user jackocnr on Stack Overflow -- https://stackoverflow.com/questions/8935632/check-if-character-is-number
+                        else if (character == "&") text = "<pre>&amp;</pre>"; // was getting blank or 'space' for the '&' character on the large-type screen.
+                        else if (character == "<") text = "<pre>&lt;</pre>"; // same for less than
+                        else if (character == ">") text = "<pre>&gt;</pre>"; // including just to avoid issues even though this would generally render ok.
+
+                    }
 
                 }
 

@@ -37,22 +37,7 @@ Page {
                 Column {
 
                     width: parent.width
-/*
-                    Row {
 
-                        width: parent.width * 0.2
-                        x: (parent.width - this.width) / 2
-
-                        Image {
-
-                            width: parent.width
-                            source: "harbour-quaycentral.svg";
-                            height: width
-
-                        }
-
-                    }
-*/
                     Row {
 
                         width: appTitleLabel.width
@@ -70,7 +55,23 @@ Page {
                             //font.bold: true
                             color: Theme.highlightColor
                             topPadding: Theme.paddingLarge
-                            bottomPadding: Theme.paddingLarge
+                            bottomPadding: Theme.paddingSmall
+
+                        }
+
+                    }
+
+                    Row {
+
+                        width: parent.width * 0.1
+                        x: (parent.width - this.width) / 2
+                        bottomPadding: Theme.paddingLarge
+
+                        Image {
+
+                            width: parent.width
+                            source: "harbour-quaycentral.svg";
+                            height: width
 
                         }
 
@@ -79,7 +80,7 @@ Page {
                     Separator {
 
                         id: titleSeparator
-                        width: appTitleLabel.width
+                        width: parent.width * 0.66
                         x: (page.width - this.width) * 0.5
                         horizontalAlignment: Separator.Center
                         color: Theme.primaryColor
@@ -99,11 +100,28 @@ Page {
                             font.pixelSize: Theme.fontSizeExtraSmall
                             color: Theme.highlightColor
                             wrapMode: Text.Wrap
-                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\nmjeb.dev\n\nVersion 0.9.1\nMIT License\n\nApp icon by JSEHV on GitHub--Thank you for this contribution.\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
+                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\nmjeb.dev\n\nVersion 0.9.2\nLicensed under GNU GPLv3\n\nApp icon by JSEHV on GitHub--Thank you for this contribution.\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
                             topPadding: Theme.paddingLarge * 2
                             bottomPadding: Theme.paddingLarge
 
                         }
+
+                    }
+
+                    Row {
+
+                        width: parent.width
+                        height: Theme.paddingLarge
+
+                    }
+
+                    Separator {
+
+                        id: aboutTextSeparator
+                        width: parent.width * 0.66
+                        x: (page.width - this.width) * 0.5
+                        horizontalAlignment: Separator.Center
+                        color: Theme.primaryColor
 
                     }
 

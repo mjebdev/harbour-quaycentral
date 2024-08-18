@@ -92,7 +92,7 @@ Page {
 
                         allItemDetails = false;
                         itemCopied = itemSearchModel.get(0).title;
-                        getPassword.start("op", ["item", "get", itemSearchModel.get(0).uuid, "--fields", "label=password", "--vault", itemSearchModel.get(0).itemVaultId, "--session", currentSession]);
+                        getPassword.start("op", ["item", "get", itemSearchModel.get(0).uuid, "--fields", "label=password", "--vault", itemSearchModel.get(0).itemVaultId, "--reveal", "--session", currentSession]);
 
                     }
 
@@ -186,7 +186,7 @@ Page {
 
                             allItemDetails = false;
                             itemCopied = title;
-                            getPassword.start("op", ["item", "get", uuid, "--fields", "label=password", "--vault", itemVaultId, "--session", currentSession]);
+                            getPassword.start("op", ["item", "get", uuid, "--fields", "label=password", "--vault", itemVaultId, "--reveal", "--session", currentSession]);
 
                         }
 
@@ -218,7 +218,7 @@ Page {
 
                             allItemDetails = false;
                             itemCopied = title;
-                            getPassword.start("op", ["item", "get", uuid, "--fields", "label=password", "--vault", itemVaultId, "--session", currentSession]);
+                            getPassword.start("op", ["item", "get", uuid, "--fields", "label=password", "--vault", itemVaultId, "--reveal", "--session", currentSession]);
 
                         }
 

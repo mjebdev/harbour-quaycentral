@@ -184,6 +184,7 @@ Page {
                         id: docIcon
                         source: "image://theme/icon-m-file-document-dark"
                         visible: settings.showItemIconsInList
+                        color: delegate.highlighted ? Theme.highlightColor : enabled ? Theme.primaryColor : Theme.secondaryColor
 
                         anchors {
 
@@ -210,7 +211,7 @@ Page {
                         width: page.width - this.x - (Theme.paddingMedium * 2)
                         truncationMode: TruncationMode.Fade
                         text: title
-                        color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
+                        color: delegate.highlighted ? Theme.highlightColor : enabled ? Theme.primaryColor : Theme.secondaryColor
 
                     }
 

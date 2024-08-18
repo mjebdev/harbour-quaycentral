@@ -145,7 +145,7 @@ Page {
 
                             allFavDetails = false;
                             itemCopied = itemTitle;
-                            getFavorite.start("op", ["item", "get", itemId, "--fields", "label=password", "--vault", itemVaultId, "--session", currentSession]);
+                            getFavorite.start("op", ["item", "get", itemId, "--fields", "label=password", "--vault", itemVaultId, "--reveal", "--session", currentSession]);
 
                         }
 
@@ -177,7 +177,7 @@ Page {
 
                             allFavDetails = false;
                             itemCopied = itemTitle;
-                            getFavorite.start("op", ["item", "get", itemId, "--fields", "label=password", "--vault", itemVaultId, "--session", currentSession]);
+                            getFavorite.start("op", ["item", "get", itemId, "--fields", "label=password", "--vault", itemVaultId, "--reveal", "--session", currentSession]);
 
                         }
 
