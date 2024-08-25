@@ -7,6 +7,8 @@ QuayCentral is an unofficial application and is in no way associated with 1Passw
 
 App icon by <a href="https://github.com/JSEHV">JSEHV</a>. Thanks for the contribution!
 
+Please note: The email address in the About section of versions 0.5 and 0.5.1 (qc at mjbdev.net) is no longer active and that domain is no longer owned by myself. Please send any feedback to: feedback@mjeb.dev
+
 <h3>Requirements</h3>
 
 - A 1Password.com account.
