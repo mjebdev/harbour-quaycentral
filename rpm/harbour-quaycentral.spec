@@ -13,7 +13,7 @@ Version:    0.9.3
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE
-URL:        http://github.com/michaeljohnbarrett/harbour-quaycentral
+URL:        http://github.com/mjebdev/harbour-quaycentral
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  harbour-quaycentral.yaml
 Requires:   sailfishsilica-qt5 >= 0.10.9
