@@ -1,13 +1,13 @@
 # QuayCentral
-A read-only GUI for the 1Password command-line tool on Sailfish OS.
+A mostly read-only GUI for the 1Password command-line tool on Sailfish OS.
 
-Version 0.9.2
+Version 0.9.3
 
 QuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.
 
-App icon by <a href="https://github.com/JSEHV">JSEHV</a>. Thanks for the contribution!
+Much-appreciated app icon contributed by <a href="https://github.com/JSEHV">JSEHV</a>.
 
-Please note: The GitHub / PayPal / Ko-Fi / Buy Me a Coffee links have been updated (as of Sept. 23rd 2024) and won't work on versions 0.9.2 and earlier. See correct links below. Also, the email address in the About section of versions 0.5 and 0.5.1 (qc at mjbdev.net) is no longer active and that domain is no longer owned by myself. Please send any feedback to: feedback@mjeb.dev
+A note on links in previous versions: The GitHub and donation links have been updated (as of Sept. 23rd 2024) and won't work on versions 0.9.2 and earlier. See correct links below. Also, the email address in the About section of versions 0.5 and 0.5.1 (qc at mjbdev.net) is no longer active and that domain is no longer owned by myself. Please send any feedback to: <a href="mailto:feedback@mjeb.dev">feedback@mjeb.dev</a> - Thanks
 
 <h3>Requirements</h3>
 
@@ -39,11 +39,11 @@ Please note: The GitHub / PayPal / Ko-Fi / Buy Me a Coffee links have been updat
 - Official 1Password app that supports 1Password.com accounts requires Android version 5 or greater and is incompatible with Android app support on Xperia X, and of course devices without any Android app support as well.
 - A positive to have more native SFOS apps and fewer dependencies on Android versions.
 
-<h3>Privacy & Security</h3>
+<h3>App Security</h3>
 
 - Users can lock the vault(s) by tapping the padlock button on the app's cover icon, swiping back in the app to the Sign-in page, or choosing 'Lock' on the pull-down menu on any other page, if this option is enabled (on by default).
 - Master password entered by user is cleared immediately following its passing to the CLI and is never stored. Same goes for all fields when entering in login info to add shorthand from the app. Item usernames and passwords are only ever in RAM, are cleared when the vault is locked, and are only copied to the clipboard if user so chooses.
-- Default vault UUID, if one is chosen, is stored as a setting (this string does not contain any data regarding the contents nor the name of the vault).
+- Default vault UUID, if one is chosen, is stored as a setting (this string does not contain any data regarding the contents or the name of the vault). Disabling the option in Settings will clear the stored string.
 - When removing the shorthand access for QuayCentral, user will need to get back into Terminal but may also remove the CLI from authorized devices on their 1Password profile page. More info on revoking access:<br>
     https://developer.1password.com/docs/cli/reference/commands/signout<br>
     https://developer.1password.com/docs/cli/reference/management-commands/account/#account-forget
