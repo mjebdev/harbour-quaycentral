@@ -436,7 +436,7 @@ Page {
                 id: defaultVaultCombo
                 width: parent.width
                 enabled: skipVaultScreenSwitch.checked
-                visible: !justOneVault
+                visible: !justOneVault // This option will only be available if user has more than one vault.
 
                 menu: ContextMenu {
 
