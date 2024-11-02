@@ -851,7 +851,7 @@ Page {
                             font.pixelSize: Theme.fontSizeSmall
                             wrapMode: Text.Wrap
                             horizontalAlignment: Text.AlignHCenter
-                            text: qsTr("<p>Guide to completing installation @ <a href=\"https://developer.1password.com/docs/cli/get-started\">1Password Developer</a>.</p>")
+                            text: qsTr("<p>Visit <a href=\"https://developer.1password.com/docs/cli/get-started\">1Password Developer</a> for a complete CLI installation guide.</p>")
                             linkColor: Theme.highlightColor
 
                             Text {
@@ -1055,19 +1055,19 @@ Page {
                 updateButton.enabled = false;
                 updateAvailable = true;
                 releaseNotesURL = standardOutput.slice(standardOutput.indexOf("<") + 1, standardOutput.indexOf(">"));
-                updateResponseLabel.text = "<pre>" + standardOutput.slice(0, standardOutput.indexOf("<")) + "<a href=\"" + releaseNotesURL + "\">" + releaseNotesURL + "</a></pre>";
+                updateResponseLabel.text = updateResponseLabel.text + "\n\n<pre>" + standardOutput.slice(0, standardOutput.indexOf("<")) + "<a href=\"" + releaseNotesURL + "\">" + releaseNotesURL + "</a></pre>";
                 updateLabelsRow.visible = true;
                 updateInitialResponseRow.visible = true;
 
             }
-
+/*
             else {
 
                 Clipboard.text = standardOutput;
                 updateResponseLabel.text = qsTr("QuayCentral is unable to process CLI response. Copied to clipboard.");
 
             }
-
+*/
             standardOutput = "";
 
         }
