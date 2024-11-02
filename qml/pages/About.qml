@@ -52,7 +52,7 @@ Page {
                             horizontalAlignment: Qt.AlignHCenter
                             id: appTitleLabel
                             font.pixelSize: Theme.fontSizeLarge
-                            //font.bold: true
+                            font.bold: true
                             color: Theme.highlightColor
                             topPadding: Theme.paddingLarge
                             bottomPadding: Theme.paddingSmall
@@ -100,7 +100,7 @@ Page {
                             font.pixelSize: Theme.fontSizeExtraSmall
                             color: Theme.highlightColor
                             wrapMode: Text.Wrap
-                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\nmjeb.dev\n\nVersion 0.9.2\nLicensed under GNU GPLv3\n\nApp icon by JSEHV on GitHub--Thank you for this contribution.\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
+                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\nmjeb.dev\n\nVersion 0.9.3\nLicensed under GNU GPLv3\n\nMuch-appreciated app icon contributed by JSEHV on GitHub.\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
                             topPadding: Theme.paddingLarge * 2
                             bottomPadding: Theme.paddingLarge
 
@@ -134,22 +134,23 @@ Page {
 
                     Row {
 
-                        width: linkToKoFi.width
-                        x: (parent.width - linkToKoFi.width) / 2
-                        height: Theme.itemSizeExtraSmall + (Theme.paddingMedium * 2)
+                        id: linkToKoFiRow
+                        width: parent.width * 0.4
+                        x: parent.width * 0.3
+                        height: parent.width * 0.25
 
                         Image {
 
                             id: linkToKoFi
-                            source: Theme.colorScheme == Theme.DarkOnLight ? "Ko-fi_Logo_RGB_Dark.png" : "Ko-fi_Logo_RGB_DarkBg.png"
+                            source: "kofi_logo.webp"
                             fillMode: Image.PreserveAspectFit
-                            height: Theme.itemSizeExtraSmall
-                            y: Theme.paddingMedium
+                            width: parent.width
+                            y: (parent.height - height) * 0.5
 
                             MouseArea {
 
                                 anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("https://www.ko-fi.com/michaeljb");
+                                onClicked: Qt.openUrlExternally("https://www.ko-fi.com/mjebdev");
 
                             }
 
@@ -159,62 +160,22 @@ Page {
 
                     Row {
 
-                        width: parent.width
-                        height: Theme.paddingLarge
-
-                    }
-
-                    Row {
-
-                        width: linkToPayPal.width
-                        x: (parent.width - linkToPayPal.width) / 2
-                        height: Theme.itemSizeExtraSmall + (Theme.paddingMedium * 2)
-
-                        Image {
-
-                            id: linkToPayPal
-                            source: Theme.colorScheme == Theme.DarkOnLight ? "PayPal_logo_black.png" : "PayPal_logo_white.png"
-                            fillMode: Image.PreserveAspectFit
-                            height: Theme.itemSizeExtraSmall
-                            y: Theme.paddingMedium
-
-                            MouseArea {
-
-                                anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("https://paypal.me/michaeljohnbarrett");
-
-                            }
-
-                        }
-
-                    }
-
-                    Row {
-
-                        width: parent.width
-                        height: Theme.paddingLarge
-
-                    }
-
-                    Row {
-
-                        width: linkToGitHub.width
-                        x: (parent.width - linkToGitHub.width) / 2
-                        height: Theme.itemSizeExtraSmall + (Theme.paddingMedium * 2)
+                        width: parent.width * 0.4
+                        x: parent.width * 0.3
+                        height: parent.width * 0.25
 
                         Image {
 
                             id: linkToGitHub
-                            source: Theme.colorScheme == Theme.DarkOnLight ? "GitHub_Logo.png" : "GitHub_Logo_White.png"
+                            source: Theme.colorScheme == Theme.DarkOnLight ? "GitHub_Logo_cropped_to_content.png" : "GitHub_Logo_White_cropped_to_content.png"
                             fillMode: Image.PreserveAspectFit
-                            height: Theme.itemSizeExtraSmall
-                            y: Theme.paddingMedium
-                            x: (parent.width - this.width) / 2
+                            width: parent.width
+                            y: (parent.height - height) * 0.5
 
                             MouseArea {
 
                                 anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("https://github.com/michaeljohnbarrett/harbour-quaycentral");
+                                onClicked: Qt.openUrlExternally("https://github.com/mjebdev/harbour-seachest");
 
                             }
 
@@ -224,7 +185,33 @@ Page {
 
                     Row {
 
-                        id: gapRow
+                        id: linkToPayPalRow
+                        width: parent.width * 0.4
+                        x: parent.width * 0.3
+                        height: parent.width * 0.25
+
+                        Image {
+
+                            id: linkToPayPal
+                            source: Theme.colorScheme == Theme.DarkOnLight ? "PayPal_logo_black_cropped_to_content.png" : "PayPal_logo_white_cropped_to_content.png"
+                            fillMode: Image.PreserveAspectFit
+                            width: parent.width
+                            y: (parent.height - height) * 0.5
+
+                            MouseArea {
+
+                                anchors.fill: parent
+                                onClicked: Qt.openUrlExternally("https://www.paypal.me/mjebdev");
+
+                            }
+
+                        }
+
+                    }
+
+                    Row {
+
+                        id: bmacGapRow
                         height: Theme.paddingLarge
                         width: parent.width
 
