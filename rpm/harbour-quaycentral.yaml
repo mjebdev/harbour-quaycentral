@@ -1,18 +1,18 @@
 Name: harbour-quaycentral
-Summary: QuayCentral
+Summary: QuayCentral is a GUI app for the 1Password command-line tool on Sailfish OS.
 Version: 0.9.3
 Release: 1
 # The contents of the Group field should be one of the groups listed here:
 # https://github.com/mer-tools/spectacle/blob/master/data/GROUPS
 Group: Qt/Qt
-URL: http://github.com/mjebdev/harbour-quaycentral
-License: LICENSE
+URL: http://mjeb.dev
+License: GNU GPLv3
 # This must be generated before uploading a package to a remote build service.
 # Usually this line does not need to be modified.
 Sources:
 - '%{name}-%{version}.tar.bz2'
 Description: |
-  QuayCentral is a GUI app for the 1Password command-line tool for Sailfish OS.
+  QuayCentral is a GUI app for the 1Password command-line tool on Sailfish OS.
 Builder: qmake5
 
 # This section specifies build dependencies that are resolved using pkgconfig.
