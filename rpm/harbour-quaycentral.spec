@@ -8,12 +8,12 @@ Name:       harbour-quaycentral
 # >> macros
 # << macros
 
-Summary:    QuayCentral
+Summary:    QuayCentral is a GUI app for the 1Password command-line tool on Sailfish OS.
 Version:    0.9.3
 Release:    1
 Group:      Qt/Qt
-License:    LICENSE
-URL:        http://github.com/mjebdev/harbour-quaycentral
+License:    GNU GPLv3
+URL:        https://mjeb.dev
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  harbour-quaycentral.yaml
 Requires:   sailfishsilica-qt5 >= 0.10.9
@@ -24,7 +24,7 @@ BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  desktop-file-utils
 
 %description
-QuayCentral is a GUI app for the 1Password command-line tool for Sailfish OS.
+QuayCentral is a GUI app for the 1Password command-line tool on Sailfish OS.
 
 
 %prep
