@@ -1,6 +1,6 @@
 Name: harbour-quaycentral
 Summary: QuayCentral is a GUI app for the 1Password command-line tool on Sailfish OS.
-Version: 0.9.3
+Version: 0.9.4
 Release: 1
 # The contents of the Group field should be one of the groups listed here:
 # https://github.com/mer-tools/spectacle/blob/master/data/GROUPS
@@ -40,3 +40,4 @@ Files:
 
 # For more information about yaml and what's supported in Sailfish OS
 # build system, please see https://wiki.merproject.org/wiki/Spectacle
+  
