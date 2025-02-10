@@ -30,7 +30,7 @@ Page {
 
             }
 
-            BackgroundItem { // Avoiding a repeater/model method for now due to the way settings need to be synced etc. Hope to update with more efficient method of applying settings here, i.e. some kind of an array for settings.
+            BackgroundItem { // Avoiding a repeater/model method for now due to the way settings need to be synced.
 
                 width: parent.width
 
