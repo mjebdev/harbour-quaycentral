@@ -370,7 +370,7 @@ Page {
                         break;
 
                     default: // A catch-all for Identity, Membership and Social Security Number, as these will all have the same ID-card icon.
-                        itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://icon-m-file-vcard", iconEmoji: ""});
+                        itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-file-vcard", iconEmoji: ""});
 
                     }
 
@@ -500,3 +500,4 @@ Page {
     }
 
 }
+    
