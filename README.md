@@ -1,13 +1,11 @@
 # QuayCentral
 A mostly read-only GUI for the 1Password command-line tool on Sailfish OS.
 
-Version 0.9.3
+Version 0.9.4
 
 QuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.
 
 Much-appreciated app icon contributed by <a href="https://github.com/JSEHV">JSEHV</a>.
-
-A note on links in previous versions: The GitHub and donation links have been updated (as of Sept. 23rd 2024) and won't work on versions 0.9.2 and earlier. See correct links below. Also, the email address in the About section of versions 0.5 and 0.5.1 (qc at mjbdev.net) is no longer active and that domain is no longer owned by myself. Please send any feedback to: <a href="mailto:feedback@mjeb.dev">feedback@mjeb.dev</a> - Thanks
 
 <h3>Requirements</h3>
 
@@ -17,7 +15,7 @@ A note on links in previous versions: The GitHub and donation links have been up
     https://developer.1password.com/docs/cli/get-started/
 - Addition of the shorthand "quaycentsfos" to your device's CLI. This avoids the need for QC to store your address for signing in (in most cases 'my' but not always). It can be done from the app or independtly using Terminal. More info on adding the shorthand:<br>
     https://developer.1password.com/docs/cli/sign-in-manually/#set-a-custom-account-shorthand
-- Tested on SFOS 4.5 & 4.6.
+- Tested on SFOS versions 4.5/4.6/5.0
 
 <h3>Limitations & Issues</h3>
 
@@ -47,6 +45,8 @@ A note on links in previous versions: The GitHub and donation links have been up
 - When removing the shorthand access for QuayCentral, user will need to get back into Terminal but may also remove the CLI from authorized devices on their 1Password profile page. More info on revoking access:<br>
     https://developer.1password.com/docs/cli/reference/commands/signout<br>
     https://developer.1password.com/docs/cli/reference/management-commands/account/#account-forget
+
+A note on links in previous versions: GitHub and donation links were updated for version 0.9.3 and are broken on earlier versions. Please find updated donation links below. Also, the email address in the About section of versions 0.5 and 0.5.1 (qc at mjbdev.net) is now inactive. Please send any feedback to: <a href="mailto:feedback@mjeb.dev">feedback@mjeb.dev</a> - Thanks
 
 <h3>Tips</h3>
 
