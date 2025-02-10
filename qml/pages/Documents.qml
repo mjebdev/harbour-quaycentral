@@ -9,7 +9,6 @@ Page {
 
     id: page
     allowedOrientations: Orientation.PortraitMask
-    property int searchFieldMargin
     property bool localDownloadFin: appWindow.downloadFin
     property bool localUploadFin: appWindow.uploadFin
 
@@ -19,7 +18,7 @@ Page {
 
             downloadingDocBusy.running = false;
             itemListView.enabled = true;
-            downloadFin = false; // to allow for subsequent downloads to work also--bug fixed.
+            downloadFin = false;
 
         }
 
@@ -136,16 +135,7 @@ Page {
 
             Component.onCompleted: {
 
-                searchFieldMargin = this.textLeftMargin;
-
-                if (searchFieldMargin > Theme.paddingLarge) { // OS version 4.5 or earlier - rendered differently.
-
-                    if (settings.showItemIconsInList) searchFieldMargin = searchFieldMargin - Theme.iconSizeMedium - Theme.paddingMedium;
-
-                }
-
-                else if (!settings.showItemIconsInList) searchFieldMargin = searchFieldMargin + Theme.iconSizeMedium + Theme.paddingMedium;
-                if (searchField.text === "") searchField.forceActiveFocus();
+                searchField.forceActiveFocus();
 
             }
 
@@ -173,7 +163,7 @@ Page {
 
                 width: parent.width
                 id: itemRow
-                spacing: Theme.paddingMedium
+                x: Theme.horizontalPageMargin
 
                 ListItem {
 
@@ -185,11 +175,12 @@ Page {
                         source: "image://theme/icon-m-file-document-dark"
                         visible: settings.showItemIconsInList
                         color: delegate.highlighted ? Theme.highlightColor : enabled ? Theme.primaryColor : Theme.secondaryColor
+                        width: Theme.iconSizeMedium
+                        height: width
 
                         anchors {
 
                             left: parent.left
-                            leftMargin: searchFieldMargin // - this.width - Theme.paddingMedium
                             verticalCenter: parent.verticalCenter
 
                         }
@@ -203,12 +194,12 @@ Page {
                         anchors {
 
                             left: settings.showItemIconsInList ? docIcon.right : parent.left
-                            leftMargin: settings.showItemIconsInList ? Theme.paddingMedium : searchFieldMargin
                             verticalCenter: parent.verticalCenter
 
                         }
 
-                        width: page.width - this.x - (Theme.paddingMedium * 2)
+                        leftPadding: Theme.paddingSmall
+                        width: settings.showItemIconsInList ? page.width - docIcon.width - (Theme.paddingMedium * 2) : page.width - (Theme.paddingMedium * 2)
                         truncationMode: TruncationMode.Fade
                         text: title
                         color: delegate.highlighted ? Theme.highlightColor : enabled ? Theme.primaryColor : Theme.secondaryColor
@@ -477,3 +468,4 @@ Page {
     }
 
 }
+    
