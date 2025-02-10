@@ -27,6 +27,18 @@ public:
 
     }
 
+    Q_INVOKABLE void startWithEnv(const QString &program, const QVariantList &arguments, const QString &sessionKey) {
+// was trying to get creating an item to work.
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        env.insert("OP_SESSION", sessionKey);
+        env.insert("OP_DEBUG", "true");
+        QStringList args;
+        for (int i = 0; i < arguments.length(); i++) args << arguments[i].toString();
+        QProcess::setProcessEnvironment(env);
+        QProcess::start(program, args);
+
+    }
+
     Q_INVOKABLE QByteArray readAll() {
 
         return QProcess::readAll();
