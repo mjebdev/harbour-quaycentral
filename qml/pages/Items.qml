@@ -54,16 +54,7 @@ Page {
             Component.onCompleted: {
 
                 otpDisplayedOnCover = false;
-                searchFieldMargin = this.textLeftMargin;
-
-                if (searchFieldMargin > Theme.paddingLarge) { // OS version 4.5 or earlier - rendered differently.
-
-                    if (settings.showItemIconsInList) searchFieldMargin = searchFieldMargin - Theme.iconSizeMedium - Theme.paddingMedium;
-
-                }
-
-                else if (!settings.showItemIconsInList) searchFieldMargin = searchFieldMargin + Theme.iconSizeMedium + Theme.paddingMedium;
-                if (searchField.text === "") searchField.forceActiveFocus();
+                searchField.forceActiveFocus();
 
             }
 
@@ -115,9 +106,9 @@ Page {
 
             Row {
 
-                width: parent.width
+                width: parent.width - Theme.horizontalPageMargin
                 id: itemRow
-                spacing: Theme.paddingMedium
+                x: Theme.horizontalPageMargin
 
                 BackgroundItem {
 
@@ -129,49 +120,33 @@ Page {
                         id: itemIcon
                         source: iconUrl
                         visible: iconEmoji === "" && settings.showItemIconsInList
-
-                        anchors {
-
-                            left: parent.left
-                            leftMargin: searchFieldMargin
-                            verticalCenter: parent.verticalCenter
-
-                        }
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        height: Theme.iconSizeMedium
+                        width: height
 
                     }
                     
                     Label {
                         
                         id: itemEmojiIcon
-                        padding: 0
                         visible: iconEmoji !== "" && settings.showItemIconsInList
                         text: iconEmoji
                         font.pixelSize: Theme.fontSizeExtraLarge
                         color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
                         width: Theme.iconSizeMedium
                         horizontalAlignment: "AlignHCenter"
-
-                        anchors {
-                            
-                            left: parent.left
-                            leftMargin: searchFieldMargin
-                            verticalCenter: parent.verticalCenter
-                            
-                        }
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
 
                     }
 
                     Label {
 
-                        anchors {
-
-                            left: settings.showItemIconsInList ? itemIcon.visible ? itemIcon.right : itemEmojiIcon.right : parent.left
-                            leftMargin: settings.showItemIconsInList ? Theme.paddingMedium : searchFieldMargin
-                            verticalCenter: parent.verticalCenter
-
-                        }
-
-                        width: page.width - this.x - (Theme.paddingMedium * 2)
+                        anchors.left: settings.showItemIconsInList ? itemIcon.visible ? itemIcon.right : itemEmojiIcon.right : parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        leftPadding: Theme.paddingSmall
+                        width: settings.showItemIconsInList ? page.width - Theme.iconSizeMedium - (Theme.horizontalPageMargin * 2) : page.width - (Theme.horizontalPageMargin * 2)
                         truncationMode: TruncationMode.Fade
                         text: title
                         color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
