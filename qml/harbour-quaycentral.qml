@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Process 1.0
+import QcJsonFile 1.0
 import Nemo.Notifications 1.0
 import Nemo.Configuration 1.0
 import "pages"
@@ -37,7 +38,6 @@ ApplicationWindow {
         property bool autoDownloadRpmAarch64: true
         property bool forceOverwriteDocs
         property bool showItemIconsInList: true
-
         property bool vaultPageDisplayApiCredential: true
         property bool vaultPageDisplayBankAccount: true
         property bool vaultPageDisplayCreditCard: true
@@ -168,16 +168,7 @@ ApplicationWindow {
         function update(searchFieldText) {
 
             clear();
-
-            for (var i = 0; i < itemListModel.count; i++) {
-
-                if (searchFieldText === "" || itemListModel.get(i).titleUpperCase.indexOf(searchFieldText.toUpperCase()) >= 0) {
-
-                    append(itemListModel.get(i));
-
-                }
-
-            }
+            for (var i = 0; i < itemListModel.count; i++) if (searchFieldText === "" || itemListModel.get(i).titleUpperCase.indexOf(searchFieldText.toUpperCase()) >= 0) append(itemListModel.get(i));
 
         }
 
@@ -457,6 +448,7 @@ ApplicationWindow {
         mainOtpTimer.stop();
         signOutProcess.start("op", ["signout"]);
         signOutProcess.waitForFinished();
+        pageStack.completeAnimation(); // Avoiding a "cannot push while transition is in progress" error on the New Item page.
 
         if (signOutProcess.exitStatus() === 0 && errorReadout === "") {
 

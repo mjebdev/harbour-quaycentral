@@ -567,7 +567,7 @@ Page {
 
                 id: specifyVaultsPageCategoriesSwitch
                 text: qsTr("List only selected categories");
-                description: checked ? qsTr("Toggle switch to edit selected categories.") : null
+                description: checked ? qsTr("Toggle switch to edit selected categories.") : ""
                 checked: settings.limitedCatsVaultsPage
                 automaticCheck: false
 

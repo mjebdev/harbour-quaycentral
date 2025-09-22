@@ -77,6 +77,18 @@ Page {
 
             }
 
+
+        }
+
+        PushUpMenu {
+
+            MenuItem {
+
+                text: qsTr("Create Item")
+                onClicked: pageStack.push(Qt.resolvedUrl("NewItem.qml"));
+
+            }
+
         }
 
         header: Column {
@@ -500,4 +512,3 @@ Page {
     }
 
 }
-    

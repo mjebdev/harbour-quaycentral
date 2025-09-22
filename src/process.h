@@ -27,15 +27,26 @@ public:
 
     }
 
-    Q_INVOKABLE void startWithEnv(const QString &program, const QVariantList &arguments, const QString &sessionKey) {
-// was trying to get creating an item to work.
-        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-        env.insert("OP_SESSION", sessionKey);
-        env.insert("OP_DEBUG", "true");
-        QStringList args;
-        for (int i = 0; i < arguments.length(); i++) args << arguments[i].toString();
-        QProcess::setProcessEnvironment(env);
-        QProcess::start(program, args);
+    Q_INVOKABLE void commandWithPipedInput(const QString &program1, const QVariantList &arguments1, const QString &program2, const QVariantList &arguments2) {
+
+        // Thanks to leemes on StackOverflow for providing an example of simulated piped input using QProcess.
+        // https://stackoverflow.com/questions/10701504/command-working-in-terminal-but-not-via-qprocess
+
+        QStringList args1;
+        for (int i = 0; i < arguments1.length(); i++) args1 << arguments1[i].toString();
+        QStringList args2;
+        for (int i = 0; i < arguments2.length(); i++) args2 << arguments2[i].toString();
+        QProcess command1;
+        QProcess command2;
+        command1.setStandardOutputProcess(&command2);
+        command1.start(program1, args1);
+        command2.start(program2, args2);
+        command2.waitForFinished();
+        QByteArray standardOutput = command2.readAllStandardOutput();
+        QByteArray standardError = command2.readAllStandardError();
+        command1.close();
+        command2.close();
+        newItemFinished(standardOutput, standardError);
 
     }
 
@@ -74,6 +85,10 @@ public:
         return QProcess::exitStatus();
 
     }
+
+signals:
+
+    void newItemFinished(QByteArray standardOutput, QByteArray standardError);
 
 };
 

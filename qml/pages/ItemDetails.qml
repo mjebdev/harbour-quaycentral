@@ -431,13 +431,7 @@ Page {
 
                                                 largeTypeModel.clear();
                                                 var pwdString = itemDetailsPasswordField.text;
-
-                                                for (var i = 0; i < pwdString.length; i++) {
-
-                                                    largeTypeModel.append({"character": pwdString.slice(i, i + 1)});
-
-                                                }
-
+                                                for (var i = 0; i < pwdString.length; i++) largeTypeModel.append({"character": pwdString.slice(i, i + 1)});
                                                 pageStack.push(Qt.resolvedUrl("LargeType.qml"));
 
                                             }
@@ -526,23 +520,23 @@ Page {
 
                                             Rectangle {
 
-                                                height: gatheringOtpBusy.height + (gatheringOtpBusy.y * 2)
+                                                height: gatheringOtpBusy.height + Theme.paddingMedium
                                                 color: "transparent"
                                                 opacity: 1.0
-                                                radius: 20
+                                                radius: 10
 
                                                 anchors {
 
-                                                    top: parent.top
                                                     left: parent.left
                                                     right: parent.right
+                                                    verticalCenter: parent.verticalCenter
 
                                                 }
 
                                                 border {
 
                                                     width: 3
-                                                    color: localVarOtpSecondsLeft < 11 ? Theme.errorColor : Theme.highlightColor
+                                                    color: localVarOtpSecondsLeft < 10 ? Theme.errorColor : Theme.highlightColor
 
                                                 }
 

@@ -38,7 +38,7 @@ Page {
 
                 getToSetupPage.visible = false; // incase coming back from setup page without CLI yet installed.
                 statusLabel.text = "";
-                statusLabel.color = Theme.primaryColor;
+                statusLabel.color = Theme.highlightColor;
                 statusLabel.horizontalAlignment = "AlignHCenter";
                 checkingShorthand = false; // starting over
                 appPastLaunch = true;
@@ -92,9 +92,9 @@ Page {
                 Label {
 
                     id: appVersionLabel
-                    text: "v0.9.4"
+                    text: "v0.10"
                     font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.secondaryColor
+                    color: Theme.secondaryHighlightColor
                     width: parent.width
                     horizontalAlignment: "AlignHCenter"
                     verticalAlignment: "AlignTop"
@@ -116,7 +116,7 @@ Page {
                     id: statusLabel
                     text: ""
                     font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.primaryColor
+                    color: Theme.highlightColor
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignTop
@@ -168,7 +168,7 @@ Page {
                         else {
 
                             statusLabel.text = "";
-                            statusLabel.color = Theme.primaryColor; // back to default color
+                            statusLabel.color = Theme.highlightColor; // back to default color
                             loginButton.enabled = true;
                             loginButton.opacity = 1.0;
                             EnterKey.enabled = true;
@@ -265,7 +265,7 @@ Page {
                             statusRow.height = column.height * 0.12;
                             setupButtonLayout.visible = false;
                             titleLabel.opacity = 1.0;
-                            appVersionLabel.color = Theme.secondaryColor;
+                            appVersionLabel.color = Theme.secondaryHighlightColor;
                             appPastLaunch = false;
                             pageStack.push(Qt.resolvedUrl("Setup.qml"));
 
@@ -293,7 +293,7 @@ Page {
             cliVersion = readAllStandardOutput();
             cliVersion = cliVersion.trim();
             titleLabel.opacity = 1.0;
-            appVersionLabel.color = Theme.secondaryColor;
+            appVersionLabel.color = Theme.secondaryHighlightColor;
             checkingShorthand = true;
             architectureCheck.start("op", ["account", "list", "--format", "json"]);
 
@@ -311,11 +311,8 @@ Page {
 
                 const listOfAccounts = readAllStandardOutput();
 
-                console.log("Got past readyReadyStandardOutput for process.");
-
                 if (listOfAccounts == "[]") {
 
-                    console.log("listOfAccounts blank or null. Status label should be showing.");
                     loggingInBusy.running = false;
                     statusLabel.horizontalAlignment = "AlignLeft";
                     statusLabel.text = "<style>a{color:" + Theme.primaryColor + ";}</style>" + qsTr("QuayCentral shorthand has not been added to the 1Password command-line tool.\n\nClick 'Setup' below to add, or manually add via Terminal [op account add --shorthand quaycentsfos]. Instructions @ <a href='https://developer.1password.com/docs/cli/sign-in-manually/#set-a-custom-account-shorthand'>1Password Developer</a>.");
@@ -326,7 +323,6 @@ Page {
 
                 else {
 
-                    console.log("listOfAccounts not blank, checking for shorthand now.");
                     var parsedListOfAccounts = JSON.parse(listOfAccounts);
                     var matchFound = false;
                     for (var i = 0; i < parsedListOfAccounts.length; i++) if (parsedListOfAccounts[i].shorthand == "quaycentsfos") matchFound = true;
@@ -334,7 +330,7 @@ Page {
                     if (matchFound) {
 
                         titleLabel.opacity = 1.0; // incase coming back from setup page etc.
-                        appVersionLabel.color = Theme.secondaryColor;
+                        appVersionLabel.color = Theme.secondaryHighlightColor;
                         passwordField.visible = true;
                         passwordField.opacity = 1.0;
 
@@ -480,6 +476,7 @@ Page {
                     itemSearchModel.clear();
                     processOne.waitForFinished();
                     var prelimOutput = readAllStandardOutput();
+
                     var itemList = JSON.parse(prelimOutput);
 
                     if (itemCategoryListingType == "") {
@@ -503,9 +500,7 @@ Page {
                             case "DATABASE": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "", iconEmoji: "🗃️"});
                                 break;
 
-                            case "DOCUMENT":
-                                if (itemList[i].overview.ainfo !== null) itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-file-document-dark", iconEmoji: "", docCreatedAt: itemList[i].created_at, docUpdatedAt: itemList[i].updated_at, docAdditionalInfo: itemList[i].overview.ainfo});
-                                else itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-file-document-dark", iconEmoji: "", docCreatedAt: itemList[i].created_at, docUpdatedAt: itemList[i].updated_at});
+                            case "DOCUMENT": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-file-document-dark", iconEmoji: "", docCreatedAt: itemList[i].created_at, docUpdatedAt: itemList[i].updated_at, docAdditionalInfo: itemList[i].additional_information});
                                 break;
 
                             case "DRIVER_LICENSE": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "", iconEmoji: "🚘"});
@@ -732,11 +727,11 @@ Page {
 
             errorReadout = readAllStandardError();
 
-            if (errorReadout.indexOf("Unauthorized") !== -1) {
+            if (errorReadout.indexOf("Unauthorized") != -1 || errorReadout.indexOf("not currently signed in") != -1) {
 
                 loggingInBusy.running = false;
                 statusLabel.color = Theme.errorColor;
-                statusLabel.text = qsTr("Incorrect password");
+                statusLabel.text = qsTr("That didn't work. Please try again.");
                 passwordField.visible = true;
                 passwordField.opacity = 1.0;
 
@@ -779,6 +774,8 @@ Page {
 
             else {
 
+                console.log("Error being caught where it should be but the string was not properly recognized when checking.");
+                console.log("Value of whether string is part of error: " + (errorReadout.indexOf("not currently signed in") != -1));
                 loggingInBusy.running = false;
                 statusLabel.color = Theme.errorColor;
                 statusLabel.text = qsTr("Error: ") + errorReadout.slice(28);
@@ -932,9 +929,7 @@ Page {
                 case "DATABASE": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "", iconEmoji: "🗃️"});
                     break;
 
-                case "DOCUMENT":
-                    if (itemList[i].overview.ainfo !== null) itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-file-document-dark", iconEmoji: "", docCreatedAt: itemList[i].created_at, docUpdatedAt: itemList[i].updated_at, docAdditionalInfo: itemList[i].overview.ainfo});
-                    else itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-file-document-dark", iconEmoji: "", docCreatedAt: itemList[i].created_at, docUpdatedAt: itemList[i].updated_at});
+                case "DOCUMENT": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "image://theme/icon-m-file-document-dark", iconEmoji: "", docCreatedAt: itemList[i].created_at, docUpdatedAt: itemList[i].updated_at, docAdditionalInfo: itemList[i].additional_information});
                     break;
 
                 case "DRIVER_LICENSE": itemListModel.append({uuid: itemList[i].id, title: itemList[i].title, titleUpperCase: itemList[i].title.toUpperCase(), templateUuid: itemList[i].category, itemVaultId: itemList[i].vault.id, itemVaultName: itemList[i].vault.name, iconUrl: "", iconEmoji: "🚘"});
@@ -1038,4 +1033,3 @@ Page {
     }
 
 }
-    

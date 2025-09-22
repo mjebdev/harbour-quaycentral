@@ -5,6 +5,7 @@
 #include <QtQml>
 #include <sailfishapp.h>
 #include "process.h"
+#include "qcJsonFile.h"
 
 int main(int argc, char *argv[]) {
 
@@ -19,7 +20,7 @@ int main(int argc, char *argv[]) {
     // To display the view, call "show()" (will show fullscreen on device).
 
     qmlRegisterType<Process>("Process", 1, 0, "Process");
+    qmlRegisterType<QcJsonFile>("QcJsonFile", 1, 0, "QcJsonFile");
     return SailfishApp::main(argc, argv);
 
 }
-    

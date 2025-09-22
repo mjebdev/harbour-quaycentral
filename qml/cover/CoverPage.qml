@@ -39,8 +39,8 @@ CoverBackground {
 
     }
 
-    ListView {
-
+    ListView {  // Need to refactor this to avoid so many rows and columns, possibly related to issue with OTP
+                // disappearing? Simplifying may help in any case.
         id: otpListView
 
         anchors {
@@ -259,4 +259,3 @@ CoverBackground {
     }
 
 }
-    

@@ -9,6 +9,7 @@ Page {
     id: page
     allowedOrientations: Orientation.PortraitMask
     property string itemCopied
+    property string passwordStr
     property int searchFieldMargin
     property bool allItemDetails
 
@@ -106,9 +107,9 @@ Page {
 
             Row {
 
-                width: parent.width - Theme.horizontalPageMargin
+                width: parent.width
                 id: itemRow
-                x: Theme.horizontalPageMargin
+                //x: Theme.horizontalPageMargin
 
                 BackgroundItem {
 
@@ -122,6 +123,7 @@ Page {
                         visible: iconEmoji === "" && settings.showItemIconsInList
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: parent.left
+                        anchors.leftMargin: Theme.horizontalPageMargin
                         height: Theme.iconSizeMedium
                         width: height
 
@@ -137,6 +139,7 @@ Page {
                         width: Theme.iconSizeMedium
                         horizontalAlignment: "AlignHCenter"
                         anchors.left: parent.left
+                        anchors.leftMargin: Theme.horizontalPageMargin
                         anchors.verticalCenter: parent.verticalCenter
 
                     }
@@ -144,6 +147,7 @@ Page {
                     Label {
 
                         anchors.left: settings.showItemIconsInList ? itemIcon.visible ? itemIcon.right : itemEmojiIcon.right : parent.left
+                        anchors.leftMargin: settings.showItemIconsInList ? 0 : Theme.horizontalPageMargin
                         anchors.verticalCenter: parent.verticalCenter
                         leftPadding: Theme.paddingSmall
                         width: settings.showItemIconsInList ? page.width - Theme.iconSizeMedium - (Theme.horizontalPageMargin * 2) : page.width - (Theme.horizontalPageMargin * 2)
@@ -241,7 +245,11 @@ Page {
 
             else {
 
-                Clipboard.text = prelimOutput;
+                // issues with trim not working when directly applying it to prelimOutput
+                passwordStr = prelimOutput;
+                passwordStr = passwordStr.trim();
+                Clipboard.text = passwordStr;
+                passwordStr = "";
                 itemsPageNotification.previewSummary = qsTr("%1 password copied.").arg(itemCopied);
                 itemsPageNotification.publish();
 

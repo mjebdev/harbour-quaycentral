@@ -23,6 +23,7 @@ DISTFILES += qml/harbour-quaycentral.qml \
     qml/pages/ItemDetails.qml \
     qml/pages/Items.qml \
     qml/pages/LargeType.qml \
+    qml/pages/NewItem.qml \
     qml/pages/SelectCategories.qml \
     qml/pages/Settings.qml \
     qml/pages/Setup.qml \
@@ -51,4 +52,5 @@ QT += core
 # keeping 'harbour-quaycentral.ts' up to date should anyone wish to translate
 # TRANSLATIONS += translations/harbour-quaycentral-de.ts
 
-HEADERS += src/process.h
+HEADERS += src/process.h \
+    src/qcJsonFile.h
