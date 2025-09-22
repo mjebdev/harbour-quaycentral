@@ -46,10 +46,9 @@ Much-appreciated icon contribution from [JSEHV](https://github.com/JSEHV).
 - When removing the shorthand access for QuayCentral, user will need to get back into Terminal but may also remove the CLI from authorized devices on their 1Password profile page. More info on revoking access:  
     https://developer.1password.com/docs/cli/reference/commands/signout  
     https://developer.1password.com/docs/cli/reference/management-commands/account/#account-forget
+- A note on links in previous versions: GitHub and donation links were updated for version 0.9.3 and are broken on earlier versions. Please find updated donation links below. Also, the email address in the About section of versions 0.5 and 0.5.1 (qc at mjbdev.net) is now inactive. Please send any feedback to: [feedback@mjeb.dev](mailto:feedback@mjeb.dev) - Thanks
 
 ### Tips
 
 - [Ko-fi](https://ko-fi.com/mjebdev)
 - [PayPal](https://paypal.me/mjebdev)
-
-A note on links in previous versions: GitHub and donation links were updated for version 0.9.3 and are broken on earlier versions. Please find updated donation links below. Also, the email address in the About section of versions 0.5 and 0.5.1 (qc at mjbdev.net) is now inactive. Please send any feedback to: [feedback@mjeb.dev](mailto:feedback@mjeb.dev) - Thanks
