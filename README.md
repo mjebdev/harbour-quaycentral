@@ -20,7 +20,7 @@ Much-appreciated icon contribution from [JSEHV](https://github.com/JSEHV).
 
 ### Limitations & Issues
 
-- New item creation functionality limited to in the categories Logins (without one-time passcodes), Wireless Routers and Secure Notes.
+- New item creation functionality limited to Logins (without one-time passcodes), Wireless Routers and Secure Notes.
 - Lockout timer may not function if device is put to sleep etc. and so is not meant as a reliable replacement for manually locking vault(s) using one of the available methods.
 - Lockout timer only goes by the app's interaction with the CLI and isn't reset by any user interaction that doesn't access data, such as swiping back, going to Settings, etc. If part of an item, the one-time password is obtained every 30 seconds using the CLI but can be stopped from continuing by using the Close button on the app cover or just swiping back from the item details if inside the app.
 - One-time password will sometimes disappear from Cover and the Item page in the app after loading, reason as yet unknown. Will fix as soon as cause is identified.
