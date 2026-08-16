@@ -1,7 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Process 1.0
-import QcJsonFile 1.0
 import Nemo.Notifications 1.0
 import Nemo.Configuration 1.0
 import "pages"
@@ -83,11 +82,7 @@ ApplicationWindow {
     property bool uploadFin
     property bool itemListingFin
 
-    // Testing w/ OTP variables instead of a ListModel
-
     property string varOtp
-    //property string varOtpPart1
-    //property string varOtpPart2
     property int varOtpSecondsLeft
     property bool varOtpPrimaryColor: true
     property bool varOtpActive
