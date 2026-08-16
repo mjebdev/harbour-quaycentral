@@ -145,7 +145,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\nmjeb.dev\n\nVersion 0.9.2\nLicensed under GNU GPLv3\n\nApp icon by JSEHV on GitHub--Thank you for this contribution.\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.</source>
+        <source>A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\n\nVersion 0.11\nLicensed under GNU GPLv3\n\nThanks to JSEHV on GitHub for the app icon.\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tip or View Source Code</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -177,7 +181,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Search items</source>
+        <source>Search documents</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -653,7 +657,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;p&gt;Guide to completing installation @ &lt;a href=&quot;https://developer.1password.com/docs/cli/get-started&quot;&gt;1Password Developer&lt;/a&gt;&lt;/p&gt;</source>
+        <source>&lt;p&gt;Visit &lt;a href=&quot;https://developer.1password.com/docs/cli/get-started&quot;&gt;1Password Developer&lt;/a&gt; for a complete CLI installation guide.&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -831,7 +835,7 @@ Download has taken longer than one minute. Please check Downloads folder for com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Incorrect password</source>
+        <source>That didn't work. Please try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
