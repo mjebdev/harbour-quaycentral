@@ -22,7 +22,7 @@ CoverBackground {
 
         id: coverBackgroundIcon
         source: "BW_harbour-quaycentral.png"
-        width: parent.height - (Theme.paddingMedium * 2)
+        width: parent.width - (Theme.paddingLarge * 2)
         height: width
         fillMode: Image.PreserveAspectFit
         opacity: 0.15
@@ -30,17 +30,14 @@ CoverBackground {
         anchors {
 
             verticalCenter: parent.verticalCenter
-            bottom: parent.bottom
-            bottomMargin: Theme.paddingMedium
-            right: parent.right
-            rightMargin: Theme.paddingMedium
+            horizontalCenter: parent.horizontalCenter
 
         }
 
     }
 
-    ListView {  // Need to refactor this to avoid so many rows and columns, possibly related to issue with OTP
-                // disappearing? Simplifying may help in any case.
+    ListView {
+
         id: otpListView
 
         anchors {
