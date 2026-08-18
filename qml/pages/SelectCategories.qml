@@ -30,7 +30,7 @@ Page {
 
             }
 
-            BackgroundItem { // Avoiding a repeater/model method for now due to the way settings need to be synced.
+            BackgroundItem {
 
                 width: parent.width
 
@@ -475,4 +475,3 @@ Page {
     }
 
 }
-    
