@@ -850,8 +850,8 @@ Page {
                             topPadding: Theme.paddingLarge
                             font.pixelSize: Theme.fontSizeSmall
                             wrapMode: Text.Wrap
-                            horizontalAlignment: Text.AlignHCenter
-                            text: qsTr("<p>Visit <a href=\"https://developer.1password.com/docs/cli/get-started\">1Password Developer</a> for a complete CLI installation guide.</p>")
+                            //horizontalAlignment: Text.AlignHCenter
+                            text: qsTr("<p>Please visit <a href=\"https://developer.1password.com/docs/cli/get-started\">1Password Developer</a> for a complete CLI installation guide.</p>")
                             linkColor: Theme.highlightColor
 
                             Text {
@@ -962,8 +962,8 @@ Page {
 
             Row {
 
-                width: parent.width
                 height: Theme.paddingLarge
+                width: parent.width
 
             }
 
@@ -990,8 +990,6 @@ Page {
             }
 
             accountsLabel.text = "<pre>" + accountsString + "</pre>";
-            // way to wait for accountsLabel to finish displaying text? below method doesn't go all the way to bottom of screen..
-            //settingsFlickable.scrollToBottom(); -- testing using onTextChanged in accountsLabel instead..
 
         }
 
