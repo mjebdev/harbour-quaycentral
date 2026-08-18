@@ -92,7 +92,7 @@ Page {
                 Label {
 
                     id: appVersionLabel
-                    text: "v0.10"
+                    text: "v0.11"
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.secondaryHighlightColor
                     width: parent.width
@@ -265,7 +265,7 @@ Page {
                             statusRow.height = column.height * 0.12;
                             setupButtonLayout.visible = false;
                             titleLabel.opacity = 1.0;
-                            appVersionLabel.color = Theme.secondaryHighlightColor;
+                            appVersionLabel.opacity = 1.0;
                             appPastLaunch = false;
                             pageStack.push(Qt.resolvedUrl("Setup.qml"));
 
@@ -293,7 +293,7 @@ Page {
             cliVersion = readAllStandardOutput();
             cliVersion = cliVersion.trim();
             titleLabel.opacity = 1.0;
-            appVersionLabel.color = Theme.secondaryHighlightColor;
+            appVersionLabel.opacity = 1.0;
             checkingShorthand = true;
             architectureCheck.start("op", ["account", "list", "--format", "json"]);
 
@@ -330,7 +330,7 @@ Page {
                     if (matchFound) {
 
                         titleLabel.opacity = 1.0; // incase coming back from setup page etc.
-                        appVersionLabel.color = Theme.secondaryHighlightColor;
+                        appVersionLabel.opacity = 1.0;
                         passwordField.visible = true;
                         passwordField.opacity = 1.0;
 
@@ -737,7 +737,7 @@ Page {
 
             }
 
-            else if (errorReadout.indexOf("o accounts configured") !== -1 || errorReadout.indexOf("o accounts found matching filter") !== -1) {
+            else if (errorReadout.indexOf("no accounts configured") !== -1 || errorReadout.indexOf("no accounts found matching filter") !== -1) {
 
                 loggingInBusy.running = false;
                 statusLabel.horizontalAlignment = "AlignLeft";
@@ -780,7 +780,7 @@ Page {
                 statusLabel.color = Theme.errorColor;
                 statusLabel.text = qsTr("Error: ") + errorReadout.slice(28);
                 titleLabel.opacity = 0.5;
-                appVersionLabel.color = "grey"
+                appVersionLabel.opacity = 0.5;
                 statusRow.height = statusLabel.height;
 
             }
@@ -1013,7 +1013,7 @@ Page {
         onTriggered: {
 
             titleLabel.opacity = 0.5;
-            appVersionLabel.color = "grey";
+            appVersionLabel.opacity = 0.5;
             statusLabel.horizontalAlignment = "AlignLeft";
             statusLabel.color = Theme.highlightColor;
 
