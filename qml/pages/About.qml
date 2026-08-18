@@ -40,79 +40,31 @@ Page {
 
                     Row {
 
-                        width: parent.width * 0.25
+                        width: aboutIcon.width + aboutTitle.width
                         x: (parent.width - this.width) / 2
-                        //bottomPadding: Theme.paddingLarge
 
                         Image {
 
-                            width: parent.width
+                            id: aboutIcon
                             source: "harbour-quaycentral.svg";
-                            height: width
+                            height: Theme.itemSizeSmall
+                            width: height
 
                         }
 
-                    }
-
-                    Row {
-
-                        width: appTitleLabel.width
-                        x: (parent.width - appTitleLabel.width) * 0.5
-
                         Label {
 
+                            id: aboutTitle
                             text: "QuayCentral"
                             width: text.width
-                            height: text.height
-                            horizontalAlignment: Qt.AlignHCenter
-                            id: appTitleLabel
-                            font.pixelSize: Theme.fontSizeLarge
-                            //font.bold: true
-                            color: Theme.highlightColor
-                            topPadding: Theme.paddingLarge
-                            bottomPadding: Theme.paddingLarge
+                            height: Theme.itemSizeSmall
+                            verticalAlignment: Qt.AlignVCenter
+                            font.pixelSize: Theme.fontSizeExtraLarge
+                            font.bold: true
+                            anchors.verticalCenter: parent.verticalCenter
+                            leftPadding: Theme.paddingMedium
 
                         }
-
-                    }
-
-                    Separator {
-
-                        id: titleSeparator
-                        width: parent.width * 0.66
-                        x: (page.width - this.width) * 0.5
-                        horizontalAlignment: Separator.Center
-                        color: Theme.highlightColor
-
-                    }
-
-                    Row {
-
-                        width: parent.width * 0.66
-                        x: parent.width * 0.17
-                        height: aboutTextLabel.height
-
-                        Label {
-
-                            id: aboutTextLabel
-                            width: parent.width
-                            font.pixelSize: Theme.fontSizeExtraSmall
-                            color: Theme.highlightColor
-                            wrapMode: Text.Wrap
-                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\n\nVersion 0.10\nLicensed under GNU GPLv3\n\nMuch-appreciated icon contribution from JSEHV on GitHub.\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
-                            topPadding: Theme.paddingLarge
-                            bottomPadding: Theme.paddingLarge
-
-                        }
-
-                    }
-
-                    Separator {
-
-                        width: parent.width * 0.66
-                        x: (page.width - this.width) * 0.5
-                        horizontalAlignment: Separator.Center
-                        color: Theme.highlightColor
 
                     }
 
@@ -125,22 +77,54 @@ Page {
 
                     Row {
 
-                        width: parent.width * 0.34
-                        x: parent.width * 0.33
-                        height: parent.width * 0.2
+                        width: parent.width - (Theme.horizontalPageMargin * 2)
+                        x: Theme.horizontalPageMargin
+                        height: aboutTextLabel.height
+
+                        Label {
+
+                            id: aboutTextLabel
+                            width: parent.width
+                            font.pixelSize: Theme.fontSizeExtraSmall
+                            wrapMode: Text.Wrap
+                            text: qsTr("A GUI app for the 1Password command-line tool on Sailfish OS.\n\nby Michael J. Barrett\n\nVersion 0.11\nLicensed under GNU GPLv3\n\nThanks to JSEHV on GitHub for the app icon.\n\nQuayCentral is an unofficial application and is in no way associated with 1Password or AgileBits, Inc.\n\nVersion %1 of the 1Password command-line tool is installed on your device.").arg(cliVersion);
+                            topPadding: Theme.paddingLarge
+                            bottomPadding: Theme.paddingLarge
+
+                        }
+
+                    }
+
+                    SectionHeader {
+
+                        text: qsTr("Tip or View Source Code")
+
+                    }
+
+                    Row {
+
+                        width: parent.width
+                        height: Theme.paddingLarge * 2
+
+                    }
+
+                    Row {
+
+                        width: parent.width
+                        height: Theme.itemSizeLarge
 
                         Image {
 
-                            id: linkToGitHub
-                            source: Theme.colorScheme == Theme.DarkOnLight ? "GitHub_Logo_cropped_to_content.png" : "GitHub_Logo_White_cropped_to_content.png"
+                            source: Theme.colorScheme == Theme.DarkOnLight ? "BMClogowithwordmark-black.png" : "BMClogowithwordmark-white.png"
                             fillMode: Image.PreserveAspectFit
-                            width: parent.width
-                            y: (parent.height - height) * 0.5
+                            height: Theme.itemSizeLarge
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
 
                             MouseArea {
 
                                 anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("https://github.com/mjebdev/harbour-quaycentral");
+                                onClicked: Qt.openUrlExternally("https://www.buymeacoffee.com/mjebdev");
 
                             }
 
@@ -150,22 +134,28 @@ Page {
 
                     Row {
 
-                        width: parent.width * 0.34
-                        x: parent.width * 0.33
-                        height: parent.width * 0.2
+                        width: parent.width
+                        height: Theme.paddingLarge * 2
+
+                    }
+
+                    Row {
+
+                        width: parent.width
+                        height: Theme.itemSizeMedium
 
                         Image {
 
-                            id: linkToKoFi
-                            source: "kofi_logo.webp"
+                            source: Theme.colorScheme == Theme.DarkOnLight ? "GitHub_Lockup_Black.png" : "GitHub_Lockup_White.png"
                             fillMode: Image.PreserveAspectFit
-                            width: parent.width
-                            y: (parent.height - height) * 0.5
+                            height: Theme.itemSizeSmall
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
 
                             MouseArea {
 
                                 anchors.fill: parent
-                                onClicked: Qt.openUrlExternally("https://www.ko-fi.com/mjebdev");
+                                onClicked: Qt.openUrlExternally("https://github.com/mjebdev/harbour-quaycentral");
 
                             }
 
