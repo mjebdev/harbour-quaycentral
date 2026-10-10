@@ -341,16 +341,18 @@ ApplicationWindow {
 
         onReadyReadStandardOutput: {
 
-            var otpOutput = readAllStandardOutput();
-            otpOutput = otpOutput.toString();
-            varOtp = otpOutput;
+            var prelimOutput = readAllStandardOutput();
             varOtpPrimaryColor = true;
             sessionExpiryTimer.restart();
             fetchingOtp = false;
+            var otpJson = JSON.parse(prelimOutput);
+            varOtp = otpJson.totp.trim();
 
         }
 
         onReadyReadStandardError: {
+
+            console.log("Output from mainGetOtp (error): " + readAllStandardError());
 
             errorReadout = readAllStandardError();
 
@@ -387,7 +389,6 @@ ApplicationWindow {
         id: mainOtpTimer
         interval: 500
         repeat: true
-        triggeredOnStart: false
 
         onTriggered: {
 
@@ -401,7 +402,7 @@ ApplicationWindow {
                 fetchingOtp = true;
                 varOtpSecondsLeft = 30;
                 varOtpPrimaryColor = false;
-                mainGetOtp.start("op", ["item", "get", itemDetailsModel.get(0).itemId, "--otp", "--vault", itemDetailsModel.get(0).itemVaultId, "--session", currentSession]);
+                mainGetOtp.start("op", ["item", "get", itemDetailsModel.get(0).itemId, "--format", "json", "--field", "type=otp", "--vault", itemDetailsModel.get(0).itemVaultId, "--session", currentSession]);
 
             }
 
